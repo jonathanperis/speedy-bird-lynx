@@ -191,6 +191,9 @@ pipes = {
                     b.bottom > p.top.top) {
                         gameState.current = gameState.gameOver
                         SFX_COLLISION.play()
+                        if (score.current > score.best) {
+                            score.best = score.current;
+                        }                        
                 }
                 //collision with bottom pipe
                 if (b.left < p.right &&
@@ -199,6 +202,9 @@ pipes = {
                     b.bottom > p.bot.top) {
                         gameState.current = gameState.gameOver
                         SFX_COLLISION.play()
+                        if (score.current > score.best) {
+                            score.best = score.current;
+                        }                        
                 }
             }
         }
@@ -300,7 +306,7 @@ map = [
 //current score, top score, tracker
 score = {
     current: 0,
-    best: null, // DO THIS STRETCH GOAL
+    best: 0,
     //values for drawing mapped numbers on canvas
     x: cvs.width/2,
     y: 40,
@@ -311,36 +317,51 @@ score = {
     },
     //display the score
     render: function() {
-        if (gameState.current == gameState.play ||
-            gameState.current == gameState.gameOver) {
-            //change current score number value to string value and access each place value
-            let string = this.current.toString()
-            let ones = string.charAt(string.length-1)
-            let tens = string.charAt(string.length-2)
-            let hundreds = string.charAt(string.length-3)
-
-            //if current score has thousands place value: the game is over
-            if (this.current >= 1000) {
-                gameState.current = gameState.gameOver
-            
-            //if current score has ones, tens, and hundreds place value only
-            } else if (this.current >= 100) {
-                ctx.drawImage(theme2, map[ones].imgX,map[ones].imgY,map[ones].width,map[ones].height, ( (this.x-this.w/2) + (this.w) + 3 ),this.y,this.w,this.h)
-
-                ctx.drawImage(theme2, map[tens].imgX,map[tens].imgY,map[tens].width,map[tens].height, ( (this.x-this.w/2) ),this.y,this.w,this.h)
-
-                ctx.drawImage(theme2, map[hundreds].imgX,map[hundreds].imgY,map[hundreds].width,map[hundreds].height, (   (this.x-this.w/2) - (this.w) - 3 ),this.y,this.w,this.h)
-
-            //if current score has ones and tens place value only
+        if (gameState.current == gameState.play) {
+            let string = this.current.toString();
+            let ones = string.charAt(string.length-1);
+            let tens = string.charAt(string.length-2);
+            let hundreds = string.charAt(string.length-3);
+    
+            if (this.current >= 100) {
+                ctx.drawImage(theme2, map[hundreds].imgX, map[hundreds].imgY, map[hundreds].width, map[hundreds].height, ( (this.x-this.w/2) - (this.w) - 3 ), this.y, this.w, this.h);
+                ctx.drawImage(theme2, map[tens].imgX, map[tens].imgY, map[tens].width, map[tens].height, ( (this.x-this.w/2) ), this.y, this.w, this.h);
+                ctx.drawImage(theme2, map[ones].imgX, map[ones].imgY, map[ones].width, map[ones].height, ( (this.x-this.w/2) + (this.w) + 3 ), this.y, this.w, this.h);
             } else if (this.current >= 10) {
-                ctx.drawImage(theme2, map[ones].imgX,map[ones].imgY,map[ones].width,map[ones].height, ( (this.x-this.w/2) + (this.w/2) + 3 ),this.y,this.w,this.h)
-
-                ctx.drawImage(theme2, map[tens].imgX,map[tens].imgY,map[tens].width,map[tens].height, ( (this.x-this.w/2) - (this.w/2) - 3 ),this.y,this.w,this.h)
-            
-            //if current score has ones place value only
+                ctx.drawImage(theme2, map[tens].imgX, map[tens].imgY, map[tens].width, map[tens].height, ( (this.x-this.w/2) - (this.w/2) - 3 ), this.y, this.w, this.h);
+                ctx.drawImage(theme2, map[ones].imgX, map[ones].imgY, map[ones].width, map[ones].height, ( (this.x-this.w/2) + (this.w/2) + 3 ), this.y, this.w, this.h);
             } else {
-                ctx.drawImage(theme2, map[ones].imgX,map[ones].imgY,map[ones].width,map[ones].height, ( this.x-this.w/2 ),this.y,this.w,this.h)
+                ctx.drawImage(theme2, map[ones].imgX, map[ones].imgY, map[ones].width, map[ones].height, ( this.x-this.w/2 ), this.y, this.w, this.h);
             }
+        } else if (gameState.current == gameState.gameOver) {
+            // Adjusted positions - moved more to the left on game over panel
+            const panelCenterX = gameOver.x + gameOver.w/2;
+            const currentX = panelCenterX + 25;
+            const currentY = gameOver.y + 60;
+            const bestX = panelCenterX + 25;
+            const bestY = gameOver.y + 100;
+    
+            this.renderScore(this.current, currentX, currentY);
+            this.renderScore(this.best, bestX, bestY);
+        }
+    },
+    
+    // Add helper function to render scores
+    renderScore: function(number, x, y) {
+        let string = number.toString();
+        let ones = string.charAt(string.length-1);
+        let tens = string.charAt(string.length-2);
+        let hundreds = string.charAt(string.length-3);
+    
+        if (number >= 100) {
+            ctx.drawImage(theme2, map[hundreds].imgX, map[hundreds].imgY, map[hundreds].width, map[hundreds].height, x - this.w - 3, y, this.w, this.h);
+            ctx.drawImage(theme2, map[tens].imgX, map[tens].imgY, map[tens].width, map[tens].height, x, y, this.w, this.h);
+            ctx.drawImage(theme2, map[ones].imgX, map[ones].imgY, map[ones].width, map[ones].height, x + this.w + 3, y, this.w, this.h);
+        } else if (number >= 10) {
+            ctx.drawImage(theme2, map[tens].imgX, map[tens].imgY, map[tens].width, map[tens].height, x - (this.w/2) - 3, y, this.w, this.h);
+            ctx.drawImage(theme2, map[ones].imgX, map[ones].imgY, map[ones].width, map[ones].height, x + (this.w/2) + 3, y, this.w, this.h);
+        } else {
+            ctx.drawImage(theme2, map[ones].imgX, map[ones].imgY, map[ones].width, map[ones].height, x - (this.w/2), y, this.w, this.h);
         }
     }
 }    
@@ -437,6 +458,9 @@ bird = {
                 if (gameState.current == gameState.play) {
                     gameState.current = gameState.gameOver
                     SFX_FALL.play()
+                    if (score.current > score.best) {
+                        score.best = score.current;
+                    }                    
                 }
             }
             
@@ -676,6 +700,7 @@ let draw = () => {
     bird.render()
     getReady.render()
     gameOver.render()
+    score.render()
 }
 //updates on animation and position goes in here
 let update = () => {
