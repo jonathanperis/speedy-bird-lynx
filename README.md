@@ -92,7 +92,7 @@ https://noanonoa.github.io/flappy-bird/
     - [X] collision with floor and canvas ceiling
     - [X] cut screen
     - [X] restart game on 'click' start button
-        - [ ] display best score
+        - [X] display best score
         - [X] display current score
         - [X] reset score on start game
         - [X] reset pipes
