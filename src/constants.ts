@@ -1,11 +1,11 @@
 // Game dimensions — fullscreen on mobile
 // Width matches original, height is taller for fullscreen
 export const CANVAS_WIDTH = 400;
-export const CANVAS_HEIGHT = 800;
+export const CANVAS_HEIGHT = 700;
 
 // Bird
 export const BIRD_X = 80;
-export const BIRD_Y_START = 300;
+export const BIRD_Y_START = 250;
 export const BIRD_W = 34;
 export const BIRD_H = 24;
 export const BIRD_RADIUS = 12;
@@ -27,7 +27,7 @@ export const PIPE_H = 300;
 export const PIPE_GAP = 85;
 export const PIPE_DX = 2;
 export const PIPE_MIN_Y = -260;
-export const PIPE_MAX_Y = -120;
+export const PIPE_MAX_Y = -100;
 export const PIPE_SPAWN_INTERVAL = 100; // frames
 
 // Background
