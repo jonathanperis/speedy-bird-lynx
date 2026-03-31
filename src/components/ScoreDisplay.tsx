@@ -12,9 +12,9 @@ export default function ScoreDisplay({ score, visible }: ScoreDisplayProps) {
     <view
       style={{
         position: 'absolute',
-        top: 40,
-        left: 0,
-        width: CANVAS_WIDTH,
+        top: '40px',
+        left: '0px',
+        width: `${CANVAS_WIDTH}px`,
         zIndex: 4,
         display: 'flex',
         justifyContent: 'center',
@@ -24,10 +24,9 @@ export default function ScoreDisplay({ score, visible }: ScoreDisplayProps) {
       <text
         style={{
           color: '#ffffff',
-          fontSize: 36,
+          fontSize: '36px',
           fontWeight: 'bold',
           textAlign: 'center',
-          textShadow: '2px 2px 0px rgba(0,0,0,0.3)',
         }}
       >
         {score}

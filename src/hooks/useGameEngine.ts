@@ -35,336 +35,228 @@ import { audioModule } from '../audio/audio.js';
 
 let nextPipeId = 0;
 
+// Render state — everything the UI needs to draw a single frame
+export interface RenderState {
+  birdY: number;
+  birdRotation: number;
+  birdFrame: number;
+  bgX: number;
+  groundX: number;
+  pipes: PipeData[];
+  gameState: GameState;
+  score: number;
+  bestScore: number;
+}
+
 export function useGameEngine() {
-  // --- React state (only for mount/unmount of pipes and overlays) ---
-  const [pipes, setPipes] = useState<PipeData[]>([]);
-  const [gameStateView, setGameStateView] = useState<GameState>(STATE_READY);
-  const [score, setScore] = useState(0);
-  const [bestScore, setBestScore] = useState(0);
+  // All game state lives in a ref to avoid re-render per tick
+  const engine = useRef({
+    gameState: STATE_READY as GameState,
+    frame: 0,
+    birdY: BIRD_Y_START,
+    birdVelocity: 0,
+    birdFrame: 0,
+    birdRotation: ROTATION_NEUTRAL,
+    pipes: [] as PipeData[],
+    score: 0,
+    bestScore: 0,
+    bgX: 0,
+    groundX: 0,
+  });
 
-  // --- Mutable refs (updated every frame, never trigger re-render) ---
-  const gameState = useRef<GameState>(STATE_READY);
-  const frame = useRef(0);
-  const birdY = useRef(BIRD_Y_START);
-  const birdVelocity = useRef(0);
-  const birdFrame = useRef(0);
-  const birdRotation = useRef(ROTATION_NEUTRAL);
-  const pipesRef = useRef<PipeData[]>([]);
-  const scoreRef = useRef(0);
-  const bestScoreRef = useRef(0);
-  const bgX = useRef(0);
-  const groundX = useRef(0);
-  const rafId = useRef<number | null>(null);
+  // Render state — updated via setState to trigger re-renders
+  const [renderState, setRenderState] = useState<RenderState>({
+    birdY: BIRD_Y_START,
+    birdRotation: ROTATION_NEUTRAL,
+    birdFrame: 0,
+    bgX: 0,
+    groundX: 0,
+    pipes: [],
+    gameState: STATE_READY,
+    score: 0,
+    bestScore: 0,
+  });
 
-  // --- Element refs (for setNativeProps / direct style manipulation) ---
-  const birdElRef = useRef<any>(null);
-  const birdFrameElRefs = [useRef<any>(null), useRef<any>(null), useRef<any>(null), useRef<any>(null)];
-  const bgElRef = useRef<any>(null);
-  const groundElRef = useRef<any>(null);
-  const pipeElRefs = useRef<Map<number, { top: any; bottom: any; container: any }>>(new Map());
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // --- Register/unregister pipe refs ---
-  const registerPipeRef = useCallback((id: number, refs: { top: any; bottom: any; container: any }) => {
-    pipeElRefs.current.set(id, refs);
-  }, []);
+  function tick() {
+    const e = engine.current;
 
-  const unregisterPipeRef = useCallback((id: number) => {
-    pipeElRefs.current.delete(id);
-  }, []);
-
-  // --- Physics ---
-  function updateBird() {
-    if (gameState.current === STATE_READY) {
-      birdY.current = BIRD_Y_START;
-      birdRotation.current = ROTATION_NEUTRAL;
-      birdVelocity.current = 0;
-
-      // Slow wing animation
-      if (frame.current % ANIM_GETREADY_INTERVAL === 0) {
-        birdFrame.current = (birdFrame.current + 1) % 4;
+    // --- Update bird ---
+    if (e.gameState === STATE_READY) {
+      e.birdY = BIRD_Y_START;
+      e.birdRotation = ROTATION_NEUTRAL;
+      e.birdVelocity = 0;
+      if (e.frame % ANIM_GETREADY_INTERVAL === 0) {
+        e.birdFrame = (e.birdFrame + 1) % 4;
       }
     } else {
-      // Fast wing animation
-      if (frame.current % ANIM_PLAY_INTERVAL === 0) {
-        birdFrame.current = (birdFrame.current + 1) % 4;
+      if (e.frame % ANIM_PLAY_INTERVAL === 0) {
+        e.birdFrame = (e.birdFrame + 1) % 4;
       }
+      e.birdVelocity += BIRD_GRAVITY;
+      e.birdY += e.birdVelocity;
 
-      // Gravity
-      birdVelocity.current += BIRD_GRAVITY;
-      birdY.current += birdVelocity.current;
-
-      // Rotation
-      if (birdVelocity.current <= BIRD_FLAP) {
-        birdRotation.current = ROTATION_UP;
-      } else if (birdVelocity.current >= BIRD_FLAP + 2) {
-        birdRotation.current = ROTATION_DOWN;
-        birdFrame.current = 1; // Wings mid when diving
+      if (e.birdVelocity <= BIRD_FLAP) {
+        e.birdRotation = ROTATION_UP;
+      } else if (e.birdVelocity >= BIRD_FLAP + 2) {
+        e.birdRotation = ROTATION_DOWN;
+        e.birdFrame = 1;
       } else {
-        birdRotation.current = ROTATION_NEUTRAL;
+        e.birdRotation = ROTATION_NEUTRAL;
       }
 
       // Ground collision
-      if (birdY.current + BIRD_H / 2 >= CANVAS_HEIGHT - GROUND_H) {
-        birdY.current = CANVAS_HEIGHT - GROUND_H - BIRD_H / 2;
-        birdFrame.current = 2;
-        birdRotation.current = ROTATION_DOWN;
-
-        if (gameState.current === STATE_PLAY) {
-          gameState.current = STATE_OVER;
+      if (e.birdY + BIRD_H / 2 >= CANVAS_HEIGHT - GROUND_H) {
+        e.birdY = CANVAS_HEIGHT - GROUND_H - BIRD_H / 2;
+        e.birdFrame = 2;
+        e.birdRotation = ROTATION_DOWN;
+        if (e.gameState === STATE_PLAY) {
+          e.gameState = STATE_OVER;
           audioModule.play('fall');
-          if (scoreRef.current > bestScoreRef.current) {
-            bestScoreRef.current = scoreRef.current;
-          }
-          syncViewState();
+          if (e.score > e.bestScore) e.bestScore = e.score;
         }
       }
 
       // Ceiling clamp
-      if (birdY.current - BIRD_H / 2 <= 0) {
-        birdY.current = BIRD_RADIUS;
-      }
-    }
-  }
-
-  function updatePipes() {
-    if (gameState.current !== STATE_PLAY) return;
-
-    // Spawn
-    if (frame.current % PIPE_SPAWN_INTERVAL === 0) {
-      const newPipe: PipeData = {
-        id: nextPipeId++,
-        x: CANVAS_WIDTH,
-        y: Math.floor(Math.random() * (PIPE_MAX_Y - PIPE_MIN_Y + 1)) + PIPE_MIN_Y,
-      };
-      pipesRef.current.push(newPipe);
-      setPipes([...pipesRef.current]);
-    }
-
-    // Move and despawn
-    let scored = false;
-    const remaining: PipeData[] = [];
-    for (const pipe of pipesRef.current) {
-      pipe.x -= PIPE_DX;
-
-      if (pipe.x < -PIPE_W) {
-        // Pipe exited — score!
-        scoreRef.current++;
-        scored = true;
-        unregisterPipeRef(pipe.id);
-      } else {
-        remaining.push(pipe);
+      if (e.birdY - BIRD_H / 2 <= 0) {
+        e.birdY = BIRD_RADIUS;
       }
     }
 
-    if (scored) {
-      audioModule.play('score');
-      setScore(scoreRef.current);
-    }
+    // --- Update pipes ---
+    if (e.gameState === STATE_PLAY) {
+      if (e.frame % PIPE_SPAWN_INTERVAL === 0) {
+        e.pipes.push({
+          id: nextPipeId++,
+          x: CANVAS_WIDTH,
+          y: Math.floor(Math.random() * (PIPE_MAX_Y - PIPE_MIN_Y + 1)) + PIPE_MIN_Y,
+        });
+      }
 
-    if (remaining.length !== pipesRef.current.length) {
-      pipesRef.current = remaining;
-      setPipes([...remaining]);
-    }
-  }
+      for (const pipe of e.pipes) {
+        pipe.x -= PIPE_DX;
+      }
 
-  function checkCollisions() {
-    if (gameState.current !== STATE_PLAY) return;
+      // Despawn + score
+      const before = e.pipes.length;
+      e.pipes = e.pipes.filter((pipe) => {
+        if (pipe.x < -PIPE_W) {
+          e.score++;
+          audioModule.play('score');
+          return false;
+        }
+        return true;
+      });
 
-    const b = {
-      left: BIRD_X - BIRD_RADIUS,
-      right: BIRD_X + BIRD_RADIUS,
-      top: birdY.current - BIRD_RADIUS,
-      bottom: birdY.current + BIRD_RADIUS,
-    };
-
-    for (const pipe of pipesRef.current) {
-      const p = {
-        left: pipe.x,
-        right: pipe.x + PIPE_W,
-        topBottom: pipe.y + PIPE_H,
-        botTop: pipe.y + PIPE_H + PIPE_GAP,
-        botBottom: pipe.y + PIPE_H * 2 + PIPE_GAP,
+      // --- Collision detection ---
+      const b = {
+        left: BIRD_X - BIRD_RADIUS,
+        right: BIRD_X + BIRD_RADIUS,
+        top: e.birdY - BIRD_RADIUS,
+        bottom: e.birdY + BIRD_RADIUS,
       };
 
-      // Top pipe collision
-      if (b.left < p.right && b.right > p.left && b.top < p.topBottom && b.bottom > pipe.y) {
-        triggerGameOver();
-        return;
-      }
+      for (const pipe of e.pipes) {
+        const pLeft = pipe.x;
+        const pRight = pipe.x + PIPE_W;
+        const topBottom = pipe.y + PIPE_H;
+        const botTop = pipe.y + PIPE_H + PIPE_GAP;
+        const botBottom = pipe.y + PIPE_H * 2 + PIPE_GAP;
 
-      // Bottom pipe collision
-      if (b.left < p.right && b.right > p.left && b.top < p.botBottom && b.bottom > p.botTop) {
-        triggerGameOver();
-        return;
-      }
-    }
-  }
-
-  function triggerGameOver() {
-    gameState.current = STATE_OVER;
-    audioModule.play('collision');
-    if (scoreRef.current > bestScoreRef.current) {
-      bestScoreRef.current = scoreRef.current;
-    }
-    syncViewState();
-  }
-
-  function updateScrolling() {
-    if (gameState.current === STATE_READY) {
-      bgX.current = 0;
-      groundX.current = 0;
-    } else if (gameState.current === STATE_PLAY) {
-      bgX.current = (bgX.current - BG_DX) % BG_W;
-      groundX.current = (groundX.current - GROUND_DX) % (GROUND_W / 2);
-    }
-  }
-
-  // --- Render to elements via style updates ---
-  function renderToElements() {
-    // Bird position + rotation
-    if (birdElRef.current) {
-      const style = {
-        transform: `translate(${BIRD_X - BIRD_W / 2}px, ${birdY.current - BIRD_H / 2}px) rotate(${birdRotation.current}deg)`,
-      };
-      if (birdElRef.current.setNativeProps) {
-        birdElRef.current.setNativeProps({ style });
-      } else if (birdElRef.current.style) {
-        birdElRef.current.style.transform = style.transform;
-      }
-    }
-
-    // Bird animation frames (show active, hide others)
-    for (let i = 0; i < 4; i++) {
-      const ref = birdFrameElRefs[i];
-      if (ref.current) {
-        const opacity = i === birdFrame.current ? 1 : 0;
-        if (ref.current.setNativeProps) {
-          ref.current.setNativeProps({ style: { opacity } });
-        } else if (ref.current.style) {
-          ref.current.style.opacity = String(opacity);
+        if (b.left < pRight && b.right > pLeft && b.top < topBottom && b.bottom > pipe.y) {
+          e.gameState = STATE_OVER;
+          audioModule.play('collision');
+          if (e.score > e.bestScore) e.bestScore = e.score;
+          break;
+        }
+        if (b.left < pRight && b.right > pLeft && b.top < botBottom && b.bottom > botTop) {
+          e.gameState = STATE_OVER;
+          audioModule.play('collision');
+          if (e.score > e.bestScore) e.bestScore = e.score;
+          break;
         }
       }
     }
 
-    // Background scroll
-    if (bgElRef.current) {
-      const style = { transform: `translateX(${bgX.current}px)` };
-      if (bgElRef.current.setNativeProps) {
-        bgElRef.current.setNativeProps({ style });
-      } else if (bgElRef.current.style) {
-        bgElRef.current.style.transform = style.transform;
-      }
+    // --- Update scrolling ---
+    if (e.gameState === STATE_READY) {
+      e.bgX = 0;
+      e.groundX = 0;
+    } else if (e.gameState === STATE_PLAY) {
+      e.bgX = (e.bgX - BG_DX) % BG_W;
+      e.groundX = (e.groundX - GROUND_DX) % (GROUND_W / 2);
     }
 
-    // Ground scroll
-    if (groundElRef.current) {
-      const style = { transform: `translateX(${groundX.current}px)` };
-      if (groundElRef.current.setNativeProps) {
-        groundElRef.current.setNativeProps({ style });
-      } else if (groundElRef.current.style) {
-        groundElRef.current.style.transform = style.transform;
-      }
-    }
+    e.frame++;
 
-    // Pipe positions
-    for (const pipe of pipesRef.current) {
-      const refs = pipeElRefs.current.get(pipe.id);
-      if (refs?.container) {
-        const style = { transform: `translateX(${pipe.x}px)` };
-        if (refs.container.setNativeProps) {
-          refs.container.setNativeProps({ style });
-        } else if (refs.container.style) {
-          refs.container.style.transform = style.transform;
-        }
-      }
-    }
+    // Push to React for rendering
+    setRenderState({
+      birdY: e.birdY,
+      birdRotation: e.birdRotation,
+      birdFrame: e.birdFrame,
+      bgX: e.bgX,
+      groundX: e.groundX,
+      pipes: [...e.pipes],
+      gameState: e.gameState,
+      score: e.score,
+      bestScore: e.bestScore,
+    });
   }
-
-  // --- Sync mutable state to React state (only on state changes) ---
-  function syncViewState() {
-    setGameStateView(gameState.current);
-    setScore(scoreRef.current);
-    setBestScore(bestScoreRef.current);
-  }
-
-  // --- Game loop ---
-  function tick() {
-    updateBird();
-    updatePipes();
-    checkCollisions();
-    updateScrolling();
-    renderToElements();
-    frame.current++;
-    rafId.current = requestAnimationFrame(tick);
-  }
-
-  const start = useCallback(() => {
-    if (rafId.current !== null) return;
-    rafId.current = requestAnimationFrame(tick);
-  }, []);
-
-  const stop = useCallback(() => {
-    if (rafId.current !== null) {
-      cancelAnimationFrame(rafId.current);
-      rafId.current = null;
-    }
-  }, []);
 
   // --- Input handler ---
   const handleTap = useCallback(() => {
-    if (gameState.current === STATE_READY) {
-      gameState.current = STATE_PLAY;
-      syncViewState();
+    const e = engine.current;
+
+    if (e.gameState === STATE_READY) {
+      e.gameState = STATE_PLAY;
     }
 
-    if (gameState.current === STATE_PLAY) {
-      birdVelocity.current = -BIRD_FLAP;
+    if (e.gameState === STATE_PLAY) {
+      e.birdVelocity = -BIRD_FLAP;
       audioModule.play('flap');
-    } else if (gameState.current === STATE_OVER) {
+    } else if (e.gameState === STATE_OVER) {
       // Reset
-      pipesRef.current = [];
-      setPipes([]);
-      scoreRef.current = 0;
-      birdY.current = BIRD_Y_START;
-      birdVelocity.current = 0;
-      birdFrame.current = 0;
-      birdRotation.current = ROTATION_NEUTRAL;
-      bgX.current = 0;
-      groundX.current = 0;
-      frame.current = 0;
+      e.pipes = [];
+      e.score = 0;
+      e.birdY = BIRD_Y_START;
+      e.birdVelocity = 0;
+      e.birdFrame = 0;
+      e.birdRotation = ROTATION_NEUTRAL;
+      e.bgX = 0;
+      e.groundX = 0;
+      e.frame = 0;
       nextPipeId = 0;
-      pipeElRefs.current.clear();
-
-      gameState.current = STATE_READY;
+      e.gameState = STATE_READY;
       audioModule.play('swoosh');
-      syncViewState();
     }
+
+    // Immediate render update for responsiveness
+    setRenderState({
+      birdY: e.birdY,
+      birdRotation: e.birdRotation,
+      birdFrame: e.birdFrame,
+      bgX: e.bgX,
+      groundX: e.groundX,
+      pipes: [...e.pipes],
+      gameState: e.gameState,
+      score: e.score,
+      bestScore: e.bestScore,
+    });
   }, []);
 
-  // Start loop on mount
+  // Game loop via setInterval (works in web workers, unlike requestAnimationFrame)
   useEffect(() => {
-    start();
-    return stop;
-  }, [start, stop]);
+    intervalRef.current = setInterval(tick, 17); // ~60fps
+    return () => {
+      if (intervalRef.current !== null) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
 
   return {
-    // React state (for rendering)
-    pipes,
-    gameStateView,
-    score,
-    bestScore,
-
-    // Element refs
-    birdElRef,
-    birdFrameElRefs,
-    bgElRef,
-    groundElRef,
-
-    // Pipe ref management
-    registerPipeRef,
-    unregisterPipeRef,
-
-    // Input
+    renderState,
     handleTap,
   };
 }

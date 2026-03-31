@@ -1,4 +1,3 @@
-import { useEffect } from '@lynx-js/react';
 import { useGameEngine } from './hooks/useGameEngine.js';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, BG_COLOR } from './constants.js';
 import { STATE_READY, STATE_PLAY, STATE_OVER } from './types.js';
@@ -12,87 +11,47 @@ import GameOverScreen from './components/GameOverScreen.js';
 import './App.css';
 
 export default function App() {
-  const {
-    pipes,
-    gameStateView,
-    score,
-    bestScore,
-    birdElRef,
-    birdFrameElRefs,
-    bgElRef,
-    groundElRef,
-    registerPipeRef,
-    unregisterPipeRef,
-    handleTap,
-  } = useGameEngine();
-
-  // Keyboard input (spacebar) — web target
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Space' || e.keyCode === 32) {
-        e.preventDefault();
-        handleTap();
-      }
-    };
-    if (typeof document !== 'undefined') {
-      document.addEventListener('keydown', onKeyDown);
-      return () => document.removeEventListener('keydown', onKeyDown);
-    }
-  }, [handleTap]);
+  const { renderState, handleTap } = useGameEngine();
+  const { birdY, birdRotation, birdFrame, bgX, groundX, pipes, gameState, score, bestScore } = renderState;
 
   return (
     <view className="app-container">
-      {/* Title */}
       <text className="game-title">FLAPPY BIRD</text>
 
-      {/* Game Area */}
       <view
         className="game-screen"
         bindtap={handleTap}
         style={{
-          width: CANVAS_WIDTH,
-          height: CANVAS_HEIGHT,
+          width: `${CANVAS_WIDTH}px`,
+          height: `${CANVAS_HEIGHT}px`,
           backgroundColor: BG_COLOR,
           position: 'relative',
           overflow: 'hidden',
-          borderRadius: 10,
+          borderRadius: '10px',
         }}
       >
-        {/* Background layer */}
-        <Background bgElRef={bgElRef} />
+        <Background bgX={bgX} />
 
-        {/* Pipes */}
         {pipes.map((pipe) => (
-          <Pipe
-            key={pipe.id}
-            id={pipe.id}
-            y={pipe.y}
-            registerPipeRef={registerPipeRef}
-            unregisterPipeRef={unregisterPipeRef}
-          />
+          <Pipe key={pipe.id} x={pipe.x} y={pipe.y} />
         ))}
 
-        {/* Bird */}
-        <Bird birdElRef={birdElRef} birdFrameElRefs={birdFrameElRefs} />
+        <Bird y={birdY} rotation={birdRotation} frame={birdFrame} />
 
-        {/* Ground layer */}
-        <Ground groundElRef={groundElRef} />
+        <Ground groundX={groundX} />
 
-        {/* Score */}
-        <ScoreDisplay score={score} visible={gameStateView === STATE_PLAY} />
+        <ScoreDisplay score={score} visible={gameState === STATE_PLAY} />
 
-        {/* Overlays */}
-        <GetReadyScreen visible={gameStateView === STATE_READY} />
+        <GetReadyScreen visible={gameState === STATE_READY} />
         <GameOverScreen
-          visible={gameStateView === STATE_OVER}
+          visible={gameState === STATE_OVER}
           score={score}
           bestScore={bestScore}
         />
       </view>
 
-      {/* Description */}
       <text className="game-description">
-        Press 'spacebar' or tap to begin
+        Tap to begin
       </text>
     </view>
   );

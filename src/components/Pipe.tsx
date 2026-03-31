@@ -1,67 +1,47 @@
-import { useEffect, useRef } from '@lynx-js/react';
-import { PIPE_W, PIPE_H, PIPE_GAP } from '../constants.js';
-
-interface PipeProps {
-  id: number;
-  y: number;
-  registerPipeRef: (id: number, refs: { top: any; bottom: any; container: any }) => void;
-  unregisterPipeRef: (id: number) => void;
-}
+import { PIPE_W, PIPE_H, PIPE_GAP, CANVAS_HEIGHT } from '../constants.js';
 
 const PIPE_TOP_SRC = require('../../assets/sprites/pipe-top.png');
 const PIPE_BOTTOM_SRC = require('../../assets/sprites/pipe-bottom.png');
 
-export default function Pipe({ id, y, registerPipeRef, unregisterPipeRef }: PipeProps) {
-  const containerRef = useRef<any>(null);
-  const topRef = useRef<any>(null);
-  const bottomRef = useRef<any>(null);
+interface PipeProps {
+  x: number;
+  y: number;
+}
 
-  useEffect(() => {
-    registerPipeRef(id, {
-      top: topRef.current,
-      bottom: bottomRef.current,
-      container: containerRef.current,
-    });
-    return () => unregisterPipeRef(id);
-  }, [id, registerPipeRef, unregisterPipeRef]);
-
+export default function Pipe({ x, y }: PipeProps) {
   const topPipeY = y;
   const bottomPipeY = y + PIPE_H + PIPE_GAP;
 
   return (
     <view
-      ref={containerRef}
       style={{
         position: 'absolute',
-        top: 0,
-        left: 0,
-        width: PIPE_W,
-        height: '100%',
+        top: '0px',
+        left: '0px',
+        width: `${PIPE_W}px`,
+        height: `${CANVAS_HEIGHT}px`,
         zIndex: 1,
+        transform: `translateX(${x}px)`,
       }}
     >
-      {/* Top pipe */}
       <image
-        ref={topRef}
         src={PIPE_TOP_SRC}
         style={{
           position: 'absolute',
-          top: topPipeY,
-          left: 0,
-          width: PIPE_W,
-          height: PIPE_H,
+          top: `${topPipeY}px`,
+          left: '0px',
+          width: `${PIPE_W}px`,
+          height: `${PIPE_H}px`,
         }}
       />
-      {/* Bottom pipe */}
       <image
-        ref={bottomRef}
         src={PIPE_BOTTOM_SRC}
         style={{
           position: 'absolute',
-          top: bottomPipeY,
-          left: 0,
-          width: PIPE_W,
-          height: PIPE_H,
+          top: `${bottomPipeY}px`,
+          left: '0px',
+          width: `${PIPE_W}px`,
+          height: `${PIPE_H}px`,
         }}
       />
     </view>
