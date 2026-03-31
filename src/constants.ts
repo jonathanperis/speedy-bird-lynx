@@ -27,7 +27,7 @@ export const PIPE_GAP = 150;
 export const PIPE_DX = 2.7;
 export const PIPE_MIN_Y = -180;
 export const PIPE_MAX_Y = 70;
-export const PIPE_SPAWN_INTERVAL = 115; // frames
+export const PIPE_SPAWN_INTERVAL = 77; // frames (adjusted for faster scroll)
 
 // Background
 export const BG_W = 276;
