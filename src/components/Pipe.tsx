@@ -5,11 +5,10 @@ const PIPE_TOP_MOUTH = require('../../assets/sprites/pipes/pipe-top-mouth.png');
 const PIPE_BOTTOM_BODY = require('../../assets/sprites/pipes/pipe-bottom.png');
 const PIPE_BOTTOM_MOUTH = require('../../assets/sprites/pipes/pipe-bottom-mouth.png');
 
-const TILE_SIZE = 25; // Each tile is 26x25, displayed at PIPE_W x TILE_DISPLAY
-const TILE_DISPLAY = Math.round(TILE_SIZE * (PIPE_W / 26)); // Scale proportionally
+const TILE_SIZE = 25;
+const TILE_DISPLAY = Math.round(TILE_SIZE * (PIPE_W / 26));
 
-// How many body tiles to fill the pipe height
-const BODY_TILES = Math.ceil(PIPE_H / TILE_DISPLAY) + 1;
+const BODY_TILES = Math.ceil(PIPE_H / TILE_DISPLAY);
 
 interface PipeProps {
   x: number;
@@ -20,8 +19,22 @@ export default function Pipe({ x, y }: PipeProps) {
   const topPipeY = y;
   const bottomPipeY = y + PIPE_H + PIPE_GAP;
 
-  // Top pipe: body tiles stacking down, mouth at the bottom
+  // Top pipe: 1 extra tile above (overflows off screen), mouth stays at BODY_TILES position
   const topTiles = [];
+  // Overflow tile at negative offset
+  topTiles.push(
+    <image
+      key="to"
+      src={PIPE_TOP_BODY}
+      style={{
+        position: 'absolute',
+        top: `${-TILE_DISPLAY}px`,
+        left: '0px',
+        width: `${PIPE_W}px`,
+        height: `${TILE_DISPLAY}px`,
+      }}
+    />
+  );
   for (let i = 0; i < BODY_TILES; i++) {
     topTiles.push(
       <image
@@ -37,7 +50,6 @@ export default function Pipe({ x, y }: PipeProps) {
       />
     );
   }
-  // Mouth at the bottom of the top pipe
   topTiles.push(
     <image
       key="tm"
@@ -52,7 +64,7 @@ export default function Pipe({ x, y }: PipeProps) {
     />
   );
 
-  // Bottom pipe: mouth at the top, then body tiles stacking down
+  // Bottom pipe: mouth at top, body tiles down, 1 extra at the end
   const bottomTiles = [];
   bottomTiles.push(
     <image
@@ -67,7 +79,6 @@ export default function Pipe({ x, y }: PipeProps) {
       }}
     />
   );
-  // Extra body tiles to ensure pipe reaches past ground
   const bottomBodyTiles = BODY_TILES + 7;
   for (let i = 0; i < bottomBodyTiles; i++) {
     bottomTiles.push(
@@ -97,7 +108,6 @@ export default function Pipe({ x, y }: PipeProps) {
         transform: `translateX(${x}px)`,
       }}
     >
-      {/* Top pipe */}
       <view
         style={{
           position: 'absolute',
@@ -105,19 +115,19 @@ export default function Pipe({ x, y }: PipeProps) {
           left: '0px',
           width: `${PIPE_W}px`,
           height: `${(BODY_TILES + 1) * TILE_DISPLAY}px`,
+          overflow: 'hidden',
         }}
       >
         {topTiles}
       </view>
 
-      {/* Bottom pipe */}
       <view
         style={{
           position: 'absolute',
           top: `${bottomPipeY}px`,
           left: '0px',
           width: `${PIPE_W}px`,
-          height: `${(bottomBodyTiles + 1) * TILE_DISPLAY}px`,
+          height: `${(bottomBodyTiles + 2) * TILE_DISPLAY}px`,
         }}
       >
         {bottomTiles}
