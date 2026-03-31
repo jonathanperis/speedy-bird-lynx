@@ -11,5 +11,6 @@ export default defineConfig({
     entry: {
       main: './src/index.tsx',
     },
+    assetsInclude: [/\.wav$/],
   },
 });
