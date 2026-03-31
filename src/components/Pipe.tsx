@@ -3,7 +3,6 @@ import { PIPE_W, PIPE_H, PIPE_GAP } from '../constants.js';
 const PIPE_TOP_SRC = require('../../assets/sprites/pipe-top.png');
 const PIPE_BOTTOM_SRC = require('../../assets/sprites/pipe-bottom.png');
 
-// Color matching the pipe body for the extension below the bottom pipe sprite
 const PIPE_BODY_COLOR = '#73bf2e';
 
 interface PipeProps {
@@ -27,6 +26,7 @@ export default function Pipe({ x, y }: PipeProps) {
         transform: `translateX(${x}px)`,
       }}
     >
+      {/* Top pipe */}
       <image
         src={PIPE_TOP_SRC}
         style={{
@@ -37,7 +37,18 @@ export default function Pipe({ x, y }: PipeProps) {
           height: `${PIPE_H}px`,
         }}
       />
-      {/* Bottom pipe: sprite at normal size + green extension to ground */}
+      {/* Bottom pipe: green fill first (behind), then sprite on top */}
+      <view
+        style={{
+          position: 'absolute',
+          top: `${bottomPipeY + 20}px`,
+          left: '4px',
+          width: `${PIPE_W - 8}px`,
+          height: '500px',
+          backgroundColor: PIPE_BODY_COLOR,
+          zIndex: 0,
+        }}
+      />
       <image
         src={PIPE_BOTTOM_SRC}
         style={{
@@ -46,16 +57,7 @@ export default function Pipe({ x, y }: PipeProps) {
           left: '0px',
           width: `${PIPE_W}px`,
           height: `${PIPE_H}px`,
-        }}
-      />
-      <view
-        style={{
-          position: 'absolute',
-          top: `${bottomPipeY + PIPE_H}px`,
-          left: '3px',
-          width: `${PIPE_W - 6}px`,
-          height: '400px',
-          backgroundColor: PIPE_BODY_COLOR,
+          zIndex: 1,
         }}
       />
     </view>
