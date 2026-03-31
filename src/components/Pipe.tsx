@@ -5,10 +5,7 @@ const PIPE_TOP_MOUTH = require('../../assets/sprites/pipes/pipe-top-mouth.png');
 const PIPE_BOTTOM_BODY = require('../../assets/sprites/pipes/pipe-bottom.png');
 const PIPE_BOTTOM_MOUTH = require('../../assets/sprites/pipes/pipe-bottom-mouth.png');
 
-const TILE_SIZE = 25;
-const TILE_DISPLAY = Math.round(TILE_SIZE * (PIPE_W / 26));
-
-const BODY_TILES = Math.ceil(PIPE_H / TILE_DISPLAY);
+const TILE_H = Math.round(25 * (PIPE_W / 26)); // ~53px display height per tile
 
 interface PipeProps {
   x: number;
@@ -16,56 +13,51 @@ interface PipeProps {
 }
 
 export default function Pipe({ x, y }: PipeProps) {
-  const topPipeY = y;
-  const bottomPipeY = y + PIPE_H + PIPE_GAP;
-
-  // Top pipe: 1 extra tile above (overflows off screen), mouth stays at BODY_TILES position
+  // Top pipe: collision box from y to y+PIPE_H
+  // Mouth sits at the bottom of the collision box
+  // Body fills above the mouth, extending past top of screen
+  const topMouthY = y + PIPE_H - TILE_H; // mouth bottom edge = y + PIPE_H
   const topTiles = [];
-  // Overflow tile at negative offset
-  topTiles.push(
-    <image
-      key="to"
-      src={PIPE_TOP_BODY}
-      style={{
-        position: 'absolute',
-        top: `${-TILE_DISPLAY}px`,
-        left: '0px',
-        width: `${PIPE_W}px`,
-        height: `${TILE_DISPLAY}px`,
-      }}
-    />
-  );
-  for (let i = 0; i < BODY_TILES; i++) {
+
+  // Fill body tiles from mouth upward, well past screen top
+  const topBodyCount = Math.ceil((PIPE_H + 400) / TILE_H); // enough to overflow screen
+  for (let i = 0; i < topBodyCount; i++) {
     topTiles.push(
       <image
         key={`tb${i}`}
         src={PIPE_TOP_BODY}
         style={{
           position: 'absolute',
-          top: `${i * TILE_DISPLAY}px`,
+          top: `${topMouthY - (i + 1) * TILE_H}px`,
           left: '0px',
           width: `${PIPE_W}px`,
-          height: `${TILE_DISPLAY}px`,
+          height: `${TILE_H + 1}px`,
         }}
       />
     );
   }
+  // Mouth at the exact collision boundary
   topTiles.push(
     <image
       key="tm"
       src={PIPE_TOP_MOUTH}
       style={{
         position: 'absolute',
-        top: `${BODY_TILES * TILE_DISPLAY}px`,
+        top: `${topMouthY}px`,
         left: '0px',
         width: `${PIPE_W}px`,
-        height: `${TILE_DISPLAY}px`,
+        height: `${TILE_H}px`,
       }}
     />
   );
 
-  // Bottom pipe: mouth at top, body tiles down, 1 extra at the end
+  // Bottom pipe: collision box from (y+PIPE_H+PIPE_GAP) downward
+  // Mouth sits at the top of the collision box
+  // Body fills below the mouth, extending past ground
+  const bottomY = y + PIPE_H + PIPE_GAP;
   const bottomTiles = [];
+
+  // Mouth at top
   bottomTiles.push(
     <image
       key="bm"
@@ -75,22 +67,23 @@ export default function Pipe({ x, y }: PipeProps) {
         top: '0px',
         left: '0px',
         width: `${PIPE_W}px`,
-        height: `${TILE_DISPLAY}px`,
+        height: `${TILE_H}px`,
       }}
     />
   );
-  const bottomBodyTiles = BODY_TILES + 7;
-  for (let i = 0; i < bottomBodyTiles; i++) {
+  // Body tiles extending down past ground
+  const bottomBodyCount = Math.ceil((PIPE_H + 400) / TILE_H);
+  for (let i = 0; i < bottomBodyCount; i++) {
     bottomTiles.push(
       <image
         key={`bb${i}`}
         src={PIPE_BOTTOM_BODY}
         style={{
           position: 'absolute',
-          top: `${(i + 1) * TILE_DISPLAY}px`,
+          top: `${(i + 1) * TILE_H}px`,
           left: '0px',
           width: `${PIPE_W}px`,
-          height: `${TILE_DISPLAY}px`,
+          height: `${TILE_H + 1}px`,
         }}
       />
     );
@@ -108,26 +101,17 @@ export default function Pipe({ x, y }: PipeProps) {
         transform: `translateX(${x}px)`,
       }}
     >
-      <view
-        style={{
-          position: 'absolute',
-          top: `${topPipeY}px`,
-          left: '0px',
-          width: `${PIPE_W}px`,
-          height: `${(BODY_TILES + 1) * TILE_DISPLAY}px`,
-          overflow: 'hidden',
-        }}
-      >
-        {topTiles}
-      </view>
+      {/* Top pipe — positioned absolutely, tiles overflow upward */}
+      {topTiles}
 
+      {/* Bottom pipe */}
       <view
         style={{
           position: 'absolute',
-          top: `${bottomPipeY}px`,
+          top: `${bottomY}px`,
           left: '0px',
           width: `${PIPE_W}px`,
-          height: `${(bottomBodyTiles + 2) * TILE_DISPLAY}px`,
+          height: `${(bottomBodyCount + 1) * TILE_H}px`,
         }}
       >
         {bottomTiles}
