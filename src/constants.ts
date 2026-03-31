@@ -27,7 +27,7 @@ export const PIPE_H = 300;
 export const PIPE_GAP = 85;
 export const PIPE_DX = 2;
 export const PIPE_MIN_Y = -260;
-export const PIPE_MAX_Y = -40;
+export const PIPE_MAX_Y = -120;
 export const PIPE_SPAWN_INTERVAL = 100; // frames
 
 // Background
