@@ -23,7 +23,7 @@ export const ROTATION_DOWN = 70;
 // Pipes
 export const PIPE_W = 55;
 export const PIPE_H = 300;
-export const PIPE_GAP = 125;
+export const PIPE_GAP = 150;
 export const PIPE_DX = 1.8;
 export const PIPE_MIN_Y = -180;
 export const PIPE_MAX_Y = 70;
