@@ -8,7 +8,7 @@ export const BIRD_Y_START = 280;
 export const BIRD_W = 34;
 export const BIRD_H = 24;
 export const BIRD_RADIUS = 12;
-export const BIRD_FLAP = 5.75;
+export const BIRD_FLAP = 6.04;
 export const BIRD_GRAVITY = 0.28;
 
 // Bird animation frame intervals
