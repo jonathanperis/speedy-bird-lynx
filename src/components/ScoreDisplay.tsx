@@ -1,3 +1,20 @@
+const DIGIT_SPRITES = [
+  require('../../assets/sprites/digit-0.png'),
+  require('../../assets/sprites/digit-1.png'),
+  require('../../assets/sprites/digit-2.png'),
+  require('../../assets/sprites/digit-3.png'),
+  require('../../assets/sprites/digit-4.png'),
+  require('../../assets/sprites/digit-5.png'),
+  require('../../assets/sprites/digit-6.png'),
+  require('../../assets/sprites/digit-7.png'),
+  require('../../assets/sprites/digit-8.png'),
+  require('../../assets/sprites/digit-9.png'),
+];
+
+const DIGIT_W = 18;
+const DIGIT_H = 27;
+const DIGIT_GAP = 2;
+
 interface ScoreDisplayProps {
   score: number;
   visible: boolean;
@@ -5,6 +22,9 @@ interface ScoreDisplayProps {
 
 export default function ScoreDisplay({ score, visible }: ScoreDisplayProps) {
   if (!visible) return null;
+
+  const digits = score.toString().split('');
+  const totalWidth = digits.length * DIGIT_W + (digits.length - 1) * DIGIT_GAP;
 
   return (
     <view
@@ -19,16 +39,27 @@ export default function ScoreDisplay({ score, visible }: ScoreDisplayProps) {
         alignItems: 'center',
       }}
     >
-      <text
+      <view
         style={{
-          color: '#ffffff',
-          fontSize: '48px',
-          fontWeight: 'bold',
-          textAlign: 'center',
+          width: `${totalWidth}px`,
+          height: `${DIGIT_H}px`,
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
         }}
       >
-        {score}
-      </text>
+        {digits.map((d, i) => (
+          <image
+            key={i}
+            src={DIGIT_SPRITES[parseInt(d)]}
+            style={{
+              width: `${DIGIT_W}px`,
+              height: `${DIGIT_H}px`,
+              marginLeft: i > 0 ? `${DIGIT_GAP}px` : '0px',
+            }}
+          />
+        ))}
+      </view>
     </view>
   );
 }

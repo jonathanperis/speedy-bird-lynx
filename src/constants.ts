@@ -1,7 +1,7 @@
 // Game dimensions — fullscreen on mobile
 // Width matches original, height is taller for fullscreen
 export const CANVAS_WIDTH = 400;
-export const CANVAS_HEIGHT = 700;
+export const CANVAS_HEIGHT = 650;
 
 // Bird
 export const BIRD_X = 80;
