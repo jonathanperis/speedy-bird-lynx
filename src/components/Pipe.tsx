@@ -9,7 +9,7 @@ const TILE_SIZE = 25; // Each tile is 26x25, displayed at PIPE_W x TILE_DISPLAY
 const TILE_DISPLAY = Math.round(TILE_SIZE * (PIPE_W / 26)); // Scale proportionally
 
 // How many body tiles to fill the pipe height
-const BODY_TILES = Math.ceil(PIPE_H / TILE_DISPLAY);
+const BODY_TILES = Math.ceil(PIPE_H / TILE_DISPLAY) + 1;
 
 interface PipeProps {
   x: number;
@@ -68,7 +68,7 @@ export default function Pipe({ x, y }: PipeProps) {
     />
   );
   // Extra body tiles to ensure pipe reaches past ground
-  const bottomBodyTiles = BODY_TILES + 6;
+  const bottomBodyTiles = BODY_TILES + 7;
   for (let i = 0; i < bottomBodyTiles; i++) {
     bottomTiles.push(
       <image
