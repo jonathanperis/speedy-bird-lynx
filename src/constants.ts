@@ -8,7 +8,7 @@ export const BIRD_Y_START = 280;
 export const BIRD_W = 34;
 export const BIRD_H = 24;
 export const BIRD_RADIUS = 12;
-export const BIRD_FLAP = 10.88;
+export const BIRD_FLAP = 7.25;
 export const BIRD_GRAVITY = 0.28;
 
 // Bird animation frame intervals
@@ -24,7 +24,7 @@ export const ROTATION_DOWN = 70;
 export const PIPE_W = 55;
 export const PIPE_H = 300;
 export const PIPE_GAP = 150;
-export const PIPE_DX = 1.8;
+export const PIPE_DX = 2.7;
 export const PIPE_MIN_Y = -180;
 export const PIPE_MAX_Y = 70;
 export const PIPE_SPAWN_INTERVAL = 115; // frames
@@ -37,7 +37,7 @@ export const BG_DX = 0.2;
 // Ground — 15% taller to sit higher on screen
 export const GROUND_W = 224;
 export const GROUND_H = 129;
-export const GROUND_DX = 1.8;
+export const GROUND_DX = 2.7;
 
 // Colors
 export const BG_COLOR = '#00bbc4';
