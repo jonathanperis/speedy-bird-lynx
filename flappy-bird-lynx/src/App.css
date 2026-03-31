@@ -1,0 +1,28 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.95);
+  min-height: 100vh;
+  padding-top: 20px;
+}
+
+.game-title {
+  text-align: center;
+  color: rgb(251, 176, 37);
+  font-size: 36px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  margin-bottom: 20px;
+}
+
+.game-screen {
+  margin: 0 auto;
+}
+
+.game-description {
+  color: #f0f0f0;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 16px;
+}
