@@ -18,10 +18,10 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
     <view
       style={{
         position: 'absolute',
-        top: 0,
-        left: 0,
-        width: CANVAS_WIDTH,
-        height: CANVAS_HEIGHT,
+        top: '0px',
+        left: '0px',
+        width: `${CANVAS_WIDTH}px`,
+        height: `${CANVAS_HEIGHT}px`,
         zIndex: 5,
         display: 'flex',
         justifyContent: 'center',
@@ -31,38 +31,36 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
       <view
         style={{
           position: 'absolute',
-          top: CANVAS_HEIGHT / 2 - IMG_H,
-          left: (CANVAS_WIDTH - IMG_W) / 2,
-          width: IMG_W,
-          height: IMG_H,
+          top: `${CANVAS_HEIGHT / 2 - IMG_H}px`,
+          left: `${(CANVAS_WIDTH - IMG_W) / 2}px`,
+          width: `${IMG_W}px`,
+          height: `${IMG_H}px`,
         }}
       >
         <image
           src={GAME_OVER_SRC}
-          style={{ width: IMG_W, height: IMG_H }}
+          style={{ width: `${IMG_W}px`, height: `${IMG_H}px` }}
         />
-        {/* Current score */}
         <text
           style={{
             position: 'absolute',
-            top: 60,
-            right: 30,
+            top: '60px',
+            right: '30px',
             color: '#ffffff',
-            fontSize: 16,
+            fontSize: '16px',
             fontWeight: 'bold',
             textAlign: 'right',
           }}
         >
           {score}
         </text>
-        {/* Best score */}
         <text
           style={{
             position: 'absolute',
-            top: 100,
-            right: 30,
+            top: '100px',
+            right: '30px',
             color: '#ffffff',
-            fontSize: 16,
+            fontSize: '16px',
             fontWeight: 'bold',
             textAlign: 'right',
           }}

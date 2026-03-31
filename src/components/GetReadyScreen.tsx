@@ -16,10 +16,10 @@ export default function GetReadyScreen({ visible }: GetReadyScreenProps) {
     <view
       style={{
         position: 'absolute',
-        top: 0,
-        left: 0,
-        width: CANVAS_WIDTH,
-        height: CANVAS_HEIGHT,
+        top: '0px',
+        left: '0px',
+        width: `${CANVAS_WIDTH}px`,
+        height: `${CANVAS_HEIGHT}px`,
         zIndex: 5,
         display: 'flex',
         justifyContent: 'center',
@@ -29,11 +29,11 @@ export default function GetReadyScreen({ visible }: GetReadyScreenProps) {
       <image
         src={GET_READY_SRC}
         style={{
-          width: IMG_W,
-          height: IMG_H,
+          width: `${IMG_W}px`,
+          height: `${IMG_H}px`,
           position: 'absolute',
-          top: CANVAS_HEIGHT / 2 - IMG_H,
-          left: (CANVAS_WIDTH - IMG_W) / 2,
+          top: `${CANVAS_HEIGHT / 2 - IMG_H}px`,
+          left: `${(CANVAS_WIDTH - IMG_W) / 2}px`,
         }}
       />
     </view>
