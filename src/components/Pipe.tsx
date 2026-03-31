@@ -1,7 +1,10 @@
-import { PIPE_W, PIPE_H, PIPE_GAP, CANVAS_HEIGHT } from '../constants.js';
+import { PIPE_W, PIPE_H, PIPE_GAP } from '../constants.js';
 
 const PIPE_TOP_SRC = require('../../assets/sprites/pipe-top.png');
 const PIPE_BOTTOM_SRC = require('../../assets/sprites/pipe-bottom.png');
+
+// Visual height for bottom pipe — tall enough to always reach past the ground
+const BOTTOM_PIPE_VISUAL_H = 600;
 
 interface PipeProps {
   x: number;
@@ -19,7 +22,7 @@ export default function Pipe({ x, y }: PipeProps) {
         top: '0px',
         left: '0px',
         width: `${PIPE_W}px`,
-        height: `${CANVAS_HEIGHT}px`,
+        height: '100%',
         zIndex: 1,
         transform: `translateX(${x}px)`,
       }}
@@ -41,7 +44,7 @@ export default function Pipe({ x, y }: PipeProps) {
           top: `${bottomPipeY}px`,
           left: '0px',
           width: `${PIPE_W}px`,
-          height: `${PIPE_H}px`,
+          height: `${BOTTOM_PIPE_VISUAL_H}px`,
         }}
       />
     </view>
