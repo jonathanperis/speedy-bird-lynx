@@ -1,4 +1,4 @@
-import { BG_W, BG_H, CANVAS_HEIGHT } from '../constants.js';
+import { BG_W, BG_H, GROUND_H } from '../constants.js';
 
 const BG_SRC = require('../../assets/sprites/background.png');
 
@@ -7,15 +7,13 @@ interface BackgroundProps {
 }
 
 export default function Background({ bgX }: BackgroundProps) {
-  const y = CANVAS_HEIGHT - BG_H;
-
   return (
     <view
       style={{
         position: 'absolute',
-        top: `${y}px`,
+        bottom: `${GROUND_H}px`,
         left: '0px',
-        width: `${BG_W * 3}px`,
+        width: `${BG_W * 5}px`,
         height: `${BG_H}px`,
         zIndex: 0,
         display: 'flex',
@@ -23,6 +21,8 @@ export default function Background({ bgX }: BackgroundProps) {
         transform: `translateX(${bgX}px)`,
       }}
     >
+      <image src={BG_SRC} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
+      <image src={BG_SRC} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
       <image src={BG_SRC} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
       <image src={BG_SRC} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
       <image src={BG_SRC} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />

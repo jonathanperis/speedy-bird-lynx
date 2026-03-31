@@ -1,5 +1,3 @@
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../constants.js';
-
 const GAME_OVER_SRC = require('../../assets/sprites/game-over.png');
 
 const IMG_W = 226;
@@ -20,8 +18,8 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
         position: 'absolute',
         top: '0px',
         left: '0px',
-        width: `${CANVAS_WIDTH}px`,
-        height: `${CANVAS_HEIGHT}px`,
+        width: '100%',
+        height: '100%',
         zIndex: 5,
         display: 'flex',
         justifyContent: 'center',
@@ -30,11 +28,9 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
     >
       <view
         style={{
-          position: 'absolute',
-          top: `${CANVAS_HEIGHT / 2 - IMG_H}px`,
-          left: `${(CANVAS_WIDTH - IMG_W) / 2}px`,
           width: `${IMG_W}px`,
           height: `${IMG_H}px`,
+          position: 'relative',
         }}
       >
         <image

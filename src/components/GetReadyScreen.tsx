@@ -1,5 +1,3 @@
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../constants.js';
-
 const GET_READY_SRC = require('../../assets/sprites/get-ready.png');
 
 const IMG_W = 174;
@@ -18,8 +16,8 @@ export default function GetReadyScreen({ visible }: GetReadyScreenProps) {
         position: 'absolute',
         top: '0px',
         left: '0px',
-        width: `${CANVAS_WIDTH}px`,
-        height: `${CANVAS_HEIGHT}px`,
+        width: '100%',
+        height: '100%',
         zIndex: 5,
         display: 'flex',
         justifyContent: 'center',
@@ -31,9 +29,6 @@ export default function GetReadyScreen({ visible }: GetReadyScreenProps) {
         style={{
           width: `${IMG_W}px`,
           height: `${IMG_H}px`,
-          position: 'absolute',
-          top: `${CANVAS_HEIGHT / 2 - IMG_H}px`,
-          left: `${(CANVAS_WIDTH - IMG_W) / 2}px`,
         }}
       />
     </view>
