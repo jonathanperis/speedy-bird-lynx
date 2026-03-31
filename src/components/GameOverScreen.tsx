@@ -37,26 +37,28 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
           src={GAME_OVER_SRC}
           style={{ width: `${IMG_W}px`, height: `${IMG_H}px` }}
         />
+        {/* Current score — positioned right of "SCORE" label */}
         <text
           style={{
             position: 'absolute',
-            top: '60px',
-            right: '30px',
+            top: '52px',
+            right: '15px',
             color: '#ffffff',
-            fontSize: '16px',
+            fontSize: '14px',
             fontWeight: 'bold',
             textAlign: 'right',
           }}
         >
           {score}
         </text>
+        {/* Best score — positioned right of "BEST" label */}
         <text
           style={{
             position: 'absolute',
-            top: '100px',
-            right: '30px',
+            top: '92px',
+            right: '15px',
             color: '#ffffff',
-            fontSize: '16px',
+            fontSize: '14px',
             fontWeight: 'bold',
             textAlign: 'right',
           }}
