@@ -1,7 +1,7 @@
 const sharp = require('sharp');
 const path = require('path');
 
-const outDir = path.join(__dirname, 'flappy-bird-lynx/assets/sprites');
+const outDir = path.join(__dirname, 'speedy-bird-lynx/assets/sprites');
 
 const sheet1 = path.join(__dirname, 'img/og-theme.png');
 const sheet2 = path.join(__dirname, 'img/og-theme-2.png');

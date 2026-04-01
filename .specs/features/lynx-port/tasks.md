@@ -15,10 +15,10 @@ T1 and T2 can run in parallel. T3+T4 depend on T1. T5 depends on T3+T4. T6+T7 de
 
 ## T1: Initialize Lynx Project [R-SETUP-1, R-SETUP-2, R-SETUP-3]
 
-**Do**: Scaffold a new Lynx ReactLynx project in `flappy-bird-lynx/` directory alongside the existing project.
+**Do**: Scaffold a new Lynx ReactLynx project in `speedy-bird-lynx/` directory alongside the existing project.
 
 **Steps**:
-1. Run `npm create rspeedy@latest -- --template react-ts --dir flappy-bird-lynx`
+1. Run `npm create rspeedy@latest -- --template react-ts --dir speedy-bird-lynx`
 2. Configure lynx.config.ts
 3. Create directory structure: `src/components/`, `src/hooks/`, `src/audio/`, `assets/sprites/`, `assets/audio/`
 4. Verify `npm run dev` starts without errors

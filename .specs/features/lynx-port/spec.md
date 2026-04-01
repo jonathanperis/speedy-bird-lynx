@@ -1,7 +1,7 @@
-# Feature: Lynx Port — Flappy Bird
+# Feature: Lynx Port — Speedy Bird
 
 ## Overview
-Port the canvas-based Flappy Bird to a ReactLynx app using element-based rendering, preserving all gameplay mechanics and visual fidelity.
+Port the canvas-based Speedy Bird to a ReactLynx app using element-based rendering, preserving all gameplay mechanics and visual fidelity.
 
 ## Requirements
 
@@ -18,7 +18,7 @@ Port the canvas-based Flappy Bird to a ReactLynx app using element-based renderi
 ### Game Container
 - **R-CONTAINER-1**: Root game view with fixed dimensions (300x500 logical pixels), overflow hidden
 - **R-CONTAINER-2**: Background color #00bbc4 matching original
-- **R-CONTAINER-3**: Centered on screen with title "FLAPPY BIRD" above
+- **R-CONTAINER-3**: Centered on screen with title "SPEEDY BIRD" above
 
 ### Game States
 - **R-STATE-1**: Three states: getReady (0), play (1), gameOver (2)

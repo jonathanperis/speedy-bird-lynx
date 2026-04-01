@@ -13,7 +13,7 @@ App.tsx (root)
 │   ├── ScoreDisplay (digit images or text, z-index:4)
 │   ├── GetReadyScreen (overlay image, z-index:5)
 │   └── GameOverScreen (overlay with scores, z-index:5)
-└── Title ("FLAPPY BIRD" text above game)
+└── Title ("SPEEDY BIRD" text above game)
 ```
 
 ## Component Design
@@ -161,7 +161,7 @@ tap event → handleTap() → mutate refs directly
 ## File Structure
 
 ```
-flappy-bird-lynx/
+speedy-bird-lynx/
 ├── src/
 │   ├── App.tsx
 │   ├── App.css

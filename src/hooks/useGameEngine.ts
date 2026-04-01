@@ -134,8 +134,8 @@ export function useGameEngine() {
         });
       }
 
-      // Speed increases 1% every 10 pipes
-      const speedMult = 1 + Math.floor(e.score / 10) * 0.01;
+      // Speed increases 1% per pipe
+      const speedMult = 1 + e.score * 0.01;
       const currentDX = PIPE_DX * speedMult;
 
       for (const pipe of e.pipes) {

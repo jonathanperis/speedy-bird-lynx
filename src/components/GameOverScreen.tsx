@@ -9,10 +9,10 @@ const IMG_H = 158;
 const MEDAL_SIZE = 44;
 
 function getMedalSrc(score: number): string | null {
-  if (score >= 100) return MEDAL_PLATINUM;
-  if (score >= 50) return MEDAL_GOLD;
-  if (score >= 25) return MEDAL_SILVER;
-  if (score >= 10) return MEDAL_BRONZE;
+  if (score >= 50) return MEDAL_PLATINUM;
+  if (score >= 25) return MEDAL_GOLD;
+  if (score >= 15) return MEDAL_SILVER;
+  if (score >= 5) return MEDAL_BRONZE;
   return null;
 }
 
