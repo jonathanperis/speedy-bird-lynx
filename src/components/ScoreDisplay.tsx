@@ -1,14 +1,14 @@
 const DIGIT_SPRITES = [
-  require('../../assets/sprites/digit-0.png'),
-  require('../../assets/sprites/digit-1.png'),
-  require('../../assets/sprites/digit-2.png'),
-  require('../../assets/sprites/digit-3.png'),
-  require('../../assets/sprites/digit-4.png'),
-  require('../../assets/sprites/digit-5.png'),
-  require('../../assets/sprites/digit-6.png'),
-  require('../../assets/sprites/digit-7.png'),
-  require('../../assets/sprites/digit-8.png'),
-  require('../../assets/sprites/digit-9.png'),
+  require('../../assets/sprites/digits/digit-0.png'),
+  require('../../assets/sprites/digits/digit-1.png'),
+  require('../../assets/sprites/digits/digit-2.png'),
+  require('../../assets/sprites/digits/digit-3.png'),
+  require('../../assets/sprites/digits/digit-4.png'),
+  require('../../assets/sprites/digits/digit-5.png'),
+  require('../../assets/sprites/digits/digit-6.png'),
+  require('../../assets/sprites/digits/digit-7.png'),
+  require('../../assets/sprites/digits/digit-8.png'),
+  require('../../assets/sprites/digits/digit-9.png'),
 ];
 
 const DIGIT_W = 18;
