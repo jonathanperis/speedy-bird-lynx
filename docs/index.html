@@ -32,114 +32,137 @@
   <!-- Theme -->
   <meta name="theme-color" content="#0f0e17">
 
-  <!-- Press Start 2P pixel font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,300;0,400;0,700;0,900;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg:        #0f0e17;
-      --bg-card:   #1a1a2e;
-      --gold:      #fcb700;
-      --gold-dim:  #c99200;
-      --green:     #4ade80;
-      --cyan:      #00bbc4;
-      --text:      #e0e0e0;
-      --text-dim:  #888;
-      --pixel-font: 'Press Start 2P', monospace;
-      --mono:      'Courier New', monospace;
+      --bg:           #040d1a;
+      --bg-card:      #071428;
+      --sky:          #00c8ff;
+      --sky-dim:      #0080a8;
+      --lightning:    #ffe234;
+      --lightning-dim:#b89800;
+      --text:         #e8f4ff;
+      --text-dim:     #6ba8c4;
+      --border:       #0a2040;
+      --pixel-font:   'Exo 2', sans-serif;
+      --mono:         'JetBrains Mono', monospace;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
       background: var(--bg);
+      background-image:
+        radial-gradient(ellipse at 50% 20%, rgba(0,200,255,0.06) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 80%, rgba(0,200,255,0.04) 0%, transparent 40%);
+      overflow-x: hidden;
       color: var(--text);
-      font-family: var(--mono);
       font-size: 14px;
       line-height: 1.7;
     }
 
-    .pixel-border {
-      border: 4px solid var(--gold);
-      box-shadow:
-        4px 4px 0 var(--gold-dim),
-        inset 0 0 0 2px rgba(245, 197, 66, 0.15);
+    @keyframes streak {
+      0%   { transform: translateX(120vw); opacity: 0; }
+      5%   { opacity: var(--so, 0.15); }
+      95%  { opacity: var(--so, 0.15); }
+      100% { transform: translateX(-20vw); opacity: 0; }
     }
 
-    /* Navigation */
+    .streak {
+      position: fixed;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--sky), transparent);
+      pointer-events: none;
+      z-index: 0;
+      animation: streak var(--sd, 3s) linear infinite;
+      animation-delay: var(--ss, 0s);
+    }
+
     nav {
       position: sticky;
       top: 0;
       z-index: 100;
-      background: var(--bg);
-      border-bottom: 3px solid var(--gold);
+      background: rgba(4,13,26,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,200,255,0.2);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.6rem 2rem;
+      padding: 0.8rem 2rem;
     }
-
     nav .logo {
-      font-family: var(--pixel-font);
-      font-size: 0.85rem;
-      color: var(--gold);
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 900;
+      font-size: 1.1rem;
+      color: var(--sky);
       text-decoration: none;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-shadow: 0 0 20px rgba(0,200,255,0.5);
     }
-
     nav .links { display: flex; gap: 1.5rem; list-style: none; }
-
     nav .links a {
-      font-family: var(--pixel-font);
-      font-size: 0.55rem;
-      color: var(--text);
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 300;
+      font-size: 0.85rem;
+      color: var(--text-dim);
       text-decoration: none;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: color 0.2s;
+      letter-spacing: 2px;
+      transition: color 0.2s, text-shadow 0.2s;
+    }
+    nav .links a:hover {
+      color: var(--sky);
+      text-shadow: 0 0 10px rgba(0,200,255,0.6);
     }
 
-    nav .links a:hover { color: var(--gold); }
-
-    /* Hero */
     .hero {
       text-align: center;
-      padding: 3rem 1rem 2rem;
+      padding: 5rem 1rem 2.5rem;
+      position: relative;
+      z-index: 1;
     }
-
     .hero h1 {
-      font-family: var(--pixel-font);
-      font-size: clamp(1.4rem, 4vw, 2.4rem);
-      color: var(--gold);
-      text-shadow: 3px 3px 0 var(--gold-dim);
-      margin-bottom: 0.75rem;
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 900;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 6px;
+      text-shadow: 0 0 30px rgba(0,200,255,0.4), 0 0 60px rgba(0,200,255,0.2);
+      margin-bottom: 1rem;
     }
-
     .hero p {
-      max-width: 600px;
+      max-width: 620px;
       margin: 0 auto;
       color: var(--text-dim);
-      font-size: 0.9rem;
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 300;
+      font-size: 1rem;
+      letter-spacing: 1px;
+      line-height: 1.8;
     }
 
-    /* Game section */
     .game-section {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 1rem 1rem 2.5rem;
+      padding: 1rem 1rem 3rem;
+      position: relative;
+      z-index: 1;
     }
-
     .game-wrapper {
       background: var(--bg-card);
       padding: 1rem;
       max-width: 460px;
       width: 100%;
     }
-
+    
     #canvas {
       display: block;
       width: 100%;
@@ -153,153 +176,148 @@
       background: #00bbc4;
     }
 
-    .game-controls {
-      text-align: center;
-      margin-top: 0.75rem;
-      font-family: var(--pixel-font);
-      font-size: 0.5rem;
-      color: var(--text-dim);
-      line-height: 2;
+    .pixel-border {
+      border: 1px solid rgba(0,200,255,0.25);
+      box-shadow: 0 0 40px rgba(0,200,255,0.08), 0 0 80px rgba(0,200,255,0.04);
     }
-
-    .game-controls kbd {
-      display: inline-block;
-      background: var(--bg);
-      color: var(--gold);
-      border: 2px solid var(--gold-dim);
-      padding: 0.15em 0.5em;
-      margin: 0 0.1em;
-      font-family: var(--pixel-font);
-      font-size: 0.5rem;
-    }
-
+    .btn-row { text-align: center; }
+    
     #play-btn {
       display: inline-block;
       margin-top: 1rem;
-      padding: 0.6em 1.6em;
-      font-family: var(--pixel-font);
-      font-size: 0.7rem;
+      padding: 0.6em 2em;
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
       color: var(--bg);
-      background: var(--gold);
+      background: var(--sky);
       border: none;
       cursor: pointer;
       text-transform: uppercase;
-      box-shadow: 3px 3px 0 var(--gold-dim);
+      letter-spacing: 3px;
+      box-shadow: 0 0 20px rgba(0,200,255,0.5);
       transition: transform 0.1s, box-shadow 0.1s;
     }
-
     #play-btn:hover {
-      transform: translate(-1px, -1px);
-      box-shadow: 4px 4px 0 var(--gold-dim);
+      transform: translateY(-2px);
+      box-shadow: 0 0 35px rgba(0,200,255,0.7), 0 4px 15px rgba(0,0,0,0.3);
+    }
+    #play-btn:active { transform: translateY(1px); box-shadow: 0 0 10px rgba(0,200,255,0.3); }
+    #play-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+    
+    .game-controls {
+      text-align: center;
+      margin-top: 0.75rem;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      line-height: 2;
+    }
+    .game-controls kbd {
+      display: inline-block;
+      background: rgba(0,200,255,0.08);
+      color: var(--sky);
+      border: 1px solid rgba(0,200,255,0.3);
+      padding: 0.15em 0.5em;
+      margin: 0 0.1em;
+      font-family: var(--mono);
+      font-size: 0.7rem;
     }
 
-    #play-btn:active {
-      transform: translate(2px, 2px);
-      box-shadow: 1px 1px 0 var(--gold-dim);
-    }
-
-    #play-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
-
-    .btn-row { text-align: center; }
-
-    /* About */
-    .about-section {
+    .about-section, .docs-section {
       max-width: 860px;
       margin: 0 auto;
-      padding: 2rem 1rem;
+      padding: 3rem 1rem;
+      position: relative;
+      z-index: 1;
     }
-
-    .about-section h2 {
-      font-family: var(--pixel-font);
-      font-size: 0.9rem;
-      color: var(--gold);
-      margin-bottom: 1rem;
+    .about-section h2, .docs-section h2 {
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--sky);
+      margin-bottom: 1.2rem;
       text-transform: uppercase;
+      letter-spacing: 4px;
+      text-shadow: 0 0 15px rgba(0,200,255,0.3);
     }
-
-    .about-section p { margin-bottom: 1rem; color: var(--text); }
-
+    .about-section p { margin-bottom: 1rem; color: var(--text); font-weight: 300; line-height: 1.8; }
+    .about-section a { color: var(--lightning); }
     .feature-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 1rem;
-      margin-top: 1rem;
+      margin-top: 1.2rem;
     }
-
     .feature-card {
       background: var(--bg-card);
-      padding: 1rem;
-      border: 2px solid #333;
+      padding: 1.2rem;
+      border: 1px solid var(--border);
+      transition: border-color 0.25s, box-shadow 0.25s, transform 0.15s;
     }
-
+    .feature-card:hover {
+      border-color: rgba(0,200,255,0.25);
+      box-shadow: 0 0 20px rgba(0,200,255,0.08);
+      transform: translateY(-2px);
+    }
     .feature-card h3 {
-      font-family: var(--pixel-font);
-      font-size: 0.55rem;
-      color: var(--gold);
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 700;
+      font-size: 0.75rem;
+      color: var(--lightning);
       margin-bottom: 0.5rem;
+      letter-spacing: 2px;
       text-transform: uppercase;
     }
-
-    .feature-card p { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0; }
-
-    /* Docs */
-    .docs-section {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 2rem 1rem;
-    }
-
-    .docs-section h2 {
-      font-family: var(--pixel-font);
-      font-size: 0.9rem;
-      color: var(--gold);
-      margin-bottom: 1rem;
-      text-transform: uppercase;
-    }
-
+    .feature-card p { font-size: 0.88rem; color: var(--text-dim); margin-bottom: 0; font-weight: 300; }
     .docs-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 1rem;
     }
-
     .doc-card {
       background: var(--bg-card);
-      border: 2px solid #333;
+      border: 1px solid var(--border);
       padding: 1.2rem;
       text-decoration: none;
       color: var(--text);
-      transition: border-color 0.2s, transform 0.15s;
+      transition: border-color 0.25s, box-shadow 0.25s, transform 0.15s;
       display: block;
     }
-
-    .doc-card:hover { border-color: var(--gold); transform: translateY(-2px); }
-
-    .doc-card h3 {
-      font-family: var(--pixel-font);
-      font-size: 0.55rem;
-      color: var(--gold);
-      margin-bottom: 0.5rem;
+    .doc-card:hover {
+      border-color: rgba(0,200,255,0.25);
+      box-shadow: 0 0 20px rgba(0,200,255,0.08);
+      transform: translateY(-2px);
     }
+    .doc-card h3 {
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 700;
+      font-size: 0.75rem;
+      color: var(--sky);
+      margin-bottom: 0.5rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .doc-card p { font-size: 0.88rem; color: var(--text-dim); margin-bottom: 0; font-weight: 300; }
 
-    .doc-card p { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0; }
-
-    /* Footer */
     footer {
       text-align: center;
-      padding: 2rem 1rem;
-      border-top: 3px solid #222;
+      padding: 2.5rem 1rem;
+      border-top: 1px solid var(--border);
       color: var(--text-dim);
-      font-size: 0.75rem;
+      font-size: 0.8rem;
+      position: relative;
+      z-index: 1;
+      font-weight: 300;
     }
-
-    footer a { color: var(--gold); text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
+    footer a { color: var(--sky); text-decoration: none; }
+    footer a:hover { color: var(--lightning); text-decoration: underline; }
 
     @media (max-width: 600px) {
       nav { flex-direction: column; gap: 0.5rem; padding: 0.5rem 1rem; }
       nav .links { gap: 0.8rem; }
-      .hero { padding: 2rem 1rem 1.5rem; }
+      .hero { padding: 3rem 1rem 1.5rem; }
+      .hero h1 { letter-spacing: 3px; }
     }
   </style>
 
@@ -326,6 +344,17 @@
   </script>
 </head>
 <body>
+
+<div class="streak" style="top:12%;width:30%;--sd:2.5s;--ss:0s;--so:0.12"></div>
+<div class="streak" style="top:24%;width:50%;--sd:3.5s;--ss:0.6s;--so:0.08"></div>
+<div class="streak" style="top:38%;width:20%;--sd:2s;--ss:1.2s;--so:0.15"></div>
+<div class="streak" style="top:51%;width:60%;--sd:4s;--ss:0.3s;--so:0.07"></div>
+<div class="streak" style="top:63%;width:35%;--sd:2.8s;--ss:1.8s;--so:0.1"></div>
+<div class="streak" style="top:74%;width:45%;--sd:3.2s;--ss:0.9s;--so:0.09"></div>
+<div class="streak" style="top:82%;width:25%;--sd:1.8s;--ss:2.4s;--so:0.13"></div>
+<div class="streak" style="top:18%;width:70%;--sd:5s;--ss:0.1s;--so:0.05"></div>
+<div class="streak" style="top:90%;width:40%;--sd:3s;--ss:1.5s;--so:0.11"></div>
+<div class="streak" style="top:5%;width:55%;--sd:4.5s;--ss:2s;--so:0.06"></div>
 
   <nav>
     <a href="#" class="logo">Speedy Bird</a>
