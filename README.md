@@ -21,6 +21,21 @@ A pixel art Flappy Bird clone built with [Lynx](https://lynxjs.org/) — ByteDan
 | 50+   | Gold |
 | 100+  | Platinum |
 
+## What is Lynx?
+
+[Lynx](https://lynxjs.org/) is an open-source **cross-platform native UI framework** created by **ByteDance** (the company behind TikTok). Open-sourced in early 2025, it allows developers to use web technologies — TypeScript, CSS, and React — to build **truly native UIs** for iOS, Android, Web, macOS, Windows, and HarmonyOS from a single codebase.
+
+Key characteristics:
+
+- **Not a WebView** — Lynx has its own native rendering engine written in C++
+- **ReactLynx** — React 17+ compatible layer with functional components, hooks, and JSX/TSX
+- **Dual-threaded** — background thread for React reconciliation, main thread for rendering
+- **200+ CSS properties** — flexbox, grid, animations, transforms, all rendered natively
+- **Rspack toolchain** — fast builds with hot module replacement via `@lynx-js/rspeedy`
+- **Battle-tested** — used internally at ByteDance before open-sourcing; 14,000+ GitHub stars
+
+The purpose of this project is to **learn how to build a Lynx app** from scratch, and to explore how to **automate the build and release pipeline through GitHub Actions** — from a single commit all the way to the app stores.
+
 ## Tech Stack
 
 | Layer | Technology |
