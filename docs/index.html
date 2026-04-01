@@ -730,12 +730,12 @@
         ctx.drawImage(assets.gameOver, ox, oy, ow, oh);
         // Medal
         var medal = getMedal();
-        if (medal) ctx.drawImage(medal, ox+24, oy+72, 44, 44);
+        if (medal) ctx.drawImage(medal, ox+24, oy+78, 44, 44);
         // Score text
         ctx.fillStyle = '#fff';
         ctx.font = 'bold 13px monospace';
-        ctx.fillText(score, ox+138, oy+75);
-        ctx.fillText(best, ox+138, oy+115);
+        ctx.fillText(score, ox+138, oy+73);
+        ctx.fillText(best, ox+138, oy+113);
       }
     }
 
