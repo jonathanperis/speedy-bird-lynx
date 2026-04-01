@@ -1,109 +1,98 @@
-# FLAPPY BIRD
-Flappy bird flew into an endless pipe zone (or is it?) and needs help flying through to get out.  
+# Flappy Bird
 
-# ABOUT THE GAME
-A simple side-scrolling game where the player controls a bird to fly between pipes without hitting them.  Flying between each set of pipes scores 1 point and hitting them or the ground ends the game.  See how long you can last and set records.  
+A pixel art Flappy Bird clone built with [Lynx](https://lynxjs.org/) — ByteDance's cross-platform native UI framework. One TypeScript codebase renders natively on iOS, Android, and Web.
 
-Here's a link to the game:
-https://noanonoa.github.io/flappy-bird/
+**[Play in your browser](https://jonathanperis.github.io/flappy-bird/)**
 
-# WIREFRAME  
-![wireframe for game screen](/img/001-wireframe.png "Game Screen")  
-![wireframe for collision mechanics](/img/002-wireframe.png "Collision Mechanics")
+## How to Play
 
-# TECHNOLOGY
- * HTML/CSS on canvas
- * JavaScript for game logic
+- **Tap** or press **Space** to flap
+- Fly through gaps between pipes
+- Score 1 point per pipe pair cleared
+- Game speeds up 1% every 10 pipes
+- Game ends on collision with a pipe or the ground
 
-# ASSETS
-### IMAGES
-![flappy bird theme](/img/og-theme.png)  
-(src: google images)  
-![flappy bird theme v2](/img/og-theme-2.png)  
-(src: https://www.spriters-resource.com/fullview/59894/)  
-### AUDIO
-(src: https://www.sounds-resource.com/mobile/flappybird/sound/5309/)
-### SCREENSHOT
-![flappy bird screenshot](/img/001-screenshot.png)
+## Medals
 
-# MVP
- * start the game with a 'press button'
- * bird falls default to gravity
- * bird flies to 'click' (might be better for mobile capabilities)
- * pipes spawn top and bottom and scroll to the left 
- * track score
- * end game on collision
+| Score | Medal |
+|-------|-------|
+| 10+   | Bronze |
+| 25+   | Silver |
+| 50+   | Gold |
+| 100+  | Platinum |
 
-# STRETCH GOALS
- * animate bird
- * add sounds for scoring, flying, and collision
- * a customized theme
- * game is animated while waiting for player to start game
- * night time / day time
- * add a running time to display
- * make the game web responsive
+## Tech Stack
 
-# GAMEPLAN
----
-## HTML
- - [X] container for gaming screen
- - [X] game title
- - [X] game screen `<canvas>`
+| Layer | Technology |
+|-------|-----------|
+| Framework | [Lynx](https://lynxjs.org/) (ReactLynx) |
+| Language | TypeScript / TSX |
+| Build | Rspack via `@lynx-js/rspeedy` |
+| Rendering | Element-based (`<view>`, `<image>`) with CSS transforms |
+| Game Loop | `setInterval` at 17ms (~60 FPS) |
+| Web Version | Pure JavaScript + HTML5 Canvas (in `docs/`) |
 
-## CSS
- - [X] *centered* game title
- - [X] *centered* game screen
+## Architecture
 
-## JavaScript
-### Pieces I need
- - [X] specify canvas size
- - [X] draw bird image
- - [X] top pipe image
- - [X] constant gap between pipes
- - [X] bottom pipe image
- - [X] score tracker
- - [X] ready screen: game state 0
- - [X] game over screen: game state 2
- - [X] background image
- - [X] ground image
- - [X] sounds on flying, collision, scoring, falling, and game over screen
-### Functions I need
- - [X] start game: game state 1
-    - [X] start on 'click' (mobile compatible)
-    - [X] spawn set of pipes with constant gap
-      - [X] if statement triggering at x-coordinate
- - [X] bird's movement
-    - [X] gravity: bird's y-coordinate increases to fall  
-     * velocity's value is incremented by gravity constant
-     * bird's position function updates velocity's value
-    - [X] flying: bird's y-coordinate decreases to fly on 'click'
-        - [X] eventListener 'click' (also enabled 'spacebar')
-    - [X] rotate bird upward each time it flies (smells like a challenge)
-        - [X] animation object / array of images to flip through
- - [X] a drawing function to animate game
-   - [X] place images and loop
-    - [X] pipes' x-coordinates decrease to scroll left
-        - [X] increment score by 1 upon passing pipe
-    - [X] pipes' y-coordinates are generated randomly
-    - [X] draw background
-    - [X] draw bird
- - [X] Game Over: game state 2
-    - [X] collision with pipes
-    - [X] collision with floor and canvas ceiling
-    - [X] cut screen
-    - [X] restart game on 'click' start button
-        - [X] display best score
-        - [X] display current score
-        - [X] reset score on start game
-        - [X] reset pipes
+```
+src/
+├── App.tsx                    # Root component, fullscreen game
+├── hooks/useGameEngine.ts     # Game loop, physics, collision, scoring
+├── components/
+│   ├── Bird.tsx               # Animated bird with rotation
+│   ├── Pipe.tsx               # Tile-based pipes (no stretching)
+│   ├── Background.tsx         # Parallax scrolling background
+│   ├── Ground.tsx             # Scrolling ground layer
+│   ├── ScoreDisplay.tsx       # Sprite-based digit rendering
+│   ├── GetReadyScreen.tsx     # Start screen overlay
+│   └── GameOverScreen.tsx     # Game over with medals
+├── audio/audio.ts             # Audio module (web fallback + native stubs)
+├── constants.ts               # All game constants
+└── types.ts                   # TypeScript types
 
-# FINAL THOUGHTS
-> Working with generated images of rectangles `fillRect()` was proving to be more work than actually drawing canvas images from a sprite image source.  This meant working with images from the beginning would just make things simpler in the long run.
+assets/
+├── sprites/                   # Pre-sliced PNGs from sprite sheets
+│   ├── pipes/                 # Tile-based pipe segments (26x25 each)
+│   └── medals/                # Bronze, silver, gold, platinum
+└── audio/                     # WAV sound effects
 
-> Incrementing gravity to increase velocity was crucial to the feel of the game.  It made the bird falling feel natural and is an important concept to learn.  Flapping, or flying, meant setting the velocity to fly key-value which doesn't translate well when reading code.  
+docs/                          # GitHub Pages — playable web version
+└── index.html                 # Self-contained canvas game + site
+```
 
-> Infinite pipe spawning has been a road block for me.  Animating canvas images seem even more challenging.
+## Running Locally
 
-> Tracking the score was challenging due to the fact that each place value of the number had to correlate to an image of its value. No texts and fonts were used in the game.
+### Lynx Native (iOS/Android)
 
-> Overall, I learned a lot of canvas tools and mechanics for JavaScript.  Re-creating this game was a lot of fun and good training for various JavaScript fundamentals such as loops, functions, if-else statements, arrays, objects, and concepts.
+```bash
+npm install
+npm run dev
+```
+
+Then open in [Lynx Explorer](https://github.com/lynx-family/lynx) or [Lynx Go](https://apps.apple.com/us/app/lynx-go-dev-explorer/id6743227790):
+
+```
+http://<your-ip>:3000/main.lynx.bundle
+```
+
+### Web Version
+
+Open `docs/index.html` in any browser. No build step required.
+
+## Game Physics
+
+| Constant | Value | Description |
+|----------|-------|-------------|
+| Gravity | 0.28 | Added to velocity each frame |
+| Flap | 7.25 | Upward velocity on tap |
+| Pipe Speed | 2.7 | Base scroll speed (increases 1%/10 pipes) |
+| Pipe Gap | 150 | Pixels between top and bottom pipe |
+| Spawn Rate | Every 77 frames | ~1.3 seconds between pipe pairs |
+
+## Credits
+
+- Original game concept by [Dong Nguyen](https://en.wikipedia.org/wiki/Flappy_Bird)
+- Original canvas implementation by [noanonoa](https://github.com/noanonoa/flappy-bird)
+- Sprites from [The Spriters Resource](https://www.spriters-resource.com/fullview/59894/)
+- Sound effects from [The Sounds Resource](https://www.sounds-resource.com/mobile/flappybird/sound/5309/)
+- Lynx port by [jonathanperis](https://github.com/jonathanperis)
