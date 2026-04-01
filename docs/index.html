@@ -35,8 +35,8 @@
     :root {
       --bg:        #0f0e17;
       --bg-card:   #1a1a2e;
-      --gold:      #f5c542;
-      --gold-dim:  #c49b30;
+      --gold:      #73bf2e;
+      --gold-dim:  #5a9624;
       --green:     #4ade80;
       --cyan:      #00bbc4;
       --text:      #e0e0e0;
@@ -714,13 +714,16 @@
         btn.style.display = 'none';
         reset();
 
-        cvs.addEventListener('click', handleInput);
-        cvs.addEventListener('touchstart', function(e) { e.preventDefault(); handleInput(); }, { passive: false });
-        document.addEventListener('keydown', function(e) {
-          if (e.code === 'Space' || e.keyCode === 32) { e.preventDefault(); handleInput(); }
-        });
+        // Delay input binding so the Play button click doesn't trigger handleInput
+        setTimeout(function() {
+          cvs.addEventListener('click', handleInput);
+          cvs.addEventListener('touchstart', function(e) { e.preventDefault(); handleInput(); }, { passive: false });
+          document.addEventListener('keydown', function(e) {
+            if (e.code === 'Space' || e.keyCode === 32) { e.preventDefault(); handleInput(); }
+          });
+          cvs.focus();
+        }, 100);
 
-        cvs.focus();
         tick();
       });
     };
