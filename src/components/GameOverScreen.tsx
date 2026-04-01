@@ -1,7 +1,20 @@
 const GAME_OVER_SRC = require('../../assets/sprites/game-over.png');
+const MEDAL_BRONZE = require('../../assets/sprites/medals/medal-bronze.png');
+const MEDAL_SILVER = require('../../assets/sprites/medals/medal-silver.png');
+const MEDAL_GOLD = require('../../assets/sprites/medals/medal-gold.png');
+const MEDAL_PLATINUM = require('../../assets/sprites/medals/medal-platinum.png');
 
 const IMG_W = 226;
 const IMG_H = 158;
+const MEDAL_SIZE = 44;
+
+function getMedalSrc(score: number): string | null {
+  if (score >= 40) return MEDAL_PLATINUM;
+  if (score >= 30) return MEDAL_GOLD;
+  if (score >= 20) return MEDAL_SILVER;
+  if (score >= 10) return MEDAL_BRONZE;
+  return null;
+}
 
 interface GameOverScreenProps {
   visible: boolean;
@@ -11,6 +24,8 @@ interface GameOverScreenProps {
 
 export default function GameOverScreen({ visible, score, bestScore }: GameOverScreenProps) {
   if (!visible) return null;
+
+  const medalSrc = getMedalSrc(score);
 
   return (
     <view
@@ -37,7 +52,20 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
           src={GAME_OVER_SRC}
           style={{ width: `${IMG_W}px`, height: `${IMG_H}px` }}
         />
-        {/* Current score — left of "SCORE" label area */}
+        {/* Medal badge */}
+        {medalSrc ? (
+          <image
+            src={medalSrc}
+            style={{
+              position: 'absolute',
+              top: '62px',
+              left: '24px',
+              width: `${MEDAL_SIZE}px`,
+              height: `${MEDAL_SIZE}px`,
+            }}
+          />
+        ) : null}
+        {/* Current score */}
         <text
           style={{
             position: 'absolute',
@@ -50,7 +78,7 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
         >
           {score}
         </text>
-        {/* Best score — left of "BEST" label area */}
+        {/* Best score */}
         <text
           style={{
             position: 'absolute',
