@@ -9,10 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Build Lynx JS bundle
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
@@ -24,7 +24,7 @@ jobs:
       - run: cp dist/main.lynx.bundle android/app/src/main/assets/
 
       # Build Android APK
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
@@ -33,7 +33,7 @@ jobs:
 
       - run: cd android && chmod +x gradlew && ./gradlew assembleRelease
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: android-apk
           path: android/app/build/outputs/apk/release/*.apk
