@@ -82,7 +82,13 @@ jobs:
 
       - name: Check for iOS project
         id: check
-        run: test -f ios/Podfile && echo "exists=true" >> "$GITHUB_OUTPUT" || echo "exists=false" >> "$GITHUB_OUTPUT"
+        run: |
+          if test -f ios/Podfile && ls ios/*.xcodeproj 1>/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Skipping iOS build — Xcode project not found."
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - uses: actions/download-artifact@v5
         if: steps.check.outputs.exists == 'true'
@@ -140,7 +146,20 @@ jobs:
           find artifacts/ios-archive -name "*.xcarchive" -exec cp -r {} release-assets/ \; 2>/dev/null || true
           ls -la release-assets/
 
+      - name: Generate tag for workflow_dispatch
+        if: "!startsWith(github.ref, 'refs/tags/')"
+        run: |
+          TAG="v0.0.0-$(git rev-parse --short HEAD)"
+          git tag "$TAG" 2>/dev/null || true
+          echo "RELEASE_TAG=$TAG" >> "$GITHUB_ENV"
+
+      - name: Set tag from ref
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo "RELEASE_TAG=${{ github.ref_name }}" >> "$GITHUB_ENV"
+
       - uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.RELEASE_TAG }}
           generate_release_notes: true
           files: release-assets/*
+          overwrite_files: true

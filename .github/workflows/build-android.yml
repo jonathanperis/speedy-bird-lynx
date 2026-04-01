@@ -74,8 +74,12 @@ jobs:
         env:
           VERSION_NAME: ${{ steps.version.outputs.VERSION_NAME }}
         run: |
-          git tag "build/$VERSION_NAME"
-          git push origin "build/$VERSION_NAME"
+          if git rev-parse "build/$VERSION_NAME" >/dev/null 2>&1; then
+            echo "Tag build/$VERSION_NAME already exists, skipping"
+          else
+            git tag "build/$VERSION_NAME"
+            git push origin "build/$VERSION_NAME"
+          fi
 
       - uses: actions/upload-artifact@v5
         with:
