@@ -535,7 +535,11 @@
 
     function loadAssets(cb) {
       var total = assetList.length + soundList.length, loaded = 0;
-      function done() { if (++loaded >= total) cb(); }
+      var called = false;
+      function done() {
+        loaded++;
+        if (!called && loaded >= total) { called = true; cb(); }
+      }
       assetList.forEach(function(a) {
         var img = new Image();
         img.onload = done;
@@ -545,10 +549,10 @@
       });
       soundList.forEach(function(s) {
         var au = new Audio();
-        au.src = s[1];
         au.preload = 'auto';
-        au.oncanplaythrough = done;
+        au.oncanplaythrough = function() { this.oncanplaythrough = null; done(); };
         au.onerror = done;
+        au.src = s[1];
         sounds[s[0]] = au;
       });
     }
