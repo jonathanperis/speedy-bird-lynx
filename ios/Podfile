@@ -1,0 +1,21 @@
+source 'https://cdn.cocoapods.org/'
+
+platform :ios, '13.0'
+
+target 'SpeedyBird' do
+  # Core Lynx engine
+  pod 'Lynx', '3.7.0', :subspecs => ['Framework']
+
+  # JavaScript engine (QuickJS via PrimJS)
+  pod 'PrimJS', '3.7.0', :subspecs => ['quickjs', 'napi']
+
+  # Lynx services
+  pod 'LynxService', '3.7.0', :subspecs => ['Image', 'Log', 'Http']
+
+  # Image loading (required by LynxService/Image)
+  pod 'SDWebImage', '5.15.5'
+  pod 'SDWebImageWebPCoder', '0.11.0'
+
+  # Extended elements
+  pod 'XElement', '3.7.0'
+end

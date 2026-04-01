@@ -3,3 +3,19 @@ dist/
 .rsbuild/
 *.local
 .DS_Store
+
+# Android
+android/.gradle/
+android/app/build/
+android/build/
+android/app/src/main/assets/main.lynx.bundle
+android/app/release.keystore
+*.apk
+*.aab
+
+# iOS
+ios/Pods/
+ios/SpeedyBird.xcworkspace/
+ios/SpeedyBird/Resources/main.lynx.bundle
+ios/Podfile.lock
+*.xcarchive
