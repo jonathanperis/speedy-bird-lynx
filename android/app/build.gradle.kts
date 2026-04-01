@@ -74,4 +74,7 @@ dependencies {
     // Extended elements
     implementation("org.lynxsdk.lynx:xelement:3.7.0")
     implementation("org.lynxsdk.lynx:xelement-input:3.7.0")
+
+    // Gson (required by Lynx SDK internals)
+    implementation("com.google.code.gson:gson:2.10.1")
 }
