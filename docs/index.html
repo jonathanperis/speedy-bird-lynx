@@ -691,18 +691,37 @@
       }
     }
 
-    /* ── Game Loop ────────────────────────────────────────────────── */
-    function tick() {
-      update();
+    /* ── Game Loop (fixed 60fps timestep) ───────────────────────── */
+    var lastTime = 0;
+    var accumulator = 0;
+    var TIMESTEP = 17; // ~60fps
+
+    function tick(timestamp) {
+      if (!lastTime) lastTime = timestamp;
+      accumulator += timestamp - lastTime;
+      lastTime = timestamp;
+
+      while (accumulator >= TIMESTEP) {
+        update();
+        accumulator -= TIMESTEP;
+      }
       draw();
       loopId = requestAnimationFrame(tick);
     }
 
     /* ── Input ────────────────────────────────────────────────────── */
     function handleInput() {
-      if (state === STATE_READY) state = STATE_PLAY;
-      if (state === STATE_PLAY) { vel = -FLAP; playSound('flap'); }
-      else if (state === STATE_OVER) { reset(); playSound('swoosh'); }
+      if (state === STATE_READY) {
+        state = STATE_PLAY;
+        vel = -FLAP;
+        playSound('flap');
+      } else if (state === STATE_PLAY) {
+        vel = -FLAP;
+        playSound('flap');
+      } else if (state === STATE_OVER) {
+        reset();
+        playSound('swoosh');
+      }
     }
 
     /* ── Start ────────────────────────────────────────────────────── */
