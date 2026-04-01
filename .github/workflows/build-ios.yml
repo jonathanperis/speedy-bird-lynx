@@ -41,22 +41,38 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Check for Xcode project
+        id: check
+        run: |
+          if ls ios/*.xcodeproj 1>/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Skipping iOS build — no Xcode project found. See workflow header for setup instructions."
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
       # Build Lynx JS bundle
       - uses: actions/setup-node@v5
+        if: steps.check.outputs.exists == 'true'
         with:
           node-version: 20
           cache: npm
       - run: npm ci
+        if: steps.check.outputs.exists == 'true'
       - run: npm run build
+        if: steps.check.outputs.exists == 'true'
 
       # Copy bundle into iOS app resources
       - run: cp dist/main.lynx.bundle ios/SpeedyBird/Resources/
+        if: steps.check.outputs.exists == 'true'
 
       # Install CocoaPods dependencies
       - run: cd ios && pod install
+        if: steps.check.outputs.exists == 'true'
 
       # Build unsigned archive (signing requires Apple Developer Program)
       - name: Build iOS archive
+        if: steps.check.outputs.exists == 'true'
         run: |
           xcodebuild archive \
             -workspace ios/SpeedyBird.xcworkspace \
@@ -69,6 +85,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO
 
       - uses: actions/upload-artifact@v5
+        if: steps.check.outputs.exists == 'true'
         with:
           name: ios-archive
           path: ${{ runner.temp }}/SpeedyBird.xcarchive
