@@ -691,34 +691,22 @@
       }
     }
 
-    /* ── Game Loop (fixed 60fps timestep) ───────────────────────── */
-    var lastTime = 0;
-    var accumulator = 0;
-    var TIMESTEP = 17; // ~60fps
-
-    function tick(timestamp) {
-      if (!lastTime) lastTime = timestamp;
-      accumulator += timestamp - lastTime;
-      lastTime = timestamp;
-
-      while (accumulator >= TIMESTEP) {
-        update();
-        accumulator -= TIMESTEP;
-      }
+    /* ── Game Loop (setInterval like Lynx build) ────────────────── */
+    function loop() {
+      update();
       draw();
-      loopId = requestAnimationFrame(tick);
     }
 
-    /* ── Input ────────────────────────────────────────────────────── */
-    var inputLock = false;
+    /* ── Input (matches Lynx handleTap exactly) ──────────────────── */
+    var inputReady = false;
+
     function handleInput(e) {
       if (e) e.preventDefault();
-      if (inputLock) return;
-      inputLock = true;
-      setTimeout(function() { inputLock = false; }, 50);
+      if (!inputReady) return;
 
       if (state === STATE_READY) {
         state = STATE_PLAY;
+        // First tap both starts AND flaps (same as original game)
         vel = -FLAP;
         playSound('flap');
       } else if (state === STATE_PLAY) {
@@ -743,17 +731,22 @@
         btn.style.display = 'none';
         reset();
 
-        // Delay input binding so the Play button click doesn't trigger handleInput
-        setTimeout(function() {
-          cvs.addEventListener('click', function(e) { handleInput(e); });
-          cvs.addEventListener('touchstart', function(e) { handleInput(e); }, { passive: false });
-          document.addEventListener('keydown', function(e) {
-            if (e.code === 'Space' || e.keyCode === 32) { handleInput(e); }
-          });
-          cvs.focus();
-        }, 100);
+        // Bind input
+        cvs.addEventListener('click', handleInput);
+        cvs.addEventListener('touchstart', handleInput, { passive: false });
+        document.addEventListener('keydown', function(e) {
+          if (e.code === 'Space' || e.keyCode === 32) handleInput(e);
+        });
 
-        tick();
+        // Start game loop (same as Lynx: setInterval 17ms)
+        setInterval(loop, 17);
+        draw(); // initial render
+
+        // Enable input after a short delay so Play button click doesn't fire
+        setTimeout(function() {
+          inputReady = true;
+          cvs.focus();
+        }, 300);
       });
     };
   })();
