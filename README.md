@@ -1,6 +1,6 @@
 # Speedy Bird
 
-A pixel art Speedy Bird clone built with [Lynx](https://lynxjs.org/) — ByteDance's cross-platform native UI framework. One TypeScript codebase renders natively on iOS, Android, and Web.
+A Flappy Bird clone built with [Lynx](https://lynxjs.org/) — ByteDance's cross-platform native UI framework. One TypeScript codebase renders natively on iOS, Android, and Web.
 
 **[Play in your browser](https://jonathanperis.github.io/speedy-bird-lynx/)**
 
@@ -23,7 +23,7 @@ A pixel art Speedy Bird clone built with [Lynx](https://lynxjs.org/) — ByteDan
 
 ## What is Lynx?
 
-[Lynx](https://lynxjs.org/) is an open-source **cross-platform native UI framework** created by **ByteDance** (the company behind TikTok). Open-sourced in early 2025, it allows developers to use web technologies — TypeScript, CSS, and React — to build **truly native UIs** for iOS, Android, Web, macOS, Windows, and HarmonyOS from a single codebase.
+[Lynx](https://lynxjs.org/) is an open-source **cross-platform native UI framework** created by **ByteDance** (the company behind TikTok). It allows developers to use web technologies — TypeScript, CSS, and React — to build **truly native UIs** for iOS, Android, Web, macOS, Windows, and HarmonyOS from a single codebase.
 
 Key characteristics:
 
@@ -32,7 +32,6 @@ Key characteristics:
 - **Dual-threaded** — background thread for React reconciliation, main thread for rendering
 - **200+ CSS properties** — flexbox, grid, animations, transforms, all rendered natively
 - **Rspack toolchain** — fast builds with hot module replacement via `@lynx-js/rspeedy`
-- **Battle-tested** — used internally at ByteDance before open-sourcing; 14,000+ GitHub stars
 
 The purpose of this project is to **learn how to build a Lynx app** from scratch, and to explore how to **automate the build and release pipeline through GitHub Actions** — from a single commit all the way to the app stores.
 
@@ -45,6 +44,9 @@ The purpose of this project is to **learn how to build a Lynx app** from scratch
 | Build | Rspack via `@lynx-js/rspeedy` |
 | Rendering | Element-based (`<view>`, `<image>`) with CSS transforms |
 | Game Loop | `setInterval` at 17ms (~60 FPS) |
+| Android | Kotlin + Lynx SDK 3.7.0 |
+| iOS | Swift + Lynx SDK 3.7.0 (CocoaPods) |
+| CI/CD | GitHub Actions — build, test, sign, release |
 | Web Version | Pure JavaScript + HTML5 Canvas (in `docs/`) |
 
 ## Architecture
@@ -61,23 +63,51 @@ src/
 │   ├── ScoreDisplay.tsx       # Sprite-based digit rendering
 │   ├── GetReadyScreen.tsx     # Start screen overlay
 │   └── GameOverScreen.tsx     # Game over with medals
-├── audio/audio.ts             # Audio module (web fallback + native stubs)
+├── audio/audio.ts             # Audio module (web + native stubs)
 ├── constants.ts               # All game constants
 └── types.ts                   # TypeScript types
 
+android/                       # Native Android host app (Kotlin)
+├── app/src/main/kotlin/       # MainActivity, LynxView setup
+└── app/build.gradle.kts       # Lynx SDK 3.7.0 dependencies
+
+ios/                           # Native iOS host app (Swift)
+├── SpeedyBird/                # AppDelegate, ViewController, LynxView
+└── Podfile                    # Lynx 3.7.0 CocoaPods
+
 assets/
 ├── sprites/                   # Pre-sliced PNGs from sprite sheets
-│   ├── pipes/                 # Tile-based pipe segments (26x25 each)
-│   └── medals/                # Bronze, silver, gold, platinum
+│   ├── pipes/                 # Tile-based pipe segments
+│   ├── medals/                # Bronze, silver, gold, platinum
+│   └── digits/                # 0-9 score sprites
 └── audio/                     # WAV sound effects
 
 docs/                          # GitHub Pages — playable web version
-└── index.html                 # Self-contained canvas game + site
+└── index.html                 # Self-contained canvas game
+
+.github/workflows/
+├── ci.yml                     # Build + type-check on every push/PR
+├── deploy-web.yml             # Deploy to GitHub Pages
+├── build-android.yml          # Build signed APK + create release
+├── build-ios.yml              # Build iOS archive (needs Apple Dev Program)
+└── release.yml                # Create GitHub Release on version tags
 ```
+
+## CI/CD Pipeline
+
+Every push to `main` triggers:
+
+| Workflow | What it does |
+|----------|-------------|
+| **CI** | Install, type-check (`tsc --noEmit`), build Lynx bundles |
+| **Deploy Web** | Deploy `docs/` to GitHub Pages |
+| **Build Android** | Build signed APK, create GitHub Release with artifact |
+
+Version tags (`v*`) additionally trigger the **Release** workflow with full release notes.
 
 ## Running Locally
 
-### Lynx Native (iOS/Android)
+### Lynx (Dev Server)
 
 ```bash
 npm install
@@ -89,6 +119,16 @@ Then open in [Lynx Explorer](https://github.com/lynx-family/lynx) or [Lynx Go](h
 ```
 http://<your-ip>:3000/main.lynx.bundle
 ```
+
+### Android
+
+```bash
+npm run build
+cp dist/main.lynx.bundle android/app/src/main/assets/
+cd android && ./gradlew assembleDebug
+```
+
+Install the APK from `android/app/build/outputs/apk/debug/`.
 
 ### Web Version
 
@@ -110,4 +150,4 @@ Open `docs/index.html` in any browser. No build step required.
 - Original canvas implementation by [noanonoa](https://github.com/noanonoa/flappy-bird)
 - Sprites from [The Spriters Resource](https://www.spriters-resource.com/fullview/59894/)
 - Sound effects from [The Sounds Resource](https://www.sounds-resource.com/mobile/flappybird/sound/5309/)
-- Lynx port by [jonathanperis](https://github.com/jonathanperis)
+- Lynx port and CI/CD by [jonathanperis](https://github.com/jonathanperis)
