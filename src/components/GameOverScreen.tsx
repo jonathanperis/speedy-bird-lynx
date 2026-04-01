@@ -52,10 +52,9 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
           src={GAME_OVER_SRC}
           style={{ width: `${IMG_W}px`, height: `${IMG_H}px` }}
         />
-        {/* Medal badge */}
+        {/* Medal badge — wrapped in view for Lynx absolute positioning */}
         {medalSrc ? (
-          <image
-            src={medalSrc}
+          <view
             style={{
               position: 'absolute',
               top: '62px',
@@ -63,9 +62,16 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
               width: `${MEDAL_SIZE}px`,
               height: `${MEDAL_SIZE}px`,
             }}
-          />
+          >
+            <image
+              src={medalSrc}
+              style={{
+                width: `${MEDAL_SIZE}px`,
+                height: `${MEDAL_SIZE}px`,
+              }}
+            />
+          </view>
         ) : null}
-        {/* Current score */}
         <text
           style={{
             position: 'absolute',
@@ -78,7 +84,6 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
         >
           {score}
         </text>
-        {/* Best score */}
         <text
           style={{
             position: 'absolute',
