@@ -41,6 +41,7 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
         alignItems: 'center',
       }}
     >
+      {/* Panel container — game-over image as background-like element */}
       <view
         style={{
           width: `${IMG_W}px`,
@@ -48,19 +49,27 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
           position: 'relative',
         }}
       >
+        {/* Game over panel sprite */}
         <image
           src={GAME_OVER_SRC}
-          style={{ width: `${IMG_W}px`, height: `${IMG_H}px` }}
+          style={{
+            position: 'absolute',
+            top: '0px',
+            left: '0px',
+            width: `${IMG_W}px`,
+            height: `${IMG_H}px`,
+          }}
         />
-        {/* Medal badge — wrapped in view for Lynx absolute positioning */}
+        {/* Medal — absolutely positioned in its own view */}
         {medalSrc ? (
           <view
             style={{
               position: 'absolute',
-              top: '62px',
+              top: '65px',
               left: '24px',
               width: `${MEDAL_SIZE}px`,
               height: `${MEDAL_SIZE}px`,
+              zIndex: 10,
             }}
           >
             <image
@@ -72,10 +81,11 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
             />
           </view>
         ) : null}
+        {/* Score */}
         <text
           style={{
             position: 'absolute',
-            top: '55px',
+            top: '60px',
             left: '138px',
             color: '#ffffff',
             fontSize: '13px',
@@ -84,10 +94,11 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
         >
           {score}
         </text>
+        {/* Best */}
         <text
           style={{
             position: 'absolute',
-            top: '95px',
+            top: '100px',
             left: '138px',
             color: '#ffffff',
             fontSize: '13px',
