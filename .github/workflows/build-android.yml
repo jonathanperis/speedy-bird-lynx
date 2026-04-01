@@ -6,6 +6,9 @@ on:
     tags: ['v*']
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -79,3 +82,24 @@ jobs:
           name: speedy-bird-${{ steps.version.outputs.VERSION_NAME }}-android
           path: android/app/build/outputs/apk/release/*.apk
           retention-days: 90
+
+      # Create GitHub Release with APK attached
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION_NAME: ${{ steps.version.outputs.VERSION_NAME }}
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+            TITLE="$TAG"
+            PRERELEASE=""
+          else
+            TAG="build/$VERSION_NAME"
+            TITLE="Build $VERSION_NAME"
+            PRERELEASE="--prerelease"
+          fi
+          gh release create "$TAG" \
+            --title "$TITLE" \
+            --generate-notes \
+            $PRERELEASE \
+            android/app/build/outputs/apk/release/*.apk
