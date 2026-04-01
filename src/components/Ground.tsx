@@ -1,4 +1,4 @@
-import { GROUND_W, GROUND_H } from '../constants.js';
+import { GROUND_W, GROUND_H, CANVAS_HEIGHT } from '../constants.js';
 
 const GROUND_SRC = require('../../assets/sprites/ground.png');
 
@@ -7,11 +7,13 @@ interface GroundProps {
 }
 
 export default function Ground({ groundX }: GroundProps) {
+  const y = CANVAS_HEIGHT - GROUND_H;
+
   return (
     <view
       style={{
         position: 'absolute',
-        bottom: '0px',
+        top: `${y}px`,
         left: '0px',
         width: `${GROUND_W * 5}px`,
         height: `${GROUND_H}px`,

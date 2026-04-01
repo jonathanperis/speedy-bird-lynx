@@ -1,4 +1,4 @@
-import { BG_W, BG_H, GROUND_H } from '../constants.js';
+import { BG_W, BG_H, CANVAS_HEIGHT, GROUND_H } from '../constants.js';
 
 const BG_SRC = require('../../assets/sprites/background.png');
 
@@ -7,11 +7,14 @@ interface BackgroundProps {
 }
 
 export default function Background({ bgX }: BackgroundProps) {
+  // Position from top instead of bottom for Lynx native compatibility
+  const y = CANVAS_HEIGHT - GROUND_H - BG_H;
+
   return (
     <view
       style={{
         position: 'absolute',
-        bottom: `${GROUND_H}px`,
+        top: `${y}px`,
         left: '0px',
         width: `${BG_W * 5}px`,
         height: `${BG_H}px`,
