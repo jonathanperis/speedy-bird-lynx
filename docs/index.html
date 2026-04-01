@@ -743,14 +743,19 @@
 
     /* ── Input (matches Lynx handleTap exactly) ──────────────────── */
     var inputReady = false;
+    var lastInputTime = 0;
 
     function handleInput(e) {
       if (e) e.preventDefault();
       if (!inputReady) return;
 
+      // Debounce: ignore inputs within 80ms of each other (prevents touch+click double-fire)
+      var now = Date.now();
+      if (now - lastInputTime < 80) return;
+      lastInputTime = now;
+
       if (state === STATE_READY) {
         state = STATE_PLAY;
-        // First tap both starts AND flaps (same as original game)
         vel = -FLAP;
         playSound('flap');
       } else if (state === STATE_PLAY) {
@@ -763,7 +768,11 @@
     }
 
     /* ── Start ────────────────────────────────────────────────────── */
+    var gameStarted = false;
     window.startGame = function() {
+      if (gameStarted) return;
+      gameStarted = true;
+
       var btn = document.getElementById('play-btn');
       btn.disabled = true;
       btn.textContent = 'Loading...';
