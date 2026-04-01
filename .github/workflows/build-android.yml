@@ -83,23 +83,58 @@ jobs:
           path: android/app/build/outputs/apk/release/*.apk
           retention-days: 90
 
+      # Rename APK with version
+      - name: Rename APK
+        env:
+          VERSION_NAME: ${{ steps.version.outputs.VERSION_NAME }}
+        run: |
+          APK=$(ls android/app/build/outputs/apk/release/*.apk | head -1)
+          cp "$APK" "android/app/build/outputs/apk/release/speedy-bird-${VERSION_NAME}.apk"
+
       # Create GitHub Release with APK attached
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION_NAME: ${{ steps.version.outputs.VERSION_NAME }}
+          VERSION_CODE: ${{ steps.version.outputs.VERSION_CODE }}
         run: |
+          COMMIT_SHA="${{ github.sha }}"
+          SHORT_SHA="${COMMIT_SHA:0:7}"
+          APK_FILE="speedy-bird-${VERSION_NAME}.apk"
+          APK_SIZE=$(du -h "android/app/build/outputs/apk/release/$APK_FILE" | cut -f1)
+
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
             TAG="${GITHUB_REF#refs/tags/}"
-            TITLE="$TAG"
+            TITLE="Speedy Bird $TAG"
             PRERELEASE=""
           else
             TAG="build/$VERSION_NAME"
-            TITLE="Build $VERSION_NAME"
+            TITLE="Speedy Bird v${VERSION_NAME}"
             PRERELEASE="--prerelease"
           fi
+
+          BODY="Automated release built from commit [\`${COMMIT_SHA}\`](https://github.com/${{ github.repository }}/commit/${COMMIT_SHA}).
+
+          ### Downloads
+
+          | Platform | File | Size | Notes |
+          |----------|------|------|-------|
+          | Android | \`${APK_FILE}\` | ${APK_SIZE} | Signed release APK — install directly on device |
+
+          ### Build Info
+
+          | Field | Value |
+          |-------|-------|
+          | Version | \`${VERSION_NAME}\` |
+          | Version Code | \`${VERSION_CODE}\` |
+          | Commit | [\`${SHORT_SHA}\`](https://github.com/${{ github.repository }}/commit/${COMMIT_SHA}) |
+          | Lynx SDK | 3.7.0 |
+          | Min Android | API 21 (5.0 Lollipop) |
+
+          > **[Play the web version](https://jonathanperis.github.io/speedy-bird-lynx/)** if you don't have an Android device."
+
           gh release create "$TAG" \
             --title "$TITLE" \
-            --generate-notes \
+            --notes "$BODY" \
             $PRERELEASE \
-            android/app/build/outputs/apk/release/*.apk
+            "android/app/build/outputs/apk/release/$APK_FILE"
