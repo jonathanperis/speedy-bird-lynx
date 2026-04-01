@@ -1,0 +1,46 @@
+name: Build iOS
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      # Build Lynx JS bundle
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+      # Copy bundle into iOS app resources
+      - run: mkdir -p ios/SpeedyBird/Resources
+      - run: cp dist/main.lynx.bundle ios/SpeedyBird/Resources/
+
+      # Install CocoaPods dependencies
+      - run: cd ios && pod install
+
+      # Build unsigned archive
+      - name: Build iOS archive
+        run: |
+          xcodebuild archive \
+            -workspace ios/SpeedyBird.xcworkspace \
+            -scheme SpeedyBird \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath ${{ runner.temp }}/SpeedyBird.xcarchive \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-archive
+          path: ${{ runner.temp }}/SpeedyBird.xcarchive
+          retention-days: 90

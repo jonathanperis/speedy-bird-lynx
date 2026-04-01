@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speedy Bird - Pixel Art Side-Scroller</title>
+  <meta name="description" content="A pixel art Speedy Bird clone built with Lynx cross-platform framework. Play in your browser or on mobile via Lynx native.">
+  <meta name="keywords" content="Speedy Bird, pixel art, Lynx, ReactLynx, cross-platform, mobile game, side-scroller, open source">
+  <link rel="canonical" href="https://jonathanperis.github.io/speedy-bird-lynx/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Speedy Bird - Pixel Art Side-Scroller">
+  <meta property="og:description" content="A pixel art Speedy Bird clone built with Lynx cross-platform framework. Play in your browser.">
+  <meta property="og:url" content="https://jonathanperis.github.io/speedy-bird-lynx/">
+  <meta property="og:site_name" content="Speedy Bird">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Speedy Bird - Pixel Art Side-Scroller">
+  <meta name="twitter:description" content="A pixel art Speedy Bird clone built with Lynx. Play in your browser.">
+
+  <!-- Theme -->
+  <meta name="theme-color" content="#0f0e17">
+
+  <!-- Press Start 2P pixel font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:        #0f0e17;
+      --bg-card:   #1a1a2e;
+      --gold:      #fcb700;
+      --gold-dim:  #c99200;
+      --green:     #4ade80;
+      --cyan:      #00bbc4;
+      --text:      #e0e0e0;
+      --text-dim:  #888;
+      --pixel-font: 'Press Start 2P', monospace;
+      --mono:      'Courier New', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .pixel-border {
+      border: 4px solid var(--gold);
+      box-shadow:
+        4px 4px 0 var(--gold-dim),
+        inset 0 0 0 2px rgba(245, 197, 66, 0.15);
+    }
+
+    /* Navigation */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 3px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 2rem;
+    }
+
+    nav .logo {
+      font-family: var(--pixel-font);
+      font-size: 0.85rem;
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    nav .links { display: flex; gap: 1.5rem; list-style: none; }
+
+    nav .links a {
+      font-family: var(--pixel-font);
+      font-size: 0.55rem;
+      color: var(--text);
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: color 0.2s;
+    }
+
+    nav .links a:hover { color: var(--gold); }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+    }
+
+    .hero h1 {
+      font-family: var(--pixel-font);
+      font-size: clamp(1.4rem, 4vw, 2.4rem);
+      color: var(--gold);
+      text-shadow: 3px 3px 0 var(--gold-dim);
+      margin-bottom: 0.75rem;
+    }
+
+    .hero p {
+      max-width: 600px;
+      margin: 0 auto;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    /* Game section */
+    .game-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem 1rem 2.5rem;
+    }
+
+    .game-wrapper {
+      background: var(--bg-card);
+      padding: 1rem;
+      max-width: 460px;
+      width: 100%;
+    }
+
+    #canvas {
+      display: block;
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+      aspect-ratio: 400 / 600;
+      margin: 0 auto;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      cursor: pointer;
+      background: #00bbc4;
+    }
+
+    .game-controls {
+      text-align: center;
+      margin-top: 0.75rem;
+      font-family: var(--pixel-font);
+      font-size: 0.5rem;
+      color: var(--text-dim);
+      line-height: 2;
+    }
+
+    .game-controls kbd {
+      display: inline-block;
+      background: var(--bg);
+      color: var(--gold);
+      border: 2px solid var(--gold-dim);
+      padding: 0.15em 0.5em;
+      margin: 0 0.1em;
+      font-family: var(--pixel-font);
+      font-size: 0.5rem;
+    }
+
+    #play-btn {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.6em 1.6em;
+      font-family: var(--pixel-font);
+      font-size: 0.7rem;
+      color: var(--bg);
+      background: var(--gold);
+      border: none;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 3px 3px 0 var(--gold-dim);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    #play-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0 var(--gold-dim);
+    }
+
+    #play-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 var(--gold-dim);
+    }
+
+    #play-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+    .btn-row { text-align: center; }
+
+    /* About */
+    .about-section {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .about-section h2 {
+      font-family: var(--pixel-font);
+      font-size: 0.9rem;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .about-section p { margin-bottom: 1rem; color: var(--text); }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      padding: 1rem;
+      border: 2px solid #333;
+    }
+
+    .feature-card h3 {
+      font-family: var(--pixel-font);
+      font-size: 0.55rem;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .feature-card p { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0; }
+
+    /* Docs */
+    .docs-section {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .docs-section h2 {
+      font-family: var(--pixel-font);
+      font-size: 0.9rem;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .docs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .doc-card {
+      background: var(--bg-card);
+      border: 2px solid #333;
+      padding: 1.2rem;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.2s, transform 0.15s;
+      display: block;
+    }
+
+    .doc-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+
+    .doc-card h3 {
+      font-family: var(--pixel-font);
+      font-size: 0.55rem;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .doc-card p { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0; }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      border-top: 3px solid #222;
+      color: var(--text-dim);
+      font-size: 0.75rem;
+    }
+
+    footer a { color: var(--gold); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      nav { flex-direction: column; gap: 0.5rem; padding: 0.5rem 1rem; }
+      nav .links { gap: 0.8rem; }
+      .hero { padding: 2rem 1rem 1.5rem; }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "Speedy Bird",
+    "description": "A pixel art Speedy Bird clone built with Lynx cross-platform framework. Play in your browser or on mobile.",
+    "url": "https://jonathanperis.github.io/speedy-bird-lynx/",
+    "genre": ["Arcade", "Pixel Art", "Side-Scroller"],
+    "gamePlatform": ["Web Browser", "iOS", "Android"],
+    "applicationCategory": "Game",
+    "operatingSystem": ["iOS", "Android", "Web"],
+    "author": {
+      "@type": "Person",
+      "name": "Jonathan Peris",
+      "url": "https://github.com/jonathanperis"
+    },
+    "isAccessibleForFree": true,
+    "license": "https://github.com/jonathanperis/speedy-bird-lynx/blob/master/LICENSE",
+    "codeRepository": "https://github.com/jonathanperis/speedy-bird-lynx"
+  }
+  </script>
+</head>
+<body>
+
+  <nav>
+    <a href="#" class="logo">Speedy Bird</a>
+    <ul class="links">
+      <li><a href="#play">Play</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#docs">Docs</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero">
+    <h1>Speedy Bird</h1>
+    <p>A pixel art side-scroller built with Lynx cross-platform framework.<br>
+       Play it right here — tap or press <strong>Space</strong> to flap.</p>
+  </section>
+
+  <section id="play" class="game-section">
+    <div class="game-wrapper pixel-border">
+      <canvas id="canvas" width="400" height="600" tabindex="0"></canvas>
+      <div class="btn-row">
+        <button id="play-btn" onclick="event.stopPropagation(); startGame();">Play</button>
+      </div>
+      <div class="game-controls">
+        <kbd>Space</kbd> / <kbd>Click</kbd> Flap &nbsp;&middot;&nbsp;
+        <kbd>Tap</kbd> on mobile
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="about-section">
+    <h2>About the Game</h2>
+    <h2>Why "Speedy Bird"?</h2>
+    <p>
+      Unlike the original Flappy Bird, Speedy Bird features <strong>progressive
+      difficulty</strong> — the game gets <strong>1% faster with every pipe you
+      clear</strong>. Pipes scroll quicker, the ground rushes beneath you, and spawn
+      timing tightens to keep the spacing constant. By pipe 50 you're flying at
+      1.5&times; speed. By pipe 100, it's 2&times;. How fast can you go?
+    </p>
+
+    <h2 style="margin-top: 2rem;">About the Project</h2>
+    <p>
+      This game started as a vanilla HTML5 Canvas Flappy Bird clone and was
+      <strong>ported to ByteDance's Lynx framework</strong> — a cross-platform
+      native UI engine that renders on iOS, Android, Web, and Desktop from a
+      single TypeScript codebase.
+    </p>
+    <p>
+      The purpose of this project is to <strong>learn how to build a Lynx app</strong>
+      from scratch, and to explore how to <strong>automate the entire build and
+      release pipeline through GitHub Actions</strong> — from a single commit all
+      the way to the app stores.
+    </p>
+    <p>
+      The web version above runs as a pure JavaScript canvas implementation
+      matching the exact physics, collision detection, and tile-based pipe
+      rendering of the Lynx native build.
+    </p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>Physics</h3>
+        <p>Gravity, velocity-based flap, rotation tied to speed. Feels like the original.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Tile-Based Pipes</h3>
+        <p>Pipes built from repeating 26&times;25 pixel-art tiles with mouth caps. Any height, no stretching.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Parallax</h3>
+        <p>Background scrolls at 0.2px/frame, ground at 2.7px/frame — multi-layer depth illusion.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Medal System</h3>
+        <p>Bronze, silver, gold, platinum medals awarded based on score. Displayed on the game-over panel.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Cross-Platform</h3>
+        <p>Built with Lynx (ReactLynx + TypeScript). Runs natively on iOS and Android via Lynx Explorer.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Pixel Perfect</h3>
+        <p>All sprites extracted from the original sprite sheet. Canvas renders with crisp pixel scaling.</p>
+      </div>
+    </div>
+
+    <h2 style="margin-top: 2rem;">What is Lynx?</h2>
+    <p>
+      <a href="https://lynxjs.org/" target="_blank" rel="noreferrer noopener" style="color: var(--gold);">Lynx</a>
+      is an open-source <strong>cross-platform native UI framework</strong> created by
+      <strong>ByteDance</strong> (the company behind TikTok). Open-sourced in early 2025,
+      it lets developers use web technologies — TypeScript, CSS, and React — to build
+      <strong>truly native UIs</strong> that render on iOS, Android, Web, macOS, Windows,
+      and HarmonyOS from a single codebase.
+    </p>
+    <p>
+      Unlike WebView-based solutions, Lynx has its own <strong>native rendering engine
+      written in C++</strong>. It uses a dual-threaded architecture: a background thread
+      runs React reconciliation and business logic, while the main thread handles
+      rendering and immediate UI responses. This gives native performance with a
+      web-like development experience.
+    </p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>ReactLynx</h3>
+        <p>React 17+ compatible. Functional components, hooks, context, JSX/TSX — the same React you already know.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Native Rendering</h3>
+        <p>No WebView. A C++ engine renders native UI elements on each platform with GPU-accelerated CSS transforms.</p>
+      </div>
+      <div class="feature-card">
+        <h3>CSS Styling</h3>
+        <p>200+ CSS properties, flexbox, grid, animations, transitions, transforms, and filters — all native.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Rspack Toolchain</h3>
+        <p>Built on Rspack/Rsbuild for fast builds. Hot module replacement, TypeScript, and asset bundling out of the box.</p>
+      </div>
+      <div class="feature-card">
+        <h3>6 Platforms</h3>
+        <p>Android 5+, iOS 10+, Web, macOS, Windows, and HarmonyOS. Write once, deploy everywhere.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Battle-Tested</h3>
+        <p>Used internally at ByteDance before open-sourcing. 14,000+ GitHub stars and active development.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="docs" class="docs-section">
+    <h2>Documentation</h2>
+    <div class="docs-grid">
+      <a class="doc-card" href="https://github.com/jonathanperis/speedy-bird-lynx#readme" target="_blank" rel="noreferrer noopener">
+        <h3>README</h3>
+        <p>Project overview, Lynx setup, game architecture, and how to run on mobile.</p>
+      </a>
+      <a class="doc-card" href="https://github.com/jonathanperis/speedy-bird-lynx/wiki" target="_blank" rel="noreferrer noopener">
+        <h3>Wiki &mdash; Home</h3>
+        <p>Quick-start guide and navigation to all wiki pages.</p>
+      </a>
+      <a class="doc-card" href="https://github.com/jonathanperis/speedy-bird-lynx/wiki/game_mechanics" target="_blank" rel="noreferrer noopener">
+        <h3>Wiki &mdash; Game Mechanics</h3>
+        <p>Physics, collision detection, scoring, and game state machine.</p>
+      </a>
+      <a class="doc-card" href="https://github.com/jonathanperis/speedy-bird-lynx/wiki/code_walkthrough" target="_blank" rel="noreferrer noopener">
+        <h3>Wiki &mdash; Code Walkthrough</h3>
+        <p>File structure, game loop, canvas setup, and module breakdown.</p>
+      </a>
+      <a class="doc-card" href="https://github.com/jonathanperis/speedy-bird-lynx/wiki/assets" target="_blank" rel="noreferrer noopener">
+        <h3>Wiki &mdash; Assets</h3>
+        <p>Sprites, audio files, and asset attribution.</p>
+      </a>
+      <a class="doc-card" href="https://github.com/jonathanperis/speedy-bird-lynx/wiki/getting_started" target="_blank" rel="noreferrer noopener">
+        <h3>Wiki &mdash; Getting Started</h3>
+        <p>How to run locally, controls, and Lynx Explorer setup for mobile testing.</p>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      <a href="https://github.com/jonathanperis/speedy-bird-lynx" target="_blank" rel="noreferrer noopener">GitHub Repository</a>
+      &nbsp;&middot;&nbsp;
+      <a href="https://github.com/jonathanperis/speedy-bird-lynx/wiki" target="_blank" rel="noreferrer noopener">Wiki</a>
+    </p>
+    <p style="margin-top: 0.5rem;">
+      Created by <a href="https://github.com/jonathanperis" target="_blank" rel="noreferrer noopener">jonathanperis</a>.
+      Original game by <a href="https://github.com/noanonoa" target="_blank" rel="noreferrer noopener">noanonoa</a>.
+    </p>
+    <p style="margin-top: 0.25rem;">
+      Sprites from <a href="https://www.spriters-resource.com/fullview/59894/" target="_blank" rel="noreferrer noopener">The Spriters Resource</a>.
+    </p>
+  </footer>
+
+  <script>
+  /* ── Speedy Bird — Pure JS Canvas Implementation ─────────────── */
+  (function() {
+    'use strict';
+
+    /* ── Constants (matching Lynx build exactly) ─────────────────── */
+    var W = 400, H = 600;
+    var BIRD_X = 80, BIRD_Y_START = 280, BIRD_W = 34, BIRD_H = 24, BIRD_R = 12;
+    var FLAP = 7.25, GRAVITY = 0.28;
+    var ROT_UP = -15, ROT_NEUTRAL = 0, ROT_DOWN = 70;
+    var PIPE_W = 55, PIPE_H = 300, PIPE_GAP = 150, PIPE_DX = 2.7;
+    var PIPE_MIN_Y = -200, PIPE_MAX_Y = -80, PIPE_SPAWN = 77;
+    var BG_W = 276, BG_H = 228, BG_DX = 0.2;
+    var GROUND_W = 224, GROUND_H = 129, GROUND_DX = 2.7;
+    var BG_COLOR = '#00bbc4';
+    var DEG = Math.PI / 180;
+
+    var STATE_READY = 0, STATE_PLAY = 1, STATE_OVER = 2;
+
+    /* ── Assets ──────────────────────────────────────────────────── */
+    var assets = {};
+    var assetList = [
+      ['bird0', 'assets/sprites/bird-0.png'],
+      ['bird1', 'assets/sprites/bird-1.png'],
+      ['bird2', 'assets/sprites/bird-2.png'],
+      ['bg', 'assets/sprites/background.png'],
+      ['ground', 'assets/sprites/ground.png'],
+      ['getReady', 'assets/sprites/get-ready.png'],
+      ['gameOver', 'assets/sprites/game-over.png'],
+      ['pipeTopBody', 'assets/sprites/pipes/pipe-top.png'],
+      ['pipeTopMouth', 'assets/sprites/pipes/pipe-top-mouth.png'],
+      ['pipeBotBody', 'assets/sprites/pipes/pipe-bottom.png'],
+      ['pipeBotMouth', 'assets/sprites/pipes/pipe-bottom-mouth.png'],
+      ['medalBronze', 'assets/sprites/medals/medal-bronze.png'],
+      ['medalSilver', 'assets/sprites/medals/medal-silver.png'],
+      ['medalGold', 'assets/sprites/medals/medal-gold.png'],
+      ['medalPlatinum', 'assets/sprites/medals/medal-platinum.png'],
+    ];
+    for (var d = 0; d <= 9; d++) assetList.push(['d'+d, 'assets/sprites/digits/digit-'+d+'.png']);
+
+    var sounds = {};
+    var soundList = [
+      ['flap', 'assets/audio/sfx_wing.wav'],
+      ['score', 'assets/audio/sfx_point.wav'],
+      ['hit', 'assets/audio/sfx_hit.wav'],
+      ['die', 'assets/audio/sfx_die.wav'],
+      ['swoosh', 'assets/audio/sfx_swooshing.wav'],
+    ];
+
+    function loadAssets(cb) {
+      var total = assetList.length + soundList.length, loaded = 0;
+      var called = false;
+      function done() {
+        loaded++;
+        if (!called && loaded >= total) { called = true; cb(); }
+      }
+      assetList.forEach(function(a) {
+        var img = new Image();
+        img.onload = done;
+        img.onerror = done;
+        img.src = a[1];
+        assets[a[0]] = img;
+      });
+      soundList.forEach(function(s) {
+        var au = new Audio();
+        au.preload = 'auto';
+        au.oncanplaythrough = function() { this.oncanplaythrough = null; done(); };
+        au.onerror = done;
+        au.src = s[1];
+        sounds[s[0]] = au;
+      });
+    }
+
+    function playSound(name) {
+      var s = sounds[name];
+      if (s) { s.currentTime = 0; s.play().catch(function(){}); }
+    }
+
+    /* ── Game State ──────────────────────────────────────────────── */
+    var cvs, ctx;
+    var state, frame, birdY, vel, birdFr, rot, pipes, nextId;
+    var score, best = 0, bgX, groundX, framesSinceLastPipe;
+    var loopId = null;
+    var groundY, bgY;
+
+    function reset() {
+      state = STATE_READY;
+      frame = 0;
+      birdY = BIRD_Y_START;
+      vel = 0;
+      birdFr = 0;
+      rot = ROT_NEUTRAL;
+      pipes = [];
+      nextId = 0;
+      score = 0;
+      framesSinceLastPipe = 0;
+      bgX = 0;
+      groundX = 0;
+      groundY = H - GROUND_H;
+      bgY = H - GROUND_H - BG_H;
+    }
+
+    /* ── Tile Pipe Drawing ───────────────────────────────────────── */
+    var TILE_H = Math.round(25 * (PIPE_W / 26));
+
+    function drawTopPipe(x, y) {
+      var mouthY = y + PIPE_H - TILE_H;
+      // Body tiles upward from mouth
+      for (var i = 0; i < 20; i++) {
+        ctx.drawImage(assets.pipeTopBody, x, mouthY - (i+1)*TILE_H, PIPE_W, TILE_H+1);
+      }
+      // Mouth at bottom
+      ctx.drawImage(assets.pipeTopMouth, x, mouthY, PIPE_W, TILE_H);
+    }
+
+    function drawBottomPipe(x, y) {
+      var topY = y + PIPE_H + PIPE_GAP;
+      // Mouth at top
+      ctx.drawImage(assets.pipeBotMouth, x, topY, PIPE_W, TILE_H);
+      // Body tiles downward
+      for (var i = 0; i < 20; i++) {
+        ctx.drawImage(assets.pipeBotBody, x, topY + (i+1)*TILE_H, PIPE_W, TILE_H+1);
+      }
+    }
+
+    /* ── Medal ────────────────────────────────────────────────────── */
+    function getMedal() {
+      if (score >= 100) return assets.medalPlatinum;
+      if (score >= 50) return assets.medalGold;
+      if (score >= 25) return assets.medalSilver;
+      if (score >= 10) return assets.medalBronze;
+      return null;
+    }
+
+    /* ── Update ───────────────────────────────────────────────────── */
+    function update() {
+      if (state === STATE_READY) {
+        birdY = BIRD_Y_START; rot = ROT_NEUTRAL; vel = 0;
+        if (frame % 20 === 0) birdFr = (birdFr + 1) % 4;
+      } else {
+        if (frame % 4 === 0) birdFr = (birdFr + 1) % 4;
+        vel += GRAVITY;
+        birdY += vel;
+        if (vel <= FLAP) rot = ROT_UP;
+        else if (vel >= FLAP + 2) { rot = ROT_DOWN; birdFr = 1; }
+        else rot = ROT_NEUTRAL;
+
+        // Ground
+        if (birdY + BIRD_H/2 >= groundY) {
+          birdY = groundY - BIRD_H/2;
+          birdFr = 2; rot = ROT_DOWN;
+          if (state === STATE_PLAY) {
+            state = STATE_OVER; playSound('die');
+            if (score > best) best = score;
+          }
+        }
+        if (birdY - BIRD_H/2 <= 0) birdY = BIRD_R;
+      }
+
+      if (state === STATE_PLAY) {
+        // Speed increases 1% per pipe
+        var speedMult = 1 + score * 0.01;
+        var currentDX = PIPE_DX * speedMult;
+        var currentSpawn = Math.max(20, Math.round(PIPE_SPAWN / speedMult));
+        // Spawn
+        framesSinceLastPipe++;
+        if (framesSinceLastPipe >= currentSpawn) {
+          framesSinceLastPipe = 0;
+          pipes.push({ id: nextId++, x: W, y: Math.floor(Math.random()*(PIPE_MAX_Y-PIPE_MIN_Y+1))+PIPE_MIN_Y });
+        }
+        // Move & despawn
+        for (var i = pipes.length-1; i >= 0; i--) {
+          pipes[i].x -= currentDX;
+          if (pipes[i].x < -PIPE_W) { pipes.splice(i,1); score++; playSound('score'); }
+        }
+        // Collision
+        var bl = BIRD_X-BIRD_R, br = BIRD_X+BIRD_R, bt = birdY-BIRD_R, bb = birdY+BIRD_R;
+        for (var j = 0; j < pipes.length; j++) {
+          var p = pipes[j];
+          var pl = p.x, pr = p.x+PIPE_W;
+          var ttop = p.y, tbot = p.y+PIPE_H;
+          var btop2 = p.y+PIPE_H+PIPE_GAP, bbot2 = p.y+2*PIPE_H+PIPE_GAP;
+          if (bl < pr && br > pl && bt < tbot && bb > ttop) {
+            state = STATE_OVER; playSound('hit'); if (score>best) best=score; break;
+          }
+          if (bl < pr && br > pl && bt < bbot2 && bb > btop2) {
+            state = STATE_OVER; playSound('hit'); if (score>best) best=score; break;
+          }
+        }
+        // Scroll (speed matches pipes)
+        bgX = (bgX - BG_DX * speedMult) % BG_W;
+        groundX = (groundX - GROUND_DX * speedMult) % (GROUND_W/2);
+      }
+
+      frame++;
+    }
+
+    /* ── Draw ─────────────────────────────────────────────────────── */
+    function draw() {
+      ctx.fillStyle = BG_COLOR;
+      ctx.fillRect(0, 0, W, H);
+
+      // Background
+      for (var bx = bgX; bx < W; bx += BG_W) {
+        ctx.drawImage(assets.bg, bx, bgY, BG_W, BG_H);
+      }
+
+      // Pipes
+      for (var i = 0; i < pipes.length; i++) {
+        drawTopPipe(pipes[i].x, pipes[i].y);
+        drawBottomPipe(pipes[i].x, pipes[i].y);
+      }
+
+      // Ground
+      for (var gx = groundX; gx < W + GROUND_W; gx += GROUND_W) {
+        ctx.drawImage(assets.ground, gx, groundY, GROUND_W, GROUND_H);
+      }
+
+      // Bird
+      var birdImgs = [assets.bird0, assets.bird1, assets.bird2, assets.bird1];
+      var bImg = birdImgs[birdFr] || assets.bird0;
+      ctx.save();
+      ctx.translate(BIRD_X, birdY);
+      ctx.rotate(rot * DEG);
+      ctx.drawImage(bImg, -BIRD_W/2, -BIRD_H/2, BIRD_W, BIRD_H);
+      ctx.restore();
+
+      // Score (during play)
+      if (state === STATE_PLAY) {
+        var ds = score.toString();
+        var dw = 18, dh = 27, dgap = 2;
+        var tw = ds.length * dw + (ds.length-1)*dgap;
+        var sx = (W - tw) / 2;
+        for (var di = 0; di < ds.length; di++) {
+          ctx.drawImage(assets['d'+ds[di]], sx + di*(dw+dgap), 60, dw, dh);
+        }
+      }
+
+      // Get Ready
+      if (state === STATE_READY) {
+        ctx.drawImage(assets.getReady, (W-174)/2, H/2-160, 174, 160);
+      }
+
+      // Game Over
+      if (state === STATE_OVER) {
+        var ow = 226, oh = 158;
+        var ox = (W-ow)/2, oy = H/2-oh;
+        ctx.drawImage(assets.gameOver, ox, oy, ow, oh);
+        // Medal
+        var medal = getMedal();
+        if (medal) ctx.drawImage(medal, ox+24, oy+88, 44, 44);
+        // Score text
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 13px monospace';
+        ctx.fillText(score, ox+138, oy+73);
+        ctx.fillText(best, ox+138, oy+113);
+      }
+    }
+
+    /* ── Game Loop (setInterval like Lynx build) ────────────────── */
+    function loop() {
+      update();
+      draw();
+    }
+
+    /* ── Input (matches Lynx handleTap exactly) ──────────────────── */
+    var inputReady = false;
+    var lastInputTime = 0;
+
+    function handleInput(e) {
+      if (e) e.preventDefault();
+      if (!inputReady) return;
+
+      // Debounce: ignore inputs within 80ms of each other (prevents touch+click double-fire)
+      var now = Date.now();
+      if (now - lastInputTime < 80) return;
+      lastInputTime = now;
+
+      if (state === STATE_READY) {
+        state = STATE_PLAY;
+        vel = -FLAP;
+        playSound('flap');
+      } else if (state === STATE_PLAY) {
+        vel = -FLAP;
+        playSound('flap');
+      } else if (state === STATE_OVER) {
+        reset();
+        playSound('swoosh');
+      }
+    }
+
+    /* ── Start ────────────────────────────────────────────────────── */
+    var gameStarted = false;
+    window.startGame = function() {
+      if (gameStarted) return;
+      gameStarted = true;
+
+      var btn = document.getElementById('play-btn');
+      btn.disabled = true;
+      btn.textContent = 'Loading...';
+
+      cvs = document.getElementById('canvas');
+      ctx = cvs.getContext('2d');
+
+      loadAssets(function() {
+        btn.style.display = 'none';
+        reset();
+
+        // Bind input
+        cvs.addEventListener('click', handleInput);
+        cvs.addEventListener('touchstart', handleInput, { passive: false });
+        document.addEventListener('keydown', function(e) {
+          if (e.code === 'Space' || e.keyCode === 32) handleInput(e);
+        });
+
+        // Start game loop (same as Lynx: setInterval 17ms)
+        setInterval(loop, 17);
+        draw(); // initial render
+
+        // Enable input after a short delay so Play button click doesn't fire
+        setTimeout(function() {
+          inputReady = true;
+          cvs.focus();
+        }, 300);
+      });
+    };
+  })();
+  </script>
+
+</body>
+</html>

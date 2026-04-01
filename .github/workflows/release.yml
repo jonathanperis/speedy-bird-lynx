@@ -1,0 +1,145 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lynx-bundles
+          path: |
+            dist/main.lynx.bundle
+            dist/main.web.bundle
+
+  # Android build — runs if android/ project exists
+  android:
+    needs: build
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for Android project
+        id: check
+        run: test -f android/app/build.gradle.kts && echo "exists=true" >> "$GITHUB_OUTPUT" || echo "exists=false" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/download-artifact@v4
+        if: steps.check.outputs.exists == 'true'
+        with:
+          name: lynx-bundles
+          path: dist/
+
+      - name: Copy bundle to Android assets
+        if: steps.check.outputs.exists == 'true'
+        run: |
+          mkdir -p android/app/src/main/assets
+          cp dist/main.lynx.bundle android/app/src/main/assets/
+
+      - uses: actions/setup-java@v4
+        if: steps.check.outputs.exists == 'true'
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+        if: steps.check.outputs.exists == 'true'
+
+      - name: Build APK
+        if: steps.check.outputs.exists == 'true'
+        run: cd android && chmod +x gradlew && ./gradlew assembleRelease
+
+      - uses: actions/upload-artifact@v4
+        if: steps.check.outputs.exists == 'true'
+        with:
+          name: android-apk
+          path: android/app/build/outputs/apk/release/*.apk
+
+  # iOS build — runs if ios/ project exists
+  ios:
+    needs: build
+    runs-on: macos-15
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for iOS project
+        id: check
+        run: test -f ios/Podfile && echo "exists=true" >> "$GITHUB_OUTPUT" || echo "exists=false" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/download-artifact@v4
+        if: steps.check.outputs.exists == 'true'
+        with:
+          name: lynx-bundles
+          path: dist/
+
+      - name: Copy bundle to iOS resources
+        if: steps.check.outputs.exists == 'true'
+        run: |
+          mkdir -p ios/SpeedyBird/Resources
+          cp dist/main.lynx.bundle ios/SpeedyBird/Resources/
+
+      - name: Install CocoaPods
+        if: steps.check.outputs.exists == 'true'
+        run: cd ios && pod install
+
+      - name: Build archive
+        if: steps.check.outputs.exists == 'true'
+        run: |
+          xcodebuild archive \
+            -workspace ios/SpeedyBird.xcworkspace \
+            -scheme SpeedyBird \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath ${{ runner.temp }}/SpeedyBird.xcarchive \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - uses: actions/upload-artifact@v4
+        if: steps.check.outputs.exists == 'true'
+        with:
+          name: ios-archive
+          path: ${{ runner.temp }}/SpeedyBird.xcarchive
+
+  # Create GitHub Release with all available artifacts
+  create-release:
+    needs: [build, android, ios]
+    if: always() && needs.build.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+          merge-multiple: false
+
+      - name: Collect release assets
+        run: |
+          mkdir -p release-assets
+          cp artifacts/lynx-bundles/* release-assets/ 2>/dev/null || true
+          cp artifacts/android-apk/*.apk release-assets/ 2>/dev/null || true
+          find artifacts/ios-archive -name "*.xcarchive" -exec cp -r {} release-assets/ \; 2>/dev/null || true
+          ls -la release-assets/
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: release-assets/*
