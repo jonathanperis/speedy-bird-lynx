@@ -35,7 +35,6 @@ import { audioModule } from '../audio/audio.js';
 
 let nextPipeId = 0;
 
-// Render state — everything the UI needs to draw a single frame
 export interface RenderState {
   birdY: number;
   birdRotation: number;
@@ -49,7 +48,6 @@ export interface RenderState {
 }
 
 export function useGameEngine() {
-  // All game state lives in a ref to avoid re-render per tick
   const engine = useRef({
     gameState: STATE_READY as GameState,
     frame: 0,
@@ -62,9 +60,9 @@ export function useGameEngine() {
     bestScore: 0,
     bgX: 0,
     groundX: 0,
+    framesSinceLastPipe: 0,
   });
 
-  // Render state — updated via setState to trigger re-renders
   const [renderState, setRenderState] = useState<RenderState>({
     birdY: BIRD_Y_START,
     birdRotation: ROTATION_NEUTRAL,
@@ -126,7 +124,15 @@ export function useGameEngine() {
 
     // --- Update pipes ---
     if (e.gameState === STATE_PLAY) {
-      if (e.frame % PIPE_SPAWN_INTERVAL === 0) {
+      // Speed increases 1% per pipe
+      const speedMult = 1 + e.score * 0.01;
+      const currentDX = PIPE_DX * speedMult;
+      const currentSpawn = Math.max(20, Math.round(PIPE_SPAWN_INTERVAL / speedMult));
+
+      // Spawn using counter (works with dynamic intervals)
+      e.framesSinceLastPipe++;
+      if (e.framesSinceLastPipe >= currentSpawn) {
+        e.framesSinceLastPipe = 0;
         e.pipes.push({
           id: nextPipeId++,
           x: CANVAS_WIDTH,
@@ -134,10 +140,7 @@ export function useGameEngine() {
         });
       }
 
-      // Speed increases 1% per pipe
-      const speedMult = 1 + e.score * 0.01;
-      const currentDX = PIPE_DX * speedMult;
-
+      // Move pipes
       for (const pipe of e.pipes) {
         pipe.x -= currentDX;
       }
@@ -180,21 +183,17 @@ export function useGameEngine() {
           break;
         }
       }
-    }
 
-    // --- Update scrolling ---
-    if (e.gameState === STATE_READY) {
-      e.bgX = 0;
-      e.groundX = 0;
-    } else if (e.gameState === STATE_PLAY) {
-      const speedMult = 1 + Math.floor(e.score / 10) * 0.01;
+      // Scroll (speed matches pipes)
       e.bgX = (e.bgX - BG_DX * speedMult) % BG_W;
       e.groundX = (e.groundX - GROUND_DX * speedMult) % (GROUND_W / 2);
+    } else if (e.gameState === STATE_READY) {
+      e.bgX = 0;
+      e.groundX = 0;
     }
 
     e.frame++;
 
-    // Push to React for rendering
     setRenderState({
       birdY: e.birdY,
       birdRotation: e.birdRotation,
@@ -208,19 +207,18 @@ export function useGameEngine() {
     });
   }
 
-  // --- Input handler ---
+  // --- Input handler (matches JS version exactly) ---
   const handleTap = useCallback(() => {
     const e = engine.current;
 
     if (e.gameState === STATE_READY) {
       e.gameState = STATE_PLAY;
-    }
-
-    if (e.gameState === STATE_PLAY) {
+      e.birdVelocity = -BIRD_FLAP;
+      audioModule.play('flap');
+    } else if (e.gameState === STATE_PLAY) {
       e.birdVelocity = -BIRD_FLAP;
       audioModule.play('flap');
     } else if (e.gameState === STATE_OVER) {
-      // Reset
       e.pipes = [];
       e.score = 0;
       e.birdY = BIRD_Y_START;
@@ -230,12 +228,12 @@ export function useGameEngine() {
       e.bgX = 0;
       e.groundX = 0;
       e.frame = 0;
+      e.framesSinceLastPipe = 0;
       nextPipeId = 0;
       e.gameState = STATE_READY;
       audioModule.play('swoosh');
     }
 
-    // Immediate render update for responsiveness
     setRenderState({
       birdY: e.birdY,
       birdRotation: e.birdRotation,
@@ -249,9 +247,8 @@ export function useGameEngine() {
     });
   }, []);
 
-  // Game loop via setInterval (works in web workers, unlike requestAnimationFrame)
   useEffect(() => {
-    intervalRef.current = setInterval(tick, 17); // ~60fps
+    intervalRef.current = setInterval(tick, 17);
     return () => {
       if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
