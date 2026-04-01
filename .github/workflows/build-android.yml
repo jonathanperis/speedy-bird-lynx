@@ -81,7 +81,7 @@ jobs:
             git push origin "build/$VERSION_NAME"
           fi
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         with:
           name: speedy-bird-${{ steps.version.outputs.VERSION_NAME }}-android
           path: android/app/build/outputs/apk/release/*.apk
