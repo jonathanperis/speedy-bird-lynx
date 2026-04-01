@@ -1,3 +1,5 @@
+import { CANVAS_HEIGHT } from '../constants.js';
+
 const GAME_OVER_SRC = require('../../assets/sprites/game-over.png');
 const MEDAL_BRONZE = require('../../assets/sprites/medals/medal-bronze.png');
 const MEDAL_SILVER = require('../../assets/sprites/medals/medal-silver.png');
@@ -9,10 +11,10 @@ const IMG_H = 158;
 const MEDAL_SIZE = 44;
 
 function getMedalSrc(score: number): string | null {
-  if (score >= 50) return MEDAL_PLATINUM;
-  if (score >= 25) return MEDAL_GOLD;
-  if (score >= 15) return MEDAL_SILVER;
-  if (score >= 5) return MEDAL_BRONZE;
+  if (score >= 100) return MEDAL_PLATINUM;
+  if (score >= 50) return MEDAL_GOLD;
+  if (score >= 25) return MEDAL_SILVER;
+  if (score >= 10) return MEDAL_BRONZE;
   return null;
 }
 
@@ -31,14 +33,12 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
     <view
       style={{
         position: 'absolute',
-        top: '0px',
+        top: `${CANVAS_HEIGHT / 2 - IMG_H}px`,
         left: '0px',
         width: '100%',
-        height: '100%',
         zIndex: 5,
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
       }}
     >
       {/* Panel container — game-over image as background-like element */}
@@ -65,7 +65,7 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
           <view
             style={{
               position: 'absolute',
-              top: '65px',
+              top: '88px',
               left: '24px',
               width: `${MEDAL_SIZE}px`,
               height: `${MEDAL_SIZE}px`,
