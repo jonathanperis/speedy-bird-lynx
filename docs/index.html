@@ -644,8 +644,8 @@
       }
 
       if (state === STATE_PLAY) {
-        // Speed increases 10% per pipe (stress test)
-        var speedMult = 1 + score * 0.10;
+        // Speed increases 0.5% per pipe
+        var speedMult = 1 + score * 0.005;
         var currentDX = PIPE_DX * speedMult;
         var currentSpawn = Math.max(20, Math.round(PIPE_SPAWN / speedMult));
         // Spawn
