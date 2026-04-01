@@ -27,8 +27,8 @@ class SpeedyBirdApplication : Application() {
         Fresco.initialize(applicationContext, config)
 
         LynxServiceCenter.inst().registerService(LynxImageService.getInstance())
-        LynxServiceCenter.inst().registerService(LynxLogService.INSTANCE)
-        LynxServiceCenter.inst().registerService(LynxHttpService.INSTANCE)
+        LynxServiceCenter.inst().registerService(LynxLogService())
+        LynxServiceCenter.inst().registerService(LynxHttpService())
     }
 
     private fun initLynxEnv() {
