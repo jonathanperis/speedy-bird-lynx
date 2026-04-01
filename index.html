@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Project 001</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speedy Bird — Lynx</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: rgba(0,0,0,0.95); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="game-title">
-            <h1>FLAPPY BIRD</h1>
-        </div>
-        <div class="game-screen">
-            <canvas id="game" width="300" height="500"></canvas>
-            <p id="description" class="game-description">Press 'spacebar' or 'click' to begin</p>
-        </div>
-    </div>
-    <script src="main.js"></script>
+  <script type="module">
+    import '@lynx-js/web-core';
+    import '@lynx-js/web-core/index.css';
+    import '@lynx-js/web-elements/all';
+    import '@lynx-js/web-elements/index.css';
+  </script>
+  <lynx-view
+    style="height: 100vh; width: 100vw;"
+    url="/main.web.bundle"
+  ></lynx-view>
 </body>
 </html>
