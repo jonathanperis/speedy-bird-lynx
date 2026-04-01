@@ -134,12 +134,15 @@ export function useGameEngine() {
         });
       }
 
+      // Speed increases 1% every 10 pipes
+      const speedMult = 1 + Math.floor(e.score / 10) * 0.01;
+      const currentDX = PIPE_DX * speedMult;
+
       for (const pipe of e.pipes) {
-        pipe.x -= PIPE_DX;
+        pipe.x -= currentDX;
       }
 
       // Despawn + score
-      const before = e.pipes.length;
       e.pipes = e.pipes.filter((pipe) => {
         if (pipe.x < -PIPE_W) {
           e.score++;
@@ -184,8 +187,9 @@ export function useGameEngine() {
       e.bgX = 0;
       e.groundX = 0;
     } else if (e.gameState === STATE_PLAY) {
-      e.bgX = (e.bgX - BG_DX) % BG_W;
-      e.groundX = (e.groundX - GROUND_DX) % (GROUND_W / 2);
+      const speedMult = 1 + Math.floor(e.score / 10) * 0.01;
+      e.bgX = (e.bgX - BG_DX * speedMult) % BG_W;
+      e.groundX = (e.groundX - GROUND_DX * speedMult) % (GROUND_W / 2);
     }
 
     e.frame++;
