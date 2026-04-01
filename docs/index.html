@@ -338,7 +338,7 @@
     <div class="game-wrapper pixel-border">
       <canvas id="canvas" width="400" height="600" tabindex="0"></canvas>
       <div class="btn-row">
-        <button id="play-btn" onclick="startGame()">Play</button>
+        <button id="play-btn" onclick="event.stopPropagation(); startGame();">Play</button>
       </div>
       <div class="game-controls">
         <kbd>Space</kbd> / <kbd>Click</kbd> Flap &nbsp;&middot;&nbsp;
@@ -710,7 +710,13 @@
     }
 
     /* ── Input ────────────────────────────────────────────────────── */
-    function handleInput() {
+    var inputLock = false;
+    function handleInput(e) {
+      if (e) e.preventDefault();
+      if (inputLock) return;
+      inputLock = true;
+      setTimeout(function() { inputLock = false; }, 50);
+
       if (state === STATE_READY) {
         state = STATE_PLAY;
         vel = -FLAP;
@@ -739,10 +745,10 @@
 
         // Delay input binding so the Play button click doesn't trigger handleInput
         setTimeout(function() {
-          cvs.addEventListener('click', handleInput);
-          cvs.addEventListener('touchstart', function(e) { e.preventDefault(); handleInput(); }, { passive: false });
+          cvs.addEventListener('click', function(e) { handleInput(e); });
+          cvs.addEventListener('touchstart', function(e) { handleInput(e); }, { passive: false });
           document.addEventListener('keydown', function(e) {
-            if (e.code === 'Space' || e.keyCode === 32) { e.preventDefault(); handleInput(); }
+            if (e.code === 'Space' || e.keyCode === 32) { handleInput(e); }
           });
           cvs.focus();
         }, 100);
