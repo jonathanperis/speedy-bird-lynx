@@ -644,12 +644,14 @@
 
       if (state === STATE_PLAY) {
         // Spawn
-        if (frame % PIPE_SPAWN === 0) {
+        if (frame % currentSpawn === 0) {
           pipes.push({ id: nextId++, x: W, y: Math.floor(Math.random()*(PIPE_MAX_Y-PIPE_MIN_Y+1))+PIPE_MIN_Y });
         }
         // Speed increases 10% per pipe (stress test)
         var speedMult = 1 + score * 0.10;
         var currentDX = PIPE_DX * speedMult;
+        // Spawn interval scales with speed so pipe distance stays constant
+        var currentSpawn = Math.max(20, Math.round(PIPE_SPAWN / speedMult));
         // Move & despawn
         for (var i = pipes.length-1; i >= 0; i--) {
           pipes[i].x -= currentDX;
