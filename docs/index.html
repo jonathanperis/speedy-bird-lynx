@@ -610,10 +610,10 @@
 
     /* ── Medal ────────────────────────────────────────────────────── */
     function getMedal() {
-      if (score >= 100) return assets.medalPlatinum;
-      if (score >= 50) return assets.medalGold;
-      if (score >= 25) return assets.medalSilver;
-      if (score >= 10) return assets.medalBronze;
+      if (score >= 4) return assets.medalPlatinum;
+      if (score >= 3) return assets.medalGold;
+      if (score >= 2) return assets.medalSilver;
+      if (score >= 1) return assets.medalBronze;
       return null;
     }
 
