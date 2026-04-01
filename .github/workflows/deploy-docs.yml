@@ -34,7 +34,7 @@ jobs:
           GITHUB_URL: "https://github.com/jonathanperis/speedy-bird-lynx"
           OUTPUT_PATH: "docs/docs/index.html"
           TEMPLATE_PATH: ".github/docs-template.html"
-        run: node .github/generate-docs.js
+        run: node --input-type=commonjs < .github/generate-docs.js
 
       - name: Commit and push docs
         run: |
