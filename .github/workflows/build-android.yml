@@ -110,7 +110,7 @@ jobs:
           else
             TAG="build/$VERSION_NAME"
             TITLE="Speedy Bird v${VERSION_NAME}"
-            PRERELEASE="--prerelease"
+            PRERELEASE=""
           fi
 
           BODY="Automated release built from commit [\`${COMMIT_SHA}\`](https://github.com/${{ github.repository }}/commit/${COMMIT_SHA}).
