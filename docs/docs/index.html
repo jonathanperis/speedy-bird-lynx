@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speedy Bird Lynx - Documentation</title>
+  <meta name="description" content="Flappy Bird clone built with ReactLynx and TypeScript — runs natively on iOS, Android, and Web">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --sidebar-bg: #111111;
+      --text-primary: #ededed;
+      --text-muted: #888888;
+      --text-body: #c8c8c8;
+      --accent: #7c6af7;
+      --accent-hover: #9b8df9;
+      --code-bg: #1e1e2e;
+      --code-text: #cdd6f4;
+      --border: #1f1f2e;
+      --code-border: #2a2a3e;
+      --sidebar-width: 260px;
+    }
+
+    * { box-sizing: border-box; }
+    
+    html {
+      scroll-behavior: smooth;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text-primary);
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: var(--sidebar-width);
+      height: 100vh;
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-header {
+      padding: 24px 24px 16px;
+    }
+
+    .repo-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 4px;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .repo-title::before {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 16px;
+      background: var(--accent);
+      border-radius: 4px;
+    }
+
+    .repo-description {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin: 0 0 16px;
+    }
+
+    .search-box {
+      width: 100%;
+      background: #000;
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-box:focus {
+      border-color: var(--accent);
+    }
+
+    .sidebar-nav-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 16px 24px;
+    }
+
+    .sidebar-nav-container ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-nav-container li {
+      margin-bottom: 2px;
+    }
+
+    .nav-item {
+      display: block;
+      padding: 8px 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+      background: rgba(124, 106, 247, 0.1);
+      font-weight: 500;
+    }
+
+    .sidebar-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .sidebar-footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .sidebar-footer a:hover {
+      color: var(--text-primary);
+    }
+
+    /* Main Content */
+    .content-wrapper {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      width: calc(100% - var(--sidebar-width));
+    }
+
+    .content {
+      width: 100%;
+      max-width: 860px;
+      padding: 48px 64px;
+    }
+
+    /* Typography */
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 8px;
+      color: var(--text-primary);
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin: 48px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+    }
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 32px 0 12px;
+      color: var(--text-primary);
+    }
+
+    p {
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--text-body);
+      margin: 0 0 16px;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* Code */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      overflow-x: auto;
+      margin: 24px 0;
+      position: relative;
+    }
+    
+    pre code {
+      background: transparent;
+      padding: 0;
+      border-radius: 0;
+      color: var(--code-text);
+      font-size: 13px;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      background: var(--code-bg);
+      color: var(--code-text);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 13px;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 24px 0;
+      font-size: 14px;
+      border: 1px solid var(--border);
+    }
+
+    th, td {
+      padding: 10px 16px;
+      text-align: left;
+    }
+
+    th {
+      background: #1a1a2e;
+      color: var(--text-primary);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      border-bottom: 1px solid var(--border);
+      color: var(--text-body);
+    }
+
+    tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Blockquotes */
+    blockquote {
+      margin: 24px 0;
+      padding: 12px 20px;
+      background: var(--sidebar-bg);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      color: var(--text-muted);
+    }
+
+    blockquote p {
+      margin: 0;
+    }
+
+    /* HR */
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 40px 0;
+    }
+
+    /* Sections */
+    section.doc-section {
+      scroll-margin-top: 80px;
+      margin-bottom: 80px;
+    }
+    
+    .hidden-section {
+      display: none;
+    }
+    
+    .search-highlight {
+      background: rgba(124, 106, 247, 0.3);
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+
+    /* Mobile */
+    .mobile-header {
+      display: none;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      z-index: 90;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .menu-toggle {
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .menu-toggle span {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 2px;
+    }
+    
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(2px);
+      z-index: 95;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .content-wrapper {
+        margin-left: 0;
+        width: 100%;
+      }
+      .content {
+        padding: 32px 24px;
+      }
+      .mobile-header {
+        display: flex;
+      }
+      .overlay.open {
+        display: block;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+  <!-- Mobile Header -->
+  <div class="mobile-header">
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="repo-title">Speedy Bird Lynx</div>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h1 class="repo-title">Speedy Bird Lynx</h1>
+      <p class="repo-description">Flappy Bird clone built with ReactLynx and TypeScript — runs natively on iOS, Android, and Web</p>
+      <input type="text" id="searchInput" class="search-box" placeholder="Search documentation...">
+    </div>
+    <div class="sidebar-nav-container">
+      <ul>
+  <li><a href="#home" class="nav-item">Home</a></li>
+  <li><a href="#about-lynx" class="nav-item">About Lynx</a></li>
+  <li><a href="#architecture" class="nav-item">Architecture</a></li>
+  <li><a href="#assets-and-sprites" class="nav-item">Assets And Sprites</a></li>
+  <li><a href="#ci-cd-pipeline" class="nav-item">CI CD Pipeline</a></li>
+  <li><a href="#game-engine" class="nav-item">Game Engine</a></li>
+  <li><a href="#getting-started" class="nav-item">Getting Started</a></li>
+  <li><a href="#native-host-apps" class="nav-item">Native Host Apps</a></li>
+</ul>
+    </div>
+    <div class="sidebar-footer">
+      <a href="https://github.com/jonathanperis/speedy-bird-lynx" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+      <div>Built by Jonathan Peris</div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="content-wrapper">
+    <main class="content" id="mainContent">
+      
+<section id="home" class="doc-section">
+  <h1 class="page-title">Home</h1>
+  <h1>Speedy Bird Lynx</h1>
+<p>Flappy Bird clone built with <a href="https://lynxjs.org/">ReactLynx</a> and TypeScript. Runs natively on iOS, Android, and Web from a single codebase using Lynx&#39;s native C++ rendering engine and dual-threaded architecture.</p>
+<h2>Wiki Pages</h2>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="About-Lynx">About Lynx</a></td>
+<td>What Lynx is, how it differs from React Native and WebViews, and key concepts used in this project</td>
+</tr>
+<tr>
+<td><a href="Architecture">Architecture</a></td>
+<td>Project structure, component hierarchy, rendering approach, and dual-threaded model</td>
+</tr>
+<tr>
+<td><a href="Assets-and-Sprites">Assets and Sprites</a></td>
+<td>Sprite organization, asset loading, tile-based pipe rendering, and audio</td>
+</tr>
+<tr>
+<td><a href="CI-CD-Pipeline">CI/CD Pipeline</a></td>
+<td>GitHub Actions workflows for building, signing, deploying, and releasing</td>
+</tr>
+<tr>
+<td><a href="Game-Engine">Game Engine</a></td>
+<td>Physics, collision detection, state machine, scoring, and the game loop</td>
+</tr>
+<tr>
+<td><a href="Getting-Started">Getting Started</a></td>
+<td>Setup, dev server, production builds, and platform-specific instructions</td>
+</tr>
+<tr>
+<td><a href="Native-Host-Apps">Native Host Apps</a></td>
+<td>Android and iOS native shells that embed the Lynx runtime</td>
+</tr>
+</tbody></table>
+<h2>Key Features</h2>
+<ul>
+<li>Tap or press Space to flap; fly through pipe gaps to score</li>
+<li>Speed increases 1% per pipe cleared</li>
+<li>Medal system: Bronze (10+), Silver (25+), Gold (50+), Platinum (100+)</li>
+<li>Element-based rendering with CSS transforms (no canvas)</li>
+<li>Tile-based pipe construction and parallax scrolling</li>
+<li>AABB collision detection with circular hitbox approximation</li>
+<li>Automated CI/CD for all three platforms</li>
+</ul>
+<hr>
+<p><em><a href="https://github.com/jonathanperis/speedy-bird-lynx">GitHub</a> · <a href="https://jonathanperis.github.io/speedy-bird-lynx/">Play →</a> · <a href="https://jonathanperis.github.io/">Jonathan Peris</a></em></p>
+
+</section>
+
+<section id="about-lynx" class="doc-section">
+  <h1 class="page-title">About Lynx</h1>
+  <h1>About Lynx</h1>
+<p><a href="https://lynxjs.org/">Lynx</a> is an open-source cross-platform native UI framework created by <a href="https://www.bytedance.com/">ByteDance</a> (the company behind TikTok). Open-sourced in early 2025, it allows developers to write apps in TypeScript/TSX using React-like APIs and render them as truly native UIs — not WebViews.</p>
+<h2>Why Lynx for This Project</h2>
+<p>This project exists to learn Lynx by building something real. A Flappy Bird clone is a good fit because it exercises:</p>
+<ul>
+<li>Element-based rendering — no canvas, all positioning via <code>&lt;view&gt;</code> + CSS transforms</li>
+<li>Frequent state updates — 60 FPS game loop pushing React state</li>
+<li>Touch input — tap events for gameplay</li>
+<li>Asset loading — images, sprites, audio</li>
+<li>Cross-platform builds — same code on web, Android, iOS</li>
+<li>CI/CD — automated build and release pipeline</li>
+</ul>
+<h2>How Lynx Differs from Other Frameworks</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Lynx</th>
+<th>React Native</th>
+<th>WebView (Cordova)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Rendering</td>
+<td>Native C++ engine</td>
+<td>Native bridge</td>
+<td>Browser engine</td>
+</tr>
+<tr>
+<td>UI elements</td>
+<td><code>&lt;view&gt;</code>, <code>&lt;image&gt;</code>, <code>&lt;text&gt;</code> etc.</td>
+<td><code>&lt;View&gt;</code>, <code>&lt;Image&gt;</code>, <code>&lt;Text&gt;</code></td>
+<td>HTML elements</td>
+</tr>
+<tr>
+<td>Styling</td>
+<td>CSS (200+ properties)</td>
+<td>StyleSheet (CSS subset)</td>
+<td>Full CSS</td>
+</tr>
+<tr>
+<td>Threading</td>
+<td>Dual (background + main)</td>
+<td>Bridge-based</td>
+<td>Single</td>
+</tr>
+<tr>
+<td>JS engine</td>
+<td>QuickJS (PrimJS)</td>
+<td>Hermes/JSC</td>
+<td>V8/JSC</td>
+</tr>
+<tr>
+<td>React compat</td>
+<td>React 17+ (ReactLynx)</td>
+<td>React Native</td>
+<td>React DOM</td>
+</tr>
+<tr>
+<td>Build tool</td>
+<td>Rspack (<code>@lynx-js/rspeedy</code>)</td>
+<td>Metro</td>
+<td>Webpack/Vite</td>
+</tr>
+</tbody></table>
+<h2>Key Lynx Concepts Used in Speedy Bird</h2>
+<h3>Built-in Elements</h3>
+<p>Lynx only has ~10 built-in elements. This game uses:</p>
+<ul>
+<li><code>&lt;view&gt;</code> — every container, positioned absolutely with transforms</li>
+<li><code>&lt;image&gt;</code> — bird sprites, pipe tiles, background, ground, medals, digits</li>
+<li><code>&lt;text&gt;</code> — score numbers on the game-over panel</li>
+</ul>
+<p>There is no <code>&lt;canvas&gt;</code>, <code>&lt;svg&gt;</code>, <code>&lt;audio&gt;</code>, or <code>&lt;video&gt;</code>.</p>
+<h3>CSS Differences</h3>
+<ul>
+<li>Default <code>box-sizing: border-box</code> and <code>position: relative</code></li>
+<li>No margin collapsing, no inline elements</li>
+<li><code>display</code> values: <code>linear</code> (default), <code>flex</code>, <code>grid</code>, <code>none</code></li>
+<li><code>overflow</code> only supports <code>visible</code> and <code>hidden</code></li>
+<li>Units: <code>px</code>, <code>%</code>, <code>vh</code> — no <code>em</code>, <code>rem</code>, <code>vw</code></li>
+</ul>
+<h3>Dual-Threaded Architecture</h3>
+<p>React reconciliation (diffing, state updates) runs on a background thread. The main thread handles native rendering and touch events. This means:</p>
+<ul>
+<li>The game loop and React state live on the background thread</li>
+<li>Touch events (<code>bindtap</code>) are serialized from main to background thread</li>
+<li>Native element updates are applied on the main thread after reconciliation</li>
+</ul>
+<h3>Native Modules</h3>
+<p>Lynx does not have built-in audio. The <code>audio.ts</code> module detects the environment:</p>
+<ul>
+<li><strong>Web</strong>: uses <code>HTMLAudioElement</code> (works immediately)</li>
+<li><strong>Native</strong>: calls a native module via <code>requireModule(&#39;AudioModule&#39;)</code> (requires per-platform implementation)</li>
+</ul>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://lynxjs.org/">Lynx Documentation</a></li>
+<li><a href="https://github.com/lynx-family/lynx">Lynx GitHub</a></li>
+<li><a href="https://lynxjs.org/api/index.html">ReactLynx API Reference</a></li>
+<li><a href="https://lynxjs.org/guide/start/integrate-with-existing-apps?platform=android">Lynx Integration Guide (Android)</a></li>
+<li><a href="https://lynxjs.org/guide/start/integrate-with-existing-apps?platform=ios">Lynx Integration Guide (iOS)</a></li>
+</ul>
+
+</section>
+
+<section id="architecture" class="doc-section">
+  <h1 class="page-title">Architecture</h1>
+  <h1>Architecture</h1>
+<h2>Project Structure</h2>
+<pre><code>speedy-bird-lynx/
+├── src/                          # Lynx/ReactLynx application
+│   ├── index.tsx                 # Entry point
+│   ├── App.tsx                   # Root component
+│   ├── types.ts                  # TypeScript types (GameState, PipeData)
+│   ├── constants.ts              # All game constants
+│   ├── hooks/
+│   │   └── useGameEngine.ts      # Core game loop and physics
+│   ├── components/
+│   │   ├── Bird.tsx              # Animated bird sprite
+│   │   ├── Pipe.tsx              # Tile-based pipe rendering
+│   │   ├── Background.tsx        # Parallax scrolling background
+│   │   ├── Ground.tsx            # Scrolling ground layer
+│   │   ├── ScoreDisplay.tsx      # Sprite-based digit rendering
+│   │   ├── GetReadyScreen.tsx    # Start screen overlay
+│   │   └── GameOverScreen.tsx    # Game over panel with medals
+│   └── audio/
+│       └── audio.ts              # Audio abstraction (web + native)
+│
+├── android/                      # Native Android host app
+├── ios/                          # Native iOS host app (source files)
+├── assets/                       # Sprites, audio, medals, digits
+├── docs/                         # GitHub Pages (standalone canvas version)
+├── web-host/                     # Web preview host (dev only)
+├── .github/workflows/            # CI/CD pipelines
+├── lynx.config.ts                # Lynx build configuration
+├── rsbuild.web-host.config.ts    # Web host build configuration
+└── tsconfig.json                 # TypeScript configuration
+</code></pre>
+<h2>Component Hierarchy</h2>
+<pre><code>App
+├── Background          (z-index: 0, parallax scroll)
+├── Pipe[]              (z-index: 1, tile-based, scroll left)
+├── Bird                (z-index: 2, animated sprite + rotation)
+├── Ground              (z-index: 3, scroll matches pipe speed)
+├── ScoreDisplay        (z-index: 4, visible during play)
+├── GetReadyScreen      (z-index: 5, visible on ready)
+└── GameOverScreen      (z-index: 5, visible on game over)
+</code></pre>
+<h2>Rendering Approach</h2>
+<p>Lynx has no canvas element. All visuals are composed from built-in elements:</p>
+<ul>
+<li><code>&lt;view&gt;</code> — containers and positioning via CSS transforms</li>
+<li><code>&lt;image&gt;</code> — sprites loaded as individual PNGs</li>
+<li><code>&lt;text&gt;</code> — score display on the game over panel</li>
+</ul>
+<p>Every game entity is absolutely positioned at <code>top: 0, left: 0</code> and moved using CSS <code>transform: translate(Xpx, Ypx)</code>. This avoids layout recalculations — the engine only updates transform strings.</p>
+<h2>Dual-Threaded Model</h2>
+<p>Lynx runs on two threads:</p>
+<table>
+<thead>
+<tr>
+<th>Thread</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Background</strong></td>
+<td>React reconciliation, game logic, state management</td>
+</tr>
+<tr>
+<td><strong>Main</strong></td>
+<td>Native rendering, layout, touch event delivery</td>
+</tr>
+</tbody></table>
+<p>The game loop (<code>setInterval</code> at 17ms) runs on the background thread. It updates a React state object (<code>RenderState</code>) which triggers reconciliation. Lynx&#39;s main thread then applies the resulting native element updates.</p>
+<h2>State Management</h2>
+<p>The <code>useGameEngine</code> hook manages all game state:</p>
+<ul>
+<li><strong><code>engine.current</code></strong> — mutable ref holding physics state (position, velocity, pipe list). Updated every tick without triggering renders.</li>
+<li><strong><code>renderState</code></strong> — React state snapshot pushed to components via <code>setRenderState()</code>. Only updated at the end of each tick.</li>
+</ul>
+<p>This separation means physics calculations do not allocate React objects — only the final render snapshot does.</p>
+
+</section>
+
+<section id="assets-and-sprites" class="doc-section">
+  <h1 class="page-title">Assets And Sprites</h1>
+  <h1>Assets and Sprites</h1>
+<p>All game assets are pre-sliced individual PNG files. Lynx has no canvas or sprite sheet slicing — each visual element is a separate <code>&lt;image&gt;</code> element.</p>
+<h2>Directory Structure</h2>
+<pre><code>assets/
+├── sprites/
+│   ├── bird-0.png              # Wings down
+│   ├── bird-1.png              # Wings level
+│   ├── bird-2.png              # Wings up
+│   ├── background.png          # Sky + city background tile (276x228)
+│   ├── ground.png              # Ground tile (224x129)
+│   ├── get-ready.png           # &quot;Get Ready&quot; overlay (174x160)
+│   ├── game-over.png           # Game over panel with score boxes (226x158)
+│   ├── pipes/
+│   │   ├── pipe-top.png        # Top pipe body tile
+│   │   ├── pipe-top-mouth.png  # Top pipe mouth (lip)
+│   │   ├── pipe-bottom.png     # Bottom pipe body tile
+│   │   └── pipe-bottom-mouth.png # Bottom pipe mouth (lip)
+│   ├── digits/
+│   │   └── digit-0.png … digit-9.png  # Score display (18x27 each)
+│   └── medals/
+│       ├── medal-bronze.png
+│       ├── medal-silver.png
+│       ├── medal-gold.png
+│       └── medal-platinum.png
+│
+└── audio/
+    ├── sfx_wing.wav            # Flap
+    ├── sfx_point.wav           # Score
+    ├── sfx_hit.wav             # Pipe collision
+    ├── sfx_die.wav             # Ground collision
+    └── sfx_swooshing.wav       # Game reset
+</code></pre>
+<h2>How Assets Are Loaded</h2>
+<p>In the Lynx app, assets are loaded via <code>require()</code> at the module level:</p>
+<pre><code class="language-tsx">const BIRD_SPRITES = [
+  require(&#39;../../assets/sprites/bird-0.png&#39;),
+  require(&#39;../../assets/sprites/bird-1.png&#39;),
+  require(&#39;../../assets/sprites/bird-2.png&#39;),
+  require(&#39;../../assets/sprites/bird-1.png&#39;),  // ping-pong cycle
+];
+</code></pre>
+<p>The Rspeedy bundler resolves these to URLs (dev server) or embeds them in the bundle (production).</p>
+<h2>Pipe Rendering</h2>
+<p>Pipes use a tile-based approach instead of stretching a single image. Each pipe is composed of:</p>
+<ol>
+<li><strong>Body tiles</strong> — repeated vertically to fill the pipe height (extends well past the screen edge)</li>
+<li><strong>Mouth tile</strong> — placed at the opening where the bird flies through</li>
+</ol>
+<p>This avoids visual stretching artifacts and matches the original game&#39;s pixel-art style. Each tile is 55px wide and ~53px tall.</p>
+<h2>Background and Ground Tiling</h2>
+<p>Both the background and ground use 5 copies laid out horizontally in a flex row. The container is translated left via CSS transform to create seamless scrolling. When the offset exceeds one tile width, it wraps back.</p>
+<ul>
+<li><strong>Background</strong>: 5 tiles at 276px each = 1380px total, scrolls at <code>0.2 * speedMultiplier</code> px/frame</li>
+<li><strong>Ground</strong>: 5 tiles at 224px each = 1120px total, scrolls at <code>2.7 * speedMultiplier</code> px/frame</li>
+</ul>
+<h2>Score Display</h2>
+<p>The in-game score uses sprite-based digit rendering (<code>ScoreDisplay.tsx</code>). Each digit is a separate <code>&lt;image&gt;</code> element (18x27px) laid out horizontally with 2px gaps, centered on screen.</p>
+<p>The game-over panel score uses <code>&lt;text&gt;</code> elements positioned absolutely over the panel sprite.</p>
+<h2>Credits</h2>
+<ul>
+<li>Sprites from <a href="https://www.spriters-resource.com/fullview/59894/">The Spriters Resource</a></li>
+<li>Sound effects from <a href="https://www.sounds-resource.com/mobile/flappybird/sound/5309/">The Sounds Resource</a></li>
+<li>Original game by <a href="https://en.wikipedia.org/wiki/Flappy_Bird">Dong Nguyen</a></li>
+</ul>
+
+</section>
+
+<section id="ci-cd-pipeline" class="doc-section">
+  <h1 class="page-title">CI CD Pipeline</h1>
+  <h1>CI/CD Pipeline</h1>
+<p>All automation runs on GitHub Actions. Workflows are in <code>.github/workflows/</code>.</p>
+<h2>Workflow Overview</h2>
+<table>
+<thead>
+<tr>
+<th>Workflow</th>
+<th>File</th>
+<th>Trigger</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Build Check</td>
+<td><code>build-check.yml</code></td>
+<td>Push/PR to <code>main</code></td>
+<td>Type-check and build Lynx bundles</td>
+</tr>
+<tr>
+<td>Deploy Web</td>
+<td><code>deploy-web.yml</code></td>
+<td>Push to <code>main</code></td>
+<td>Deploy <code>docs/</code> to GitHub Pages</td>
+</tr>
+<tr>
+<td>Build Android</td>
+<td><code>build-android.yml</code></td>
+<td>Push to <code>main</code>, <code>v*</code> tags, manual</td>
+<td>Build signed APK, create GitHub Release</td>
+</tr>
+<tr>
+<td>Build iOS</td>
+<td><code>build-ios.yml</code></td>
+<td><code>v*</code> tags, manual</td>
+<td>Build iOS archive (unsigned)</td>
+</tr>
+<tr>
+<td>Release</td>
+<td><code>release.yml</code></td>
+<td><code>v*</code> tags, manual</td>
+<td>Full release pipeline with all artifacts</td>
+</tr>
+</tbody></table>
+<h2>Build Check</h2>
+<p>Runs on every push and pull request. Validates the codebase compiles and builds:</p>
+<ol>
+<li><code>npm ci</code> — install dependencies</li>
+<li><code>npx tsc --noEmit</code> — TypeScript type-checking</li>
+<li><code>npm run build</code> — build Lynx and web bundles</li>
+<li>Upload bundles as artifact (14-day retention)</li>
+</ol>
+<h2>Deploy Web</h2>
+<p>Deploys the <code>docs/</code> directory (standalone canvas game) to GitHub Pages on every push to <code>main</code>. Uses <code>actions/deploy-pages</code>.</p>
+<h2>Build Android</h2>
+<p>The main production workflow. On every push to <code>main</code>:</p>
+<ol>
+<li><strong>Version computation</strong> — from git tag (<code>v1.2.3</code> → <code>1.2.3</code>) or short SHA (<code>0.0.0-a1b2c3d</code>)</li>
+<li><strong>Build Lynx bundle</strong> — <code>npm run build</code></li>
+<li><strong>Copy bundle</strong> — into <code>android/app/src/main/assets/</code></li>
+<li><strong>Decode keystore</strong> — from <code>KEYSTORE_BASE64</code> secret</li>
+<li><strong>Gradle build</strong> — <code>./gradlew assembleRelease</code> with signing env vars</li>
+<li><strong>Git tag</strong> — creates <code>build/&lt;version&gt;</code> tag on <code>main</code> pushes</li>
+<li><strong>GitHub Release</strong> — creates a release with APK attached</li>
+</ol>
+<h3>Android Signing Secrets</h3>
+<table>
+<thead>
+<tr>
+<th>Secret</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>KEYSTORE_BASE64</code></td>
+<td>Base64-encoded release keystore</td>
+</tr>
+<tr>
+<td><code>KEYSTORE_PASSWORD</code></td>
+<td>Keystore password</td>
+</tr>
+<tr>
+<td><code>KEY_ALIAS</code></td>
+<td>Key alias name</td>
+</tr>
+<tr>
+<td><code>KEY_PASSWORD</code></td>
+<td>Key password</td>
+</tr>
+</tbody></table>
+<h3>Versioning</h3>
+<table>
+<thead>
+<tr>
+<th>Trigger</th>
+<th>Version Name</th>
+<th>Version Code</th>
+<th>Release Type</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Push to <code>main</code></td>
+<td><code>0.0.0-&lt;sha&gt;</code></td>
+<td>Epoch-based</td>
+<td>Pre-release</td>
+</tr>
+<tr>
+<td>Tag <code>v1.2.3</code></td>
+<td><code>1.2.3</code></td>
+<td>Epoch-based</td>
+<td>Full release</td>
+</tr>
+</tbody></table>
+<h2>Build iOS</h2>
+<p>Scaffolded but requires manual setup:</p>
+<ol>
+<li>Create Xcode project (see <a href="Native-Host-Apps">Native Host Apps</a>)</li>
+<li>Enroll in Apple Developer Program ($99/year)</li>
+<li>Configure signing secrets</li>
+</ol>
+<p>Currently builds an unsigned archive. See the workflow file header for detailed setup instructions.</p>
+<h2>Release</h2>
+<p>Triggered by version tags (<code>v*</code>) or manual dispatch. Builds Lynx bundles and conditionally builds Android/iOS if their native projects exist. Creates a GitHub Release with all available artifacts and auto-generated release notes.</p>
+
+</section>
+
+<section id="game-engine" class="doc-section">
+  <h1 class="page-title">Game Engine</h1>
+  <h1>Game Engine</h1>
+<p>The game engine lives in <code>src/hooks/useGameEngine.ts</code>. It handles the game loop, physics, collision detection, scoring, and state transitions.</p>
+<h2>State Machine</h2>
+<p>The game has three states:</p>
+<pre><code>STATE_READY (0) ──tap──&gt; STATE_PLAY (1) ──collision──&gt; STATE_OVER (2)
+      ^                                                      │
+      └──────────────────────tap─────────────────────────────┘
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Bird</th>
+<th>Pipes</th>
+<th>Input</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Ready</strong></td>
+<td>Hovers at Y=280, wing animation (20-frame interval)</td>
+<td>None on screen</td>
+<td>Tap starts game</td>
+</tr>
+<tr>
+<td><strong>Play</strong></td>
+<td>Falls with gravity, flaps on tap, fast animation (4-frame interval)</td>
+<td>Spawn, scroll left, score on pass</td>
+<td>Tap = flap</td>
+</tr>
+<tr>
+<td><strong>Over</strong></td>
+<td>Falls to ground, no animation</td>
+<td>Frozen</td>
+<td>Tap resets to Ready</td>
+</tr>
+</tbody></table>
+<h2>Game Loop</h2>
+<p>The loop runs via <code>setInterval(tick, 17)</code> targeting ~60 FPS. Each tick:</p>
+<ol>
+<li><strong>Update bird</strong> — apply gravity, update velocity, clamp position, compute rotation, advance animation frame</li>
+<li><strong>Update pipes</strong> — spawn new pipes on interval, move all pipes left, despawn off-screen pipes (incrementing score), check collisions</li>
+<li><strong>Update scenery</strong> — scroll background and ground at their respective speeds</li>
+<li><strong>Push render state</strong> — call <code>setRenderState()</code> with the current snapshot for React to render</li>
+</ol>
+<h2>Physics</h2>
+<p>All values are in pixels per frame (at 60 FPS):</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Gravity</td>
+<td>0.28 px/frame²</td>
+<td>Downward acceleration</td>
+</tr>
+<tr>
+<td>Flap velocity</td>
+<td>-7.25 px/frame</td>
+<td>Upward impulse on tap</td>
+</tr>
+<tr>
+<td>Pipe base speed</td>
+<td>2.7 px/frame</td>
+<td>Horizontal scroll speed</td>
+</tr>
+<tr>
+<td>Speed scaling</td>
+<td>+1% per pipe</td>
+<td><code>speed = 2.7 * (1 + score * 0.01)</code></td>
+</tr>
+<tr>
+<td>Background scroll</td>
+<td>0.2 px/frame</td>
+<td>Slower parallax layer</td>
+</tr>
+<tr>
+<td>Ground scroll</td>
+<td>2.7 px/frame</td>
+<td>Matches pipe speed</td>
+</tr>
+</tbody></table>
+<h2>Bird Rotation</h2>
+<p>Rotation is determined by vertical velocity:</p>
+<table>
+<thead>
+<tr>
+<th>Velocity</th>
+<th>Rotation</th>
+<th>Visual</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&lt;= -7.25 (rising fast)</td>
+<td>-15 deg</td>
+<td>Nose up</td>
+</tr>
+<tr>
+<td>Between -7.25 and -5.25</td>
+<td>0 deg</td>
+<td>Level</td>
+</tr>
+<tr>
+<td>&gt;= -5.25 (falling)</td>
+<td>70 deg</td>
+<td>Nose dive</td>
+</tr>
+</tbody></table>
+<p>During nose dive, the animation frame is locked to frame 1 (wings level).</p>
+<h2>Bird Animation</h2>
+<p>The bird has a 4-frame cycle: <code>bird-0, bird-1, bird-2, bird-1</code> (ping-pong).</p>
+<ul>
+<li><strong>Ready state</strong>: frame advances every 20 ticks (slow flutter)</li>
+<li><strong>Play state</strong>: frame advances every 4 ticks (fast flapping)</li>
+<li><strong>Over state</strong>: locked to frame 2 (wings up) with nose-dive rotation</li>
+</ul>
+<h2>Collision Detection</h2>
+<p>Collision uses AABB (Axis-Aligned Bounding Box) with a circular bird hitbox approximated as a square:</p>
+<pre><code>Bird bounding box:
+  left:   BIRD_X - BIRD_RADIUS (80 - 12 = 68)
+  right:  BIRD_X + BIRD_RADIUS (80 + 12 = 92)
+  top:    birdY - BIRD_RADIUS
+  bottom: birdY + BIRD_RADIUS
+
+Per pipe pair, two checks:
+  Top pipe:    x to x+55, y to y+300
+  Bottom pipe: x to x+55, y+300+150 to y+600+150
+</code></pre>
+<p>Ground collision triggers when <code>birdY + BIRD_H/2 &gt;= CANVAS_HEIGHT - GROUND_H</code>.</p>
+<h2>Pipe Spawning</h2>
+<ul>
+<li><strong>Interval</strong>: every 77 frames (~1.3s), adjusted by speed: <code>Math.max(20, Math.round(77 / speedMultiplier))</code></li>
+<li><strong>Y position</strong>: random between -200 and -80 (controls gap vertical placement)</li>
+<li><strong>Gap size</strong>: 150px fixed</li>
+<li><strong>Despawn</strong>: when <code>pipe.x &lt; -55</code> (fully off-screen left), score increments</li>
+</ul>
+<h2>Scoring and Medals</h2>
+<p>Score increments by 1 each time a pipe scrolls off-screen. Best score persists within the session.</p>
+<table>
+<thead>
+<tr>
+<th>Score</th>
+<th>Medal</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10+</td>
+<td>Bronze</td>
+</tr>
+<tr>
+<td>25+</td>
+<td>Silver</td>
+</tr>
+<tr>
+<td>50+</td>
+<td>Gold</td>
+</tr>
+<tr>
+<td>100+</td>
+<td>Platinum</td>
+</tr>
+</tbody></table>
+<h2>Audio</h2>
+<p>Five sound effects, managed by <code>src/audio/audio.ts</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Sound</th>
+<th>File</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Tap/flap</td>
+<td>Wing flap</td>
+<td><code>sfx_wing.wav</code></td>
+</tr>
+<tr>
+<td>Pipe passed</td>
+<td>Score point</td>
+<td><code>sfx_point.wav</code></td>
+</tr>
+<tr>
+<td>Pipe collision</td>
+<td>Hit</td>
+<td><code>sfx_hit.wav</code></td>
+</tr>
+<tr>
+<td>Ground collision</td>
+<td>Fall</td>
+<td><code>sfx_die.wav</code></td>
+</tr>
+<tr>
+<td>Reset game</td>
+<td>Swoosh</td>
+<td><code>sfx_swooshing.wav</code></td>
+</tr>
+</tbody></table>
+<p>On web, audio uses <code>HTMLAudioElement</code>. On native platforms, it falls back to a native module stub (<code>AudioModule</code>).</p>
+
+</section>
+
+<section id="getting-started" class="doc-section">
+  <h1 class="page-title">Getting Started</h1>
+  <h1>Getting Started</h1>
+<h2>Prerequisites</h2>
+<ul>
+<li><strong>Node.js</strong> 18+ and <strong>npm</strong></li>
+<li><strong>Java 17</strong> and <strong>Android SDK</strong> (for Android builds)</li>
+<li><strong>Xcode 15+</strong> and <strong>CocoaPods</strong> (for iOS builds)</li>
+</ul>
+<h2>Quick Start</h2>
+<pre><code class="language-bash">git clone https://github.com/jonathanperis/speedy-bird-lynx.git
+cd speedy-bird-lynx
+npm install
+npm run dev
+</code></pre>
+<p>This starts the Rspeedy dev server with hot module replacement. The game is accessible at:</p>
+<ul>
+<li><strong>Web preview</strong>: <code>http://localhost:3000/__web_preview?casename=main.web.bundle</code></li>
+<li><strong>Lynx bundle</strong>: <code>http://localhost:3000/main.lynx.bundle</code></li>
+</ul>
+<p>To view on a mobile device, open the Lynx bundle URL in <a href="https://github.com/lynx-family/lynx">Lynx Explorer</a> or <a href="https://apps.apple.com/us/app/lynx-go-dev-explorer/id6743227790">Lynx Go</a> (replace <code>localhost</code> with your machine&#39;s IP).</p>
+<h2>Building for Production</h2>
+<pre><code class="language-bash">npm run build
+</code></pre>
+<p>This outputs:</p>
+<ul>
+<li><code>dist/main.lynx.bundle</code> — native bundle for Android/iOS</li>
+<li><code>dist/main.web.bundle</code> — web bundle</li>
+</ul>
+<h2>Android</h2>
+<pre><code class="language-bash">npm run build
+cp dist/main.lynx.bundle android/app/src/main/assets/
+cd android &amp;&amp; ./gradlew assembleDebug
+</code></pre>
+<p>The APK is at <code>android/app/build/outputs/apk/debug/app-debug.apk</code>. Install via <code>adb install</code> or transfer to your device.</p>
+<p>For release builds with signing, see <a href="CI-CD-Pipeline">CI/CD Pipeline</a>.</p>
+<h2>iOS</h2>
+<blockquote>
+<p>Requires Xcode and an Xcode project (.xcodeproj). See <a href="Native-Host-Apps">Native Host Apps</a> for setup instructions.</p>
+</blockquote>
+<pre><code class="language-bash">npm run build
+cp dist/main.lynx.bundle ios/SpeedyBird/Resources/
+cd ios &amp;&amp; pod install
+open SpeedyBird.xcworkspace
+</code></pre>
+<p>Build and run from Xcode on a simulator or device.</p>
+<h2>Web (Standalone)</h2>
+<p>Open <code>docs/index.html</code> directly in any browser. This is a self-contained canvas-based version that requires no build step — the same version deployed to GitHub Pages.</p>
+<h2>Project Commands</h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>npm run dev</code></td>
+<td>Start dev server with HMR</td>
+</tr>
+<tr>
+<td><code>npm run build</code></td>
+<td>Production build (Lynx + Web bundles)</td>
+</tr>
+<tr>
+<td><code>cd android &amp;&amp; ./gradlew assembleDebug</code></td>
+<td>Build debug Android APK</td>
+</tr>
+<tr>
+<td><code>cd android &amp;&amp; ./gradlew assembleRelease</code></td>
+<td>Build release Android APK</td>
+</tr>
+</tbody></table>
+
+</section>
+
+<section id="native-host-apps" class="doc-section">
+  <h1 class="page-title">Native Host Apps</h1>
+  <h1>Native Host Apps</h1>
+<p>Lynx bundles do not run standalone — they need a thin native shell that embeds the Lynx runtime and loads the bundle. This project includes host apps for Android (complete) and iOS (source files).</p>
+<h2>Android</h2>
+<p>The Android host app is a minimal Kotlin application in <code>android/</code>.</p>
+<h3>Key Files</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>SpeedyBirdApplication.kt</code></td>
+<td>Initializes Lynx engine, Fresco (image loading), and registers services</td>
+</tr>
+<tr>
+<td><code>MainActivity.kt</code></td>
+<td>Creates a <code>LynxView</code> and loads <code>main.lynx.bundle</code> from assets</td>
+</tr>
+<tr>
+<td><code>AssetTemplateProvider.kt</code></td>
+<td>Implements <code>AbsTemplateProvider</code> to read bundles from APK assets</td>
+</tr>
+<tr>
+<td><code>AndroidManifest.xml</code></td>
+<td>Fullscreen, portrait-only, internet permission</td>
+</tr>
+<tr>
+<td><code>build.gradle.kts</code></td>
+<td>Lynx SDK 3.7.0 dependencies, signing config from env vars</td>
+</tr>
+<tr>
+<td><code>proguard-rules.pro</code></td>
+<td>Keep rules for Lynx SDK classes during R8 minification</td>
+</tr>
+</tbody></table>
+<h3>Dependencies</h3>
+<table>
+<thead>
+<tr>
+<th>Artifact</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>org.lynxsdk.lynx:lynx</code></td>
+<td>Core rendering engine</td>
+</tr>
+<tr>
+<td><code>org.lynxsdk.lynx:lynx-jssdk</code></td>
+<td>JavaScript bridge</td>
+</tr>
+<tr>
+<td><code>org.lynxsdk.lynx:primjs</code></td>
+<td>QuickJS JavaScript engine</td>
+</tr>
+<tr>
+<td><code>org.lynxsdk.lynx:lynx-trace</code></td>
+<td>Performance tracing</td>
+</tr>
+<tr>
+<td><code>org.lynxsdk.lynx:lynx-service-image</code></td>
+<td>Image loading (wraps Fresco)</td>
+</tr>
+<tr>
+<td><code>org.lynxsdk.lynx:lynx-service-log</code></td>
+<td>Logging</td>
+</tr>
+<tr>
+<td><code>org.lynxsdk.lynx:lynx-service-http</code></td>
+<td>Network requests</td>
+</tr>
+<tr>
+<td><code>org.lynxsdk.lynx:xelement</code></td>
+<td>Extended UI elements</td>
+</tr>
+<tr>
+<td><code>com.google.code.gson:gson</code></td>
+<td>JSON (required by Lynx internals)</td>
+</tr>
+</tbody></table>
+<h3>How It Works</h3>
+<ol>
+<li><code>SpeedyBirdApplication.onCreate()</code> initializes Fresco, registers Lynx services, and calls <code>LynxEnv.inst().init()</code></li>
+<li><code>MainActivity.onCreate()</code> builds a <code>LynxView</code> via <code>LynxViewBuilder</code>, attaches the <code>AssetTemplateProvider</code>, and calls <code>renderTemplateUrl(&quot;main.lynx.bundle&quot;, &quot;&quot;)</code></li>
+<li>The <code>AssetTemplateProvider</code> reads the bundle bytes from <code>assets/main.lynx.bundle</code> and passes them to the Lynx engine</li>
+</ol>
+<h3>Signing</h3>
+<p>The <code>build.gradle.kts</code> reads signing configuration from environment variables:</p>
+<ul>
+<li><code>KEYSTORE_FILE</code> — path to keystore file</li>
+<li><code>KEYSTORE_PASSWORD</code> — keystore password</li>
+<li><code>KEY_ALIAS</code> — key alias</li>
+<li><code>KEY_PASSWORD</code> — key password</li>
+</ul>
+<p>These are populated by CI from GitHub Secrets. For local release builds, set them in your shell or use a <code>local.properties</code> file.</p>
+<h2>iOS</h2>
+<p>The iOS host app source files are in <code>ios/</code>. An Xcode project must be created manually.</p>
+<h3>Included Files</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Podfile</code></td>
+<td>Lynx 3.7.0, PrimJS, SDWebImage, XElement</td>
+</tr>
+<tr>
+<td><code>AppDelegate.swift</code></td>
+<td>Initializes <code>LynxEnv</code></td>
+</tr>
+<tr>
+<td><code>SceneDelegate.swift</code></td>
+<td>Creates window with <code>ViewController</code></td>
+</tr>
+<tr>
+<td><code>ViewController.swift</code></td>
+<td>Fullscreen <code>LynxView</code>, portrait-only, hidden status bar</td>
+</tr>
+<tr>
+<td><code>BundleTemplateProvider.swift</code></td>
+<td>Loads <code>main.lynx.bundle</code> from the app bundle</td>
+</tr>
+<tr>
+<td><code>SpeedyBird-Bridging-Header.h</code></td>
+<td>Objective-C bridge for Lynx SDK headers</td>
+</tr>
+<tr>
+<td><code>Info.plist</code></td>
+<td>App metadata, scene configuration</td>
+</tr>
+</tbody></table>
+<h3>Setup Steps</h3>
+<ol>
+<li>Open Xcode &gt; File &gt; New &gt; Project &gt; App<ul>
+<li>Product Name: <code>SpeedyBird</code></li>
+<li>Bundle Identifier: <code>com.jonathanperis.speedybird</code></li>
+<li>Language: Swift</li>
+</ul>
+</li>
+<li>Delete the auto-generated Swift files</li>
+<li>Add all files from <code>ios/SpeedyBird/</code> to the project</li>
+<li>Build Settings &gt; Swift Compiler &gt; Objective-C Bridging Header &gt; set to <code>SpeedyBird/SpeedyBird-Bridging-Header.h</code></li>
+<li>Build Settings &gt; User Script Sandboxing &gt; set to <strong>NO</strong></li>
+<li>Terminal: <code>cd ios &amp;&amp; pod install</code></li>
+<li>Open <code>SpeedyBird.xcworkspace</code> (not <code>.xcodeproj</code>)</li>
+<li>Build Phases &gt; Copy Bundle Resources &gt; add <code>main.lynx.bundle</code></li>
+</ol>
+<h3>Apple Developer Program</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Free</th>
+<th>Paid ($99/year)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Simulator builds</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Sideload to own device</td>
+<td>7-day expiry</td>
+<td>Unlimited</td>
+</tr>
+<tr>
+<td>TestFlight</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>App Store distribution</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>CI signing (certificates)</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+</tbody></table>
+
+</section>
+
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Mobile menu toggle
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+
+      function toggleMenu() {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('open');
+      }
+
+      if(menuToggle) menuToggle.addEventListener('click', toggleMenu);
+      if(overlay) overlay.addEventListener('click', toggleMenu);
+
+      // Scrollspy
+      const sections = document.querySelectorAll('section.doc-section');
+      const navItems = document.querySelectorAll('.nav-item');
+      
+      const observerOptions = {
+        root: null,
+        rootMargin: '-80px 0px -60% 0px',
+        threshold: 0
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            navItems.forEach(item => {
+              item.classList.remove('active');
+              if (item.getAttribute('href') === `#${entry.target.id}`) {
+                item.classList.add('active');
+                // Scroll sidebar if needed
+                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              }
+            });
+          }
+        });
+      }, observerOptions);
+
+      sections.forEach(section => observer.observe(section));
+
+      // Click on nav items (mobile close)
+      navItems.forEach(item => {
+        item.addEventListener('click', () => {
+          if (window.innerWidth <= 768) {
+            toggleMenu();
+          }
+        });
+      });
+
+      // Search
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const query = e.target.value.toLowerCase();
+          
+          sections.forEach(section => {
+            const text = section.textContent.toLowerCase();
+            const navItem = document.querySelector(`.nav-item[href="#${section.id}"]`);
+            const li = navItem ? navItem.parentElement : null;
+            
+            if (text.includes(query) || query === '') {
+              section.classList.remove('hidden-section');
+              if(li) li.style.display = '';
+            } else {
+              section.classList.add('hidden-section');
+              if(li) li.style.display = 'none';
+            }
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html>
