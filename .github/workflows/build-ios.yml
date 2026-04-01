@@ -1,5 +1,35 @@
 name: Build iOS
 
+# ┌──────────────────────────────────────────────────────────────────────┐
+# │ REQUIRES: Apple Developer Program ($99/year)                        │
+# │                                                                     │
+# │ To enable this workflow you need to:                                │
+# │                                                                     │
+# │ 1. Create an Xcode project (.xcodeproj) via Xcode:                 │
+# │    - Open Xcode > Create New Project > App                         │
+# │    - Product Name: SpeedyBird                                      │
+# │    - Bundle ID: com.jonathanperis.speedybird                       │
+# │    - Language: Swift                                                │
+# │    - Add existing Swift files from ios/SpeedyBird/                 │
+# │    - Set Bridging Header in Build Settings                         │
+# │    - Add main.lynx.bundle to Copy Bundle Resources                 │
+# │    - Set User Script Sandboxing = NO in Build Settings             │
+# │                                                                     │
+# │ 2. Enroll in the Apple Developer Program:                          │
+# │    https://developer.apple.com/programs/                           │
+# │                                                                     │
+# │ 3. Create a signing certificate + provisioning profile             │
+# │    (Fastlane Match recommended for CI)                             │
+# │                                                                     │
+# │ 4. Add these GitHub secrets:                                       │
+# │    - APPLE_CERTIFICATE_BASE64                                      │
+# │    - APPLE_CERTIFICATE_PASSWORD                                    │
+# │    - APPLE_PROVISIONING_PROFILE_BASE64                             │
+# │    - APPLE_TEAM_ID                                                 │
+# │                                                                     │
+# │ Without these, the workflow builds unsigned (no device install).    │
+# └──────────────────────────────────────────────────────────────────────┘
+
 on:
   push:
     tags: ['v*']
@@ -20,13 +50,12 @@ jobs:
       - run: npm run build
 
       # Copy bundle into iOS app resources
-      - run: mkdir -p ios/SpeedyBird/Resources
       - run: cp dist/main.lynx.bundle ios/SpeedyBird/Resources/
 
       # Install CocoaPods dependencies
       - run: cd ios && pod install
 
-      # Build unsigned archive
+      # Build unsigned archive (signing requires Apple Developer Program)
       - name: Build iOS archive
         run: |
           xcodebuild archive \
