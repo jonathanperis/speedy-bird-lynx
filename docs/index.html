@@ -644,16 +644,16 @@
       }
 
       if (state === STATE_PLAY) {
+        // Speed increases 10% per pipe (stress test)
+        var speedMult = 1 + score * 0.10;
+        var currentDX = PIPE_DX * speedMult;
+        var currentSpawn = Math.max(20, Math.round(PIPE_SPAWN / speedMult));
         // Spawn
         framesSinceLastPipe++;
         if (framesSinceLastPipe >= currentSpawn) {
           framesSinceLastPipe = 0;
           pipes.push({ id: nextId++, x: W, y: Math.floor(Math.random()*(PIPE_MAX_Y-PIPE_MIN_Y+1))+PIPE_MIN_Y });
         }
-        // Speed increases 10% per pipe (stress test)
-        var speedMult = 1 + score * 0.10;
-        var currentDX = PIPE_DX * speedMult;
-        var currentSpawn = Math.max(20, Math.round(PIPE_SPAWN / speedMult));
         // Move & despawn
         for (var i = pipes.length-1; i >= 0; i--) {
           pipes[i].x -= currentDX;
