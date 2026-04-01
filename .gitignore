@@ -19,3 +19,6 @@ ios/SpeedyBird.xcworkspace/
 ios/SpeedyBird/Resources/main.lynx.bundle
 ios/Podfile.lock
 *.xcarchive
+
+# Docs generation
+wiki/
