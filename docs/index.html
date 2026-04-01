@@ -621,10 +621,10 @@
 
     /* ── Medal ────────────────────────────────────────────────────── */
     function getMedal() {
-      if (score >= 50) return assets.medalPlatinum;
-      if (score >= 25) return assets.medalGold;
-      if (score >= 15) return assets.medalSilver;
-      if (score >= 5) return assets.medalBronze;
+      if (score >= 100) return assets.medalPlatinum;
+      if (score >= 50) return assets.medalGold;
+      if (score >= 25) return assets.medalSilver;
+      if (score >= 10) return assets.medalBronze;
       return null;
     }
 
@@ -654,7 +654,7 @@
       }
 
       if (state === STATE_PLAY) {
-        // Speed increases 0.5% per pipe
+        // Speed increases 1% per pipe
         var speedMult = 1 + score * 0.01;
         var currentDX = PIPE_DX * speedMult;
         var currentSpawn = Math.max(20, Math.round(PIPE_SPAWN / speedMult));

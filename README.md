@@ -16,10 +16,10 @@ A pixel art Speedy Bird clone built with [Lynx](https://lynxjs.org/) — ByteDan
 
 | Score | Medal |
 |-------|-------|
-| 5+    | Bronze |
-| 15+   | Silver |
-| 25+   | Gold |
-| 50+   | Platinum |
+| 10+   | Bronze |
+| 25+   | Silver |
+| 50+   | Gold |
+| 100+  | Platinum |
 
 ## What is Lynx?
 
@@ -100,7 +100,7 @@ Open `docs/index.html` in any browser. No build step required.
 |----------|-------|-------------|
 | Gravity | 0.28 | Added to velocity each frame |
 | Flap | 7.25 | Upward velocity on tap |
-| Pipe Speed | 2.7 | Base scroll speed (increases 1%/10 pipes) |
+| Pipe Speed | 2.7 | Base scroll speed (increases 1% per pipe) |
 | Pipe Gap | 150 | Pixels between top and bottom pipe |
 | Spawn Rate | Every 77 frames | ~1.3 seconds between pipe pairs |
 

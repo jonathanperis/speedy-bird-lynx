@@ -1,3 +1,5 @@
+import { CANVAS_HEIGHT } from '../constants.js';
+
 const GET_READY_SRC = require('../../assets/sprites/get-ready.png');
 
 const IMG_W = 174;
@@ -14,14 +16,12 @@ export default function GetReadyScreen({ visible }: GetReadyScreenProps) {
     <view
       style={{
         position: 'absolute',
-        top: '0px',
+        top: `${CANVAS_HEIGHT / 2 - IMG_H}px`,
         left: '0px',
         width: '100%',
-        height: '100%',
         zIndex: 5,
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
       }}
     >
       <image
