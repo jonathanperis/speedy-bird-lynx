@@ -20,8 +20,14 @@ jobs:
       - run: npm run build
 
       # Copy bundle into Android assets
-      - run: mkdir -p android/app/src/main/assets
       - run: cp dist/main.lynx.bundle android/app/src/main/assets/
+
+      # Decode signing keystore (if secrets are configured)
+      - name: Decode keystore
+        if: env.KEYSTORE_BASE64 != ''
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: echo "$KEYSTORE_BASE64" | base64 -d > android/app/release.keystore
 
       # Build Android APK
       - uses: actions/setup-java@v5
@@ -31,7 +37,13 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - run: cd android && chmod +x gradlew && ./gradlew assembleRelease
+      - name: Build release APK
+        env:
+          KEYSTORE_FILE: ${{ secrets.KEYSTORE_BASE64 != '' && 'release.keystore' || '' }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: cd android && chmod +x gradlew && ./gradlew assembleRelease
 
       - uses: actions/upload-artifact@v5
         with:
