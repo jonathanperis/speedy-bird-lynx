@@ -1,7 +1,7 @@
-# Flappy Bird — Lynx Port
+# Speedy Bird — Lynx Port
 
 ## Vision
-Port the existing HTML5 Canvas Flappy Bird clone to ByteDance's Lynx framework, creating a cross-platform native app that runs on Android, iOS, Web, macOS, Windows, and HarmonyOS from a single TypeScript/TSX codebase.
+Port the existing HTML5 Canvas Speedy Bird clone to ByteDance's Lynx framework, creating a cross-platform native app that runs on Android, iOS, Web, macOS, Windows, and HarmonyOS from a single TypeScript/TSX codebase.
 
 ## Goals
 1. Feature parity with the current canvas-based game

@@ -1,25 +1,25 @@
-# Flappy Bird
+# Speedy Bird
 
-A pixel art Flappy Bird clone built with [Lynx](https://lynxjs.org/) — ByteDance's cross-platform native UI framework. One TypeScript codebase renders natively on iOS, Android, and Web.
+A pixel art Speedy Bird clone built with [Lynx](https://lynxjs.org/) — ByteDance's cross-platform native UI framework. One TypeScript codebase renders natively on iOS, Android, and Web.
 
-**[Play in your browser](https://jonathanperis.github.io/flappy-bird/)**
+**[Play in your browser](https://jonathanperis.github.io/speedy-bird-lynx/)**
 
 ## How to Play
 
 - **Tap** or press **Space** to flap
 - Fly through gaps between pipes
 - Score 1 point per pipe pair cleared
-- Game speeds up 1% every 10 pipes
+- Game speeds up 1% with every pipe cleared — hence "Speedy Bird"
 - Game ends on collision with a pipe or the ground
 
 ## Medals
 
 | Score | Medal |
 |-------|-------|
-| 10+   | Bronze |
-| 25+   | Silver |
-| 50+   | Gold |
-| 100+  | Platinum |
+| 5+    | Bronze |
+| 15+   | Silver |
+| 25+   | Gold |
+| 50+   | Platinum |
 
 ## What is Lynx?
 
