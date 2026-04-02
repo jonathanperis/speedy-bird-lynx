@@ -5,7 +5,6 @@ import {
   CANVAS_HEIGHT,
   BIRD_X,
   BIRD_Y_START,
-  BIRD_W,
   BIRD_H,
   BIRD_RADIUS,
   BIRD_FLAP,

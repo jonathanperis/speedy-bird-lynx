@@ -1,5 +1,5 @@
 import { useGameEngine } from './hooks/useGameEngine.js';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, BG_COLOR } from './constants.js';
+import { BG_COLOR } from './constants.js';
 import { STATE_READY, STATE_PLAY, STATE_OVER } from './types.js';
 import Bird from './components/Bird.js';
 import Pipe from './components/Pipe.js';
