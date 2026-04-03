@@ -112,10 +112,34 @@ speedy-bird-lynx/
 
 ## CI/CD
 
-| Workflow | Trigger | Actions |
-|----------|---------|---------|
-| Build Check | Push/PR to main | `tsc --noEmit` + `npm run build` |
-| Deploy Web | Push to main | Deploy `docs/` to GitHub Pages |
-| Build Android | Push to main, v* tags | Build signed APK + GitHub Release |
-| Build iOS | v* tags, manual | Xcode build (unsigned) |
-| Release | v* tags | Full pipeline: Lynx → Android → iOS → Release |
+| Workflow | File | Trigger | Actions |
+|----------|------|---------|---------|
+| Build Check | ci.yml | Push/PR to main | `tsc --noEmit` + `npm run build` |
+| CodeQL | codeql.yml | Push/PR to main, weekly | Security & quality analysis |
+| Deploy Web | deploy-web.yml | Push to main | Deploy `docs/` to GitHub Pages |
+| Deploy Docs | deploy-docs.yml | Push to main, wiki edits | Wiki → HTML docs via PR |
+| Build Android | build-android.yml | Push to main, v* tags | Build signed APK + GitHub Release |
+| Build iOS | build-ios.yml | v* tags, manual | Xcode build (unsigned) |
+| Release | release.yml | v* tags | Full pipeline: Lynx → Android → iOS → Release |
+
+---
+
+## Git & GitHub Conventions
+
+- **Branch + PR workflow**: All changes go through a branch and PR. Never push directly to main.
+- **Rebase-only merges**: Linear history enforced. No merge commits or squash.
+- **Use `gh` CLI**: All GitHub operations (PRs, issues, releases, checks) via `gh` commands.
+- **Repo-wide files**: SECURITY.md, CODE_OF_CONDUCT.md, CONTRIBUTING.md, issue/PR templates, CODEOWNERS, and FUNDING.yml live in the centralized `.github` repo — do NOT create them here.
+- **Branch protection**: main has `required_linear_history` enabled, force pushes disabled.
+- **Release tags**: Semver `v*` tags (e.g., `v1.1.0`) trigger the full release pipeline.
+- **Build tags**: `build/0.0.0-{sha}` auto-created on every main push by Android CI.
+
+---
+
+## Code Quality Notes
+
+- **TypeScript strict mode**: Enabled — all code must pass `tsc --noEmit`
+- **No test framework yet**: Vitest recommended if adding tests (Rspack ecosystem)
+- **No linter/formatter yet**: Biome recommended if adding (fast, replaces ESLint + Prettier)
+- **CodeQL**: Runs on every push/PR + weekly schedule for security analysis
+- **Dependabot**: Weekly updates for npm packages and GitHub Actions
