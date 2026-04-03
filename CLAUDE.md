@@ -116,7 +116,7 @@ speedy-bird-lynx/
 |----------|------|---------|---------|
 | Build Check | ci.yml | Push/PR to main | `tsc --noEmit` + `npm run build` |
 | CodeQL | codeql.yml | Push/PR to main, weekly | Security & quality analysis |
-| Deploy Web | deploy-web.yml | Push to main | Deploy `docs/` to GitHub Pages |
+| Deploy Web | deploy.yml | Push to main | Deploy `docs/` to GitHub Pages |
 | Deploy Docs | deploy-docs.yml | Push to main, wiki edits | Wiki → HTML docs via PR |
 | Build Android | build-android.yml | Push to main, v* tags | Build signed APK + GitHub Release |
 | Build iOS | build-ios.yml | v* tags, manual | Xcode build (unsigned) |
