@@ -32,8 +32,7 @@ android, bytedance, cross-platform, flappy-bird, game, ios, lynx, native-ui, rea
 |------|---------|
 | ci.yml | Type check + build (push/PR to main) |
 | codeql.yml | Security analysis (push/PR to main + weekly) |
-| deploy-web.yml | GitHub Pages deployment |
-| deploy-docs.yml | Wiki-to-HTML docs generation via PR |
+| deploy.yml | GitHub Pages deployment |
 | build-android.yml | Signed APK build + GitHub Release |
 | build-ios.yml | iOS archive (unsigned, v* tags) |
 | release.yml | Full release pipeline (v* tags) |
