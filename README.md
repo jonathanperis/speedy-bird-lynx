@@ -2,9 +2,9 @@
 
 > Flappy Bird clone built with ReactLynx and TypeScript — runs natively on iOS, Android, and Web from a single codebase
 
-[![CI](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/build-check.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/build-check.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Build Check](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/ci.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/ci.yml) [![Release](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/release.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/release.yml) [![CodeQL](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/codeql.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/codeql.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**[Play in browser →](https://jonathanperis.github.io/speedy-bird-lynx/)**
+**[Live demo →](https://jonathanperis.github.io/speedy-bird-lynx/)** | **[Documentation →](https://jonathanperis.github.io/speedy-bird-lynx/docs/)**
 
 ---
 
@@ -91,8 +91,10 @@ docs/                          # GitHub Pages — standalone web version
 
 | Workflow | File | Trigger | Description |
 |----------|------|---------|-------------|
-| Build Check | `build-check.yml` | Push/PR to `main` | Type-check (`tsc --noEmit`) and build Lynx bundles |
+| Build Check | `ci.yml` | Push/PR to `main` | Type-check (`tsc --noEmit`) and build Lynx bundles |
+| CodeQL | `codeql.yml` | Push/PR to `main`, weekly | Security and quality analysis |
 | Deploy Web | `deploy-web.yml` | Push to `main` | Deploy `docs/` to GitHub Pages |
+| Deploy Docs | `deploy-docs.yml` | Push to `main`, wiki edits | Generate HTML docs from wiki |
 | Build Android | `build-android.yml` | Push to `main`, `v*` tags | Build signed APK, create GitHub Release |
 | Build iOS | `build-ios.yml` | `v*` tags, manual | Build iOS archive (unsigned without Apple Developer Program) |
 | Release | `release.yml` | `v*` tags, manual | Full release pipeline: build + Android + iOS + GitHub Release |
