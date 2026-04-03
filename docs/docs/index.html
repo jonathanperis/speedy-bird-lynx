@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-EGG8C9RX9J"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-EGG8C9RX9J');
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Speedy Bird Lynx - Documentation</title>
@@ -434,31 +442,31 @@
 </tr>
 </thead>
 <tbody><tr>
-<td><a href="About-Lynx">About Lynx</a></td>
+<td><a href="#about-lynx">About Lynx</a></td>
 <td>What Lynx is, how it differs from React Native and WebViews, and key concepts used in this project</td>
 </tr>
 <tr>
-<td><a href="Architecture">Architecture</a></td>
+<td><a href="#architecture">Architecture</a></td>
 <td>Project structure, component hierarchy, rendering approach, and dual-threaded model</td>
 </tr>
 <tr>
-<td><a href="Assets-and-Sprites">Assets and Sprites</a></td>
+<td><a href="#assets-and-sprites">Assets and Sprites</a></td>
 <td>Sprite organization, asset loading, tile-based pipe rendering, and audio</td>
 </tr>
 <tr>
-<td><a href="CI-CD-Pipeline">CI/CD Pipeline</a></td>
+<td><a href="#ci-cd-pipeline">CI/CD Pipeline</a></td>
 <td>GitHub Actions workflows for building, signing, deploying, and releasing</td>
 </tr>
 <tr>
-<td><a href="Game-Engine">Game Engine</a></td>
+<td><a href="#game-engine">Game Engine</a></td>
 <td>Physics, collision detection, state machine, scoring, and the game loop</td>
 </tr>
 <tr>
-<td><a href="Getting-Started">Getting Started</a></td>
+<td><a href="#getting-started">Getting Started</a></td>
 <td>Setup, dev server, production builds, and platform-specific instructions</td>
 </tr>
 <tr>
-<td><a href="Native-Host-Apps">Native Host Apps</a></td>
+<td><a href="#native-host-apps">Native Host Apps</a></td>
 <td>Android and iOS native shells that embed the Lynx runtime</td>
 </tr>
 </tbody></table>
@@ -479,7 +487,6 @@
 
 <section id="about-lynx" class="doc-section">
   <h1 class="page-title">About Lynx</h1>
-  <h1>About Lynx</h1>
 <p><a href="https://lynxjs.org/">Lynx</a> is an open-source cross-platform native UI framework created by <a href="https://www.bytedance.com/">ByteDance</a> (the company behind TikTok). Open-sourced in early 2025, it allows developers to write apps in TypeScript/TSX using React-like APIs and render them as truly native UIs — not WebViews.</p>
 <h2>Why Lynx for This Project</h2>
 <p>This project exists to learn Lynx by building something real. A Flappy Bird clone is a good fit because it exercises:</p>
@@ -587,7 +594,6 @@
 
 <section id="architecture" class="doc-section">
   <h1 class="page-title">Architecture</h1>
-  <h1>Architecture</h1>
 <h2>Project Structure</h2>
 <pre><code>speedy-bird-lynx/
 ├── src/                          # Lynx/ReactLynx application
@@ -666,8 +672,7 @@
 </section>
 
 <section id="assets-and-sprites" class="doc-section">
-  <h1 class="page-title">Assets And Sprites</h1>
-  <h1>Assets and Sprites</h1>
+  <h1 class="page-title">Assets and Sprites</h1>
 <p>All game assets are pre-sliced individual PNG files. Lynx has no canvas or sprite sheet slicing — each visual element is a separate <code>&lt;image&gt;</code> element.</p>
 <h2>Directory Structure</h2>
 <pre><code>assets/
@@ -735,8 +740,7 @@
 </section>
 
 <section id="ci-cd-pipeline" class="doc-section">
-  <h1 class="page-title">CI CD Pipeline</h1>
-  <h1>CI/CD Pipeline</h1>
+  <h1 class="page-title">CI/CD Pipeline</h1>
 <p>All automation runs on GitHub Actions. Workflows are in <code>.github/workflows/</code>.</p>
 <h2>Workflow Overview</h2>
 <table>
@@ -750,13 +754,19 @@
 </thead>
 <tbody><tr>
 <td>Build Check</td>
-<td><code>build-check.yml</code></td>
+<td><code>ci.yml</code></td>
 <td>Push/PR to <code>main</code></td>
 <td>Type-check and build Lynx bundles</td>
 </tr>
 <tr>
+<td>CodeQL</td>
+<td><code>codeql.yml</code></td>
+<td>Push/PR to <code>main</code>, weekly</td>
+<td>Security and quality analysis</td>
+</tr>
+<tr>
 <td>Deploy Web</td>
-<td><code>deploy-web.yml</code></td>
+<td><code>deploy.yml</code></td>
 <td>Push to <code>main</code></td>
 <td>Deploy <code>docs/</code> to GitHub Pages</td>
 </tr>
@@ -788,7 +798,7 @@
 <li>Upload bundles as artifact (14-day retention)</li>
 </ol>
 <h2>Deploy Web</h2>
-<p>Deploys the <code>docs/</code> directory (standalone canvas game) to GitHub Pages on every push to <code>main</code>. Uses <code>actions/deploy-pages</code>.</p>
+<p>Deploys the <code>docs/</code> directory (standalone canvas game) to GitHub Pages on every push to <code>main</code>. Uses the GitHub Actions Pages deployment model (<code>actions/deploy-pages</code>).</p>
 <h2>Build Android</h2>
 <p>The main production workflow. On every push to <code>main</code>:</p>
 <ol>
@@ -851,7 +861,7 @@
 <h2>Build iOS</h2>
 <p>Scaffolded but requires manual setup:</p>
 <ol>
-<li>Create Xcode project (see <a href="Native-Host-Apps">Native Host Apps</a>)</li>
+<li>Create Xcode project (see <a href="#native-host-apps">Native Host Apps</a>)</li>
 <li>Enroll in Apple Developer Program ($99/year)</li>
 <li>Configure signing secrets</li>
 </ol>
@@ -863,7 +873,6 @@
 
 <section id="game-engine" class="doc-section">
   <h1 class="page-title">Game Engine</h1>
-  <h1>Game Engine</h1>
 <p>The game engine lives in <code>src/hooks/useGameEngine.ts</code>. It handles the game loop, physics, collision detection, scoring, and state transitions.</p>
 <h2>State Machine</h2>
 <p>The game has three states:</p>
@@ -1070,7 +1079,6 @@ Per pipe pair, two checks:
 
 <section id="getting-started" class="doc-section">
   <h1 class="page-title">Getting Started</h1>
-  <h1>Getting Started</h1>
 <h2>Prerequisites</h2>
 <ul>
 <li><strong>Node.js</strong> 18+ and <strong>npm</strong></li>
@@ -1103,10 +1111,10 @@ cp dist/main.lynx.bundle android/app/src/main/assets/
 cd android &amp;&amp; ./gradlew assembleDebug
 </code></pre>
 <p>The APK is at <code>android/app/build/outputs/apk/debug/app-debug.apk</code>. Install via <code>adb install</code> or transfer to your device.</p>
-<p>For release builds with signing, see <a href="CI-CD-Pipeline">CI/CD Pipeline</a>.</p>
+<p>For release builds with signing, see <a href="#ci-cd-pipeline">CI/CD Pipeline</a>.</p>
 <h2>iOS</h2>
 <blockquote>
-<p>Requires Xcode and an Xcode project (.xcodeproj). See <a href="Native-Host-Apps">Native Host Apps</a> for setup instructions.</p>
+<p>Requires Xcode and an Xcode project (.xcodeproj). See <a href="#native-host-apps">Native Host Apps</a> for setup instructions.</p>
 </blockquote>
 <pre><code class="language-bash">npm run build
 cp dist/main.lynx.bundle ios/SpeedyBird/Resources/
@@ -1146,7 +1154,6 @@ open SpeedyBird.xcworkspace
 
 <section id="native-host-apps" class="doc-section">
   <h1 class="page-title">Native Host Apps</h1>
-  <h1>Native Host Apps</h1>
 <p>Lynx bundles do not run standalone — they need a thin native shell that embeds the Lynx runtime and loads the bundle. This project includes host apps for Android (complete) and iOS (source files).</p>
 <h2>Android</h2>
 <p>The Android host app is a minimal Kotlin application in <code>android/</code>.</p>
