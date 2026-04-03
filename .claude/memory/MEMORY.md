@@ -1,0 +1,2 @@
+- [Architecture](architecture.md) — useGameEngine hook, dual-threaded Lynx model, CSS-based rendering, cross-platform builds
+- [Game Constants](game_constants.md) — Speed scaling, medal thresholds, build targets, Android signing
