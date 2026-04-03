@@ -93,8 +93,7 @@ docs/                          # GitHub Pages — standalone web version
 |----------|------|---------|-------------|
 | Build Check | `ci.yml` | Push/PR to `main` | Type-check (`tsc --noEmit`) and build Lynx bundles |
 | CodeQL | `codeql.yml` | Push/PR to `main`, weekly | Security and quality analysis |
-| Deploy Web | `deploy-web.yml` | Push to `main` | Deploy `docs/` to GitHub Pages |
-| Deploy Docs | `deploy-docs.yml` | Push to `main`, wiki edits | Generate HTML docs from wiki |
+| Deploy Web | `deploy.yml` | Push to `main` | Deploy `docs/` to GitHub Pages |
 | Build Android | `build-android.yml` | Push to `main`, `v*` tags | Build signed APK, create GitHub Release |
 | Build iOS | `build-ios.yml` | `v*` tags, manual | Build iOS archive (unsigned without Apple Developer Program) |
 | Release | `release.yml` | `v*` tags, manual | Full release pipeline: build + Android + iOS + GitHub Release |
