@@ -8,7 +8,7 @@
     "build": "rspeedy build"
   },
   "dependencies": {
-    "@lynx-js/react": "^0.117.0",
+    "@lynx-js/react": "^0.117.1",
     "@lynx-js/web-core": "^0.19.9",
     "@lynx-js/web-elements": "^0.12.0",
     "@rsbuild/core": "^1.7.5",
