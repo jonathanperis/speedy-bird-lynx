@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@lynx-js/react-rsbuild-plugin": "^0.13.0",
-    "@lynx-js/rspeedy": "^0.13.6",
+    "@lynx-js/rspeedy": "^0.14.0",
     "@lynx-js/types": "^3.7.0",
     "@types/react": "^18.3.0",
     "sharp": "^0.34.5",
