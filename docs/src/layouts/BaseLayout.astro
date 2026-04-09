@@ -1,0 +1,87 @@
+---
+import '../styles/globals.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Speedy Bird | Flappy Bird for Lynx',
+  description = 'A pixel art Speedy Bird clone built with the Lynx cross-platform framework. Play in your browser or on mobile iOS and Android.'
+} = Astro.props;
+
+const GA_ID = import.meta.env.PUBLIC_GA_ID;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'VideoGame',
+  'name': 'Speedy Bird',
+  'description': description,
+  'url': 'https://jonathanperis.github.io/speedy-bird-lynx/',
+  'genre': ['Arcade', 'Pixel Art', 'Side-Scroller'],
+  'gamePlatform': ['Web Browser', 'iOS', 'Android'],
+  'codeRepository': 'https://github.com/jonathanperis/speedy-bird-lynx',
+  'isAccessibleForFree': true,
+  'author': {
+    '@type': 'Person',
+    'name': 'Jonathan Peris',
+    'url': 'https://jonathanperis.github.io/'
+  }
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
+    <meta name="description" content={description} />
+    <meta name="keywords" content="Speedy Bird, pixel art, Lynx, ReactLynx, cross-platform, mobile game, side-scroller, open source, flappy bird" />
+    <link rel="canonical" href="https://jonathanperis.github.io/speedy-bird-lynx/" />
+    <meta name="theme-color" content="#04111e" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content="https://jonathanperis.github.io/speedy-bird-lynx/" />
+    <meta property="og:site_name" content="Speedy Bird" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:creator" content="@jperis_silva" />
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <title>{title}</title>
+  </head>
+  <body>
+    <!-- Google Analytics -->
+    <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
+    <script is:inline define:vars={{ GA_ID }}>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', GA_ID);
+    </script>
+
+    <div class="particles">
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+    </div>
+
+    <slot />
+  </body>
+</html>

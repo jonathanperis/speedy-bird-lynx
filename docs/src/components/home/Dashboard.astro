@@ -1,0 +1,83 @@
+---
+interface Stat {
+  value: string;
+  label: string;
+}
+
+interface Feature {
+  title: string;
+  description: string;
+}
+
+const stats: Stat[] = [
+  { value: 'Lynx', label: 'Cross-Platform Framework' },
+  { value: 'Web', label: 'Playable in Browser' },
+  { value: 'iOS + Android', label: 'Native Mobile' },
+  { value: 'MIT', label: 'Open Source License' },
+];
+
+const features: Feature[] = [
+  {
+    title: 'Lynx Framework',
+    description: 'Built with ByteDance\'s Lynx cross-platform framework, enabling a single codebase to run natively on iOS, Android, and the web.'
+  },
+  {
+    title: 'ReactLynx Components',
+    description: 'Developed using ReactLynx, bringing familiar React patterns and component architecture to cross-platform native development.'
+  },
+  {
+    title: 'Pixel Art Assets',
+    description: 'Classic pixel art sprites and sound effects faithfully recreate the Flappy Bird experience with a retro aesthetic.'
+  },
+  {
+    title: 'Web Playable',
+    description: 'Play directly in your browser via the GitHub Pages deployment — no install required. Canvas-based rendering for smooth gameplay.'
+  },
+  {
+    title: 'Native iOS & Android',
+    description: 'Full native builds for iOS and Android with GitHub Actions CI/CD pipelines for automated builds and releases.'
+  },
+  {
+    title: 'Open Source',
+    description: 'Fully open source under the MIT license. Clone it, learn from it, fork it, and make your own bird fly.'
+  },
+];
+---
+
+<section class="dashboard">
+  <div class="stats-grid">
+    {stats.map(stat => (
+      <div class="stat-item">
+        <h3>{stat.value}</h3>
+        <p>{stat.label}</p>
+      </div>
+    ))}
+  </div>
+
+  <div class="features-section">
+    <h3>What Makes It Fly</h3>
+    <div class="features-grid">
+      {features.map(f => (
+        <div class="feature-card">
+          <h4>{f.title}</h4>
+          <p>{f.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="quickstart-section">
+  <h3>Quick Start</h3>
+  <div class="code-block">
+    <pre><code><span class="comment"># Clone the repository</span>
+<span class="command">git clone</span> <span class="arg">https://github.com/jonathanperis/speedy-bird-lynx</span>
+
+<span class="comment"># Navigate into the directory</span>
+<span class="command">cd</span> <span class="arg">speedy-bird-lynx</span>
+
+<span class="comment"># Install dependencies and run</span>
+<span class="command">npm install</span>
+<span class="command">npm run dev</span></code></pre>
+  </div>
+</section>
