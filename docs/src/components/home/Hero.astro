@@ -1,27 +1,35 @@
 ---
 ---
 
-<section class="hero">
-  <div class="hero-badge">PIXEL ART // CROSS-PLATFORM</div>
-  <h1>Flappy Bird.<br>Blazing Fast.<br>Cross-Platform.</h1>
-  <p class="tagline">
-    A pixel art Speedy Bird clone built with the Lynx cross-platform framework.
-    Play in your browser or run natively on iOS and Android.
-  </p>
-
-  <div class="badges">
-    <span class="badge">Lynx</span>
-    <span class="badge">ReactLynx</span>
-    <span class="badge">iOS</span>
-    <span class="badge">Android</span>
-    <span class="badge">Web</span>
-    <span class="badge">TypeScript</span>
-    <span class="badge">Pixel Art</span>
+<section class="hero" id="hero">
+  <!-- Clouds -->
+  <div class="clouds-container" aria-hidden="true">
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
   </div>
 
-  <div class="ctas">
-    <a href="./play/" class="btn btn-primary">Play Now &rarr;</a>
-    <a href="./docs/" class="btn btn-outline">Documentation &rarr;</a>
-    <a href="https://github.com/jonathanperis/speedy-bird-lynx" class="btn btn-outline">GitHub &rarr;</a>
+  <!-- Animated bird -->
+  <div class="bird-wrapper" aria-hidden="true">
+    <div class="bird">
+      <div class="bird-body"></div>
+      <div class="bird-eye"></div>
+      <div class="bird-beak"></div>
+      <div class="bird-wing"></div>
+      <div class="bird-wing bird-wing-bot"></div>
+    </div>
+  </div>
+
+  <!-- Hero content -->
+  <div class="hero-content">
+    <div class="speed-badge">
+      <span class="speed-num" id="speedNum">1.00</span>
+      <span class="speed-label">SPEED MULTIPLIER</span>
+    </div>
+
+    <h1 class="hero-title">SPEEDY BIRD</h1>
+    <p class="hero-tagline">Flappy Bird &middot; But faster every pipe</p>
+
+    <a href="./play/" class="cta-btn">Play Now</a>
   </div>
 </section>

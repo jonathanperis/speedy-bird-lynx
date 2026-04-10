@@ -82,6 +82,60 @@ const jsonLd = {
       <div class="particle"></div>
     </div>
 
+    <!-- Pill nav (hidden until hero scrolls off) -->
+    <nav id="pill-nav" class="pill-nav">
+      <a href="#play">Play</a>
+      <a href="#about">About</a>
+      <a href="#docs">Docs</a>
+      <a href="./docs/">Full Docs</a>
+    </nav>
+
     <slot />
+
+    <script>
+      // Pill nav: appear when hero scrolls out of view
+      const heroEl = document.getElementById('hero');
+      const navEl = document.getElementById('pill-nav');
+      if (heroEl && navEl && window.IntersectionObserver) {
+        new IntersectionObserver(
+          ([e]) => navEl.classList.toggle('visible', !e.isIntersecting)
+        ).observe(heroEl);
+      }
+
+      // Speed counter loop
+      let spd = 1.0;
+      const spdEl = document.getElementById('speedNum');
+      if (spdEl) {
+        setInterval(() => {
+          spd += 0.01;
+          if (spd > 1.73) spd = 1.0;
+          spdEl.textContent = spd.toFixed(2);
+        }, 50);
+      }
+
+      // Section reveals
+      if (window.IntersectionObserver) {
+        document.querySelectorAll('.reveal').forEach(el => {
+          new IntersectionObserver(
+            ([e]) => { if (e.isIntersecting) el.classList.add('visible'); },
+            { threshold: 0.1 }
+          ).observe(el);
+        });
+
+        const meter = document.getElementById('speedMeter');
+        if (meter) {
+          new IntersectionObserver(
+            ([e]) => { if (e.isIntersecting) meter.classList.add('visible'); },
+            { threshold: 0.5 }
+          ).observe(meter);
+        }
+      } else {
+        document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+      }
+
+      setTimeout(() => {
+        document.querySelector('.hero-content')?.classList.add('visible');
+      }, 100);
+    </script>
   </body>
 </html>
