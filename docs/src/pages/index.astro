@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import Navbar from '@/components/home/Navbar.astro';
 import Hero from '@/components/home/Hero.astro';
 import Dashboard from '@/components/home/Dashboard.astro';
 import Footer from '@/components/home/Footer.astro';
@@ -10,10 +9,30 @@ const description = 'A pixel art Speedy Bird clone built with the Lynx cross-pla
 ---
 
 <BaseLayout title={title} description={description}>
-  <Navbar />
+  <Hero />
+
+  <!-- Pipe divider: hero → play -->
+  <div class="pipe-divider" aria-hidden="true">
+    <div class="pipe pipe-top"></div>
+    <div class="pipe-gap"></div>
+    <div class="pipe pipe-bot"></div>
+  </div>
+
+  <!-- Play anchor -->
+  <section id="play" style="max-width:700px;margin:0 auto;padding:2rem 1.5rem;text-align:center;">
+    <h2 style="font-family:'Nunito',sans-serif;font-size:2.5rem;font-weight:900;color:var(--golden);text-transform:uppercase;margin-bottom:1rem;">Play the Game</h2>
+    <p style="color:var(--text-dim);margin-bottom:2rem;font-size:1.1rem;">The full game runs in your browser — no install, no login.</p>
+    <a href="./play/" class="cta-btn" style="font-size:1.4rem;padding:1.4rem 4rem;">Play Now &rarr;</a>
+  </section>
+
+  <!-- Pipe divider: play → about -->
+  <div class="pipe-divider" aria-hidden="true">
+    <div class="pipe pipe-top"></div>
+    <div class="pipe-gap"></div>
+    <div class="pipe pipe-bot"></div>
+  </div>
 
   <main>
-    <Hero />
     <Dashboard />
   </main>
 

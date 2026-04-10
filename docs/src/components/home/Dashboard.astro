@@ -1,74 +1,103 @@
 ---
-interface Stat {
-  value: string;
-  label: string;
-}
-
-interface Feature {
-  title: string;
-  description: string;
-}
-
-const stats: Stat[] = [
-  { value: 'Lynx', label: 'Cross-Platform Framework' },
-  { value: 'Web', label: 'Playable in Browser' },
-  { value: 'iOS + Android', label: 'Native Mobile' },
-  { value: 'MIT', label: 'Open Source License' },
-];
-
-const features: Feature[] = [
-  {
-    title: 'Lynx Framework',
-    description: 'Built with ByteDance\'s Lynx cross-platform framework, enabling a single codebase to run natively on iOS, Android, and the web.'
-  },
-  {
-    title: 'ReactLynx Components',
-    description: 'Developed using ReactLynx, bringing familiar React patterns and component architecture to cross-platform native development.'
-  },
-  {
-    title: 'Pixel Art Assets',
-    description: 'Classic pixel art sprites and sound effects faithfully recreate the Flappy Bird experience with a retro aesthetic.'
-  },
-  {
-    title: 'Web Playable',
-    description: 'Play directly in your browser via the GitHub Pages deployment — no install required. Canvas-based rendering for smooth gameplay.'
-  },
-  {
-    title: 'Native iOS & Android',
-    description: 'Full native builds for iOS and Android with GitHub Actions CI/CD pipelines for automated builds and releases.'
-  },
-  {
-    title: 'Open Source',
-    description: 'Fully open source under the MIT license. Clone it, learn from it, fork it, and make your own bird fly.'
-  },
-];
 ---
 
-<section class="dashboard">
-  <div class="stats-grid">
-    {stats.map(stat => (
-      <div class="stat-item">
-        <h3>{stat.value}</h3>
-        <p>{stat.label}</p>
-      </div>
-    ))}
+<!-- About the Game -->
+<section class="about-section about-game reveal" id="about">
+  <h2>About the Game</h2>
+  <p>
+    Speedy Bird started as a vanilla HTML5 Canvas recreation of the classic Flappy Bird.
+    The twist: every pipe you clear, the game speeds up — pushing your reflexes to their
+    limit. It was later ported to the Lynx cross-platform framework as a showcase of
+    ReactLynx's capability to deliver native game-like experiences.
+  </p>
+
+  <!-- Speed meter -->
+  <div class="speed-meter reveal" id="speedMeter">
+    <div class="speed-fill"></div>
+    <div class="speed-labels">
+      <span>1.00&times; Normal</span>
+      <span>1.73&times; Max Speed</span>
+    </div>
   </div>
 
-  <div class="features-section">
-    <h3>What Makes It Fly</h3>
-    <div class="features-grid">
-      {features.map(f => (
-        <div class="feature-card">
-          <h4>{f.title}</h4>
-          <p>{f.description}</p>
-        </div>
-      ))}
+  <!-- Medals -->
+  <div class="medals-row reveal">
+    <div class="medal medal-bronze">Bronze<br><small>10 pts</small></div>
+    <div class="medal medal-silver">Silver<br><small>20 pts</small></div>
+    <div class="medal medal-gold">Gold<br><small>30 pts</small></div>
+    <div class="medal medal-platinum">Platinum<br><small>40 pts</small></div>
+  </div>
+
+  <!-- Game feature cards -->
+  <div class="feature-grid reveal">
+    <div class="feature-card">
+      <h3>Physics</h3>
+      <p>Gravity, velocity, and collision detection tuned for tight, fair gameplay — the same feel as the original, but with a speed twist.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Tile-Based Pipes</h3>
+      <p>Pipes are assembled from sprite tiles, faithfully recreating the pixel art aesthetic of the original Flappy Bird.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Parallax</h3>
+      <p>Background, ground, and pipes scroll at different speeds to create depth — the faster the bird, the more intense the parallax.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Medal System</h3>
+      <p>Earn Bronze, Silver, Gold, or Platinum medals based on your score. Can you reach Platinum before the speed kills you?</p>
+    </div>
+    <div class="feature-card">
+      <h3>Cross-Platform</h3>
+      <p>Play in your browser via GitHub Pages, or run natively on iOS and Android through the Lynx framework build.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Pixel Perfect</h3>
+      <p>Original sprites from the Spriters Resource, scaled 2&times; for retina displays. Sound effects included.</p>
     </div>
   </div>
 </section>
 
-<section class="quickstart-section">
-  <h3>Quick Start</h3>
+<!-- About Lynx -->
+<section class="about-section about-lynx reveal">
+  <h2>About Lynx</h2>
+  <p>
+    Lynx is ByteDance's open-source cross-platform framework that powers apps used by
+    hundreds of millions of people. ReactLynx brings familiar React patterns to native
+    rendering — this project demonstrates it works just as well for games.
+  </p>
+
+  <div class="feature-grid reveal">
+    <div class="feature-card">
+      <h3>ReactLynx</h3>
+      <p>Write components using React syntax and lifecycle. The same mental model, targeting native Lynx rendering instead of the DOM.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Native Rendering</h3>
+      <p>Lynx bypasses WebView for a native rendering engine, delivering smoother animations and lower latency on mobile devices.</p>
+    </div>
+    <div class="feature-card">
+      <h3>CSS Styling</h3>
+      <p>Style components with a CSS subset that compiles to native layout primitives — no custom DSL to learn.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Rspack Toolchain</h3>
+      <p>Fast Rust-based bundler (Rspack) powers the build pipeline, delivering near-instant hot-reload during development.</p>
+    </div>
+    <div class="feature-card">
+      <h3>6 Platforms</h3>
+      <p>iOS, Android, Web, desktop, and more — a single ReactLynx codebase runs everywhere Lynx supports.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Battle-Tested</h3>
+      <p>Used in production by ByteDance apps with hundreds of millions of monthly active users. This isn't an experiment — it's proven.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Quick Start -->
+<section class="about-section about-project reveal">
+  <h2>Quick Start</h2>
+  <p>Clone the repo and run locally in minutes.</p>
   <div class="code-block">
     <pre><code><span class="comment"># Clone the repository</span>
 <span class="command">git clone</span> <span class="arg">https://github.com/jonathanperis/speedy-bird-lynx</span>
@@ -79,5 +108,36 @@ const features: Feature[] = [
 <span class="comment"># Install dependencies and run</span>
 <span class="command">npm install</span>
 <span class="command">npm run dev</span></code></pre>
+  </div>
+</section>
+
+<!-- Docs -->
+<section class="docs-section reveal" id="docs">
+  <h2>Documentation</h2>
+  <div class="docs-grid">
+    <a href="./docs/" class="doc-card">
+      <h3>Getting Started</h3>
+      <p>Project overview, prerequisites, and how to run the game locally or on device.</p>
+    </a>
+    <a href="https://github.com/jonathanperis/speedy-bird-lynx/wiki" class="doc-card" target="_blank" rel="noopener noreferrer">
+      <h3>Wiki</h3>
+      <p>In-depth guides on architecture, game loop, physics, and the Lynx port.</p>
+    </a>
+    <a href="https://github.com/jonathanperis/speedy-bird-lynx/blob/main/README.md" class="doc-card" target="_blank" rel="noopener noreferrer">
+      <h3>README</h3>
+      <p>Full project README with setup, scripts, CI/CD details, and contributing guidelines.</p>
+    </a>
+    <a href="https://github.com/jonathanperis/speedy-bird-lynx/releases" class="doc-card" target="_blank" rel="noopener noreferrer">
+      <h3>Releases</h3>
+      <p>Changelog and downloadable builds for each tagged release.</p>
+    </a>
+    <a href="https://github.com/jonathanperis/speedy-bird-lynx/actions" class="doc-card" target="_blank" rel="noopener noreferrer">
+      <h3>CI/CD Pipelines</h3>
+      <p>GitHub Actions workflows for build, test, and multi-platform release.</p>
+    </a>
+    <a href="https://github.com/jonathanperis/speedy-bird-lynx/issues" class="doc-card" target="_blank" rel="noopener noreferrer">
+      <h3>Issues &amp; Roadmap</h3>
+      <p>Open issues, feature requests, and the project roadmap on GitHub.</p>
+    </a>
   </div>
 </section>
