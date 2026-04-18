@@ -25,6 +25,7 @@
   },
   "overrides": {
     "serialize-javascript": "^7.0.5",
-    "qs": "^6.15.0"
+    "qs": "^6.15.0",
+    "follow-redirects": ">=1.16.0"
   }
 }
