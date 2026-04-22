@@ -13,7 +13,7 @@
     "@lynx-js/web-elements": "^0.12.0",
     "@rsbuild/core": "^1.7.5",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^19.2.5"
   },
   "devDependencies": {
     "@lynx-js/react-rsbuild-plugin": "^0.14.0",
