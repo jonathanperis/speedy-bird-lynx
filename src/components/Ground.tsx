@@ -1,6 +1,5 @@
 import { GROUND_W, GROUND_H, CANVAS_HEIGHT } from '../constants.js';
-
-const GROUND_SRC = require('../../assets/sprites/ground.png');
+import groundSrc from '../../assets/sprites/ground.png';
 
 interface GroundProps {
   groundX: number;
@@ -23,11 +22,11 @@ export default function Ground({ groundX }: GroundProps) {
         transform: `translateX(${groundX}px)`,
       }}
     >
-      <image src={GROUND_SRC} style={{ width: `${GROUND_W}px`, height: `${GROUND_H}px` }} />
-      <image src={GROUND_SRC} style={{ width: `${GROUND_W}px`, height: `${GROUND_H}px` }} />
-      <image src={GROUND_SRC} style={{ width: `${GROUND_W}px`, height: `${GROUND_H}px` }} />
-      <image src={GROUND_SRC} style={{ width: `${GROUND_W}px`, height: `${GROUND_H}px` }} />
-      <image src={GROUND_SRC} style={{ width: `${GROUND_W}px`, height: `${GROUND_H}px` }} />
+      <image src={groundSrc} style={{ width: `${GROUND_W}px`, height: `${GROUND_H}px` }} />
+      <image src={groundSrc} style={{ width: `${GROUND_W}px`, height: `${GROUND_H}px` }} />
+      <image src={groundSrc} style={{ width: `${GROUND_W}px`, height: `${GROUND_H}px` }} />
+      <image src={groundSrc} style={{ width: `${GROUND_W}px`, height: `${GROUND_H}px` }} />
+      <image src={groundSrc} style={{ width: `${GROUND_W}px`, height: `${GROUND_H}px` }} />
     </view>
   );
 }
