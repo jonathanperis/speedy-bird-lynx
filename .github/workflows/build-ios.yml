@@ -51,16 +51,19 @@ jobs:
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
-      # Build Lynx JS bundle
-      - uses: actions/setup-node@v6
+      # Build Lynx JS bundle (bun per CLAUDE.md convention)
+      - uses: oven-sh/setup-bun@v2
         if: steps.check.outputs.exists == 'true'
         with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
+          bun-version: latest
+
+      - name: Install dependencies
         if: steps.check.outputs.exists == 'true'
-      - run: npm run build
+        run: bun install
+
+      - name: Build Lynx bundle
         if: steps.check.outputs.exists == 'true'
+        run: bun run build
 
       # Copy bundle into iOS app resources
       - run: cp dist/main.lynx.bundle ios/SpeedyBird/Resources/
@@ -79,7 +82,7 @@ jobs:
             -scheme SpeedyBird \
             -configuration Release \
             -sdk iphoneos \
-            -archivePath ${{ runner.temp }}/SpeedyBird.xcarchive \
+            -archivePath "${{ runner.temp }}/SpeedyBird.xcarchive" \
             CODE_SIGN_IDENTITY="-" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
