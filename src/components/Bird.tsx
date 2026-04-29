@@ -1,11 +1,9 @@
 import { BIRD_W, BIRD_H, BIRD_X } from '../constants.js';
+import bird0 from '../../assets/sprites/bird-0.png';
+import bird1 from '../../assets/sprites/bird-1.png';
+import bird2 from '../../assets/sprites/bird-2.png';
 
-const BIRD_SPRITES = [
-  require('../../assets/sprites/bird-0.png'),
-  require('../../assets/sprites/bird-1.png'),
-  require('../../assets/sprites/bird-2.png'),
-  require('../../assets/sprites/bird-1.png'),
-];
+const BIRD_SPRITES = [bird0, bird1, bird2, bird1];
 
 interface BirdProps {
   y: number;

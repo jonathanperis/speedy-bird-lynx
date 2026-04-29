@@ -1,6 +1,5 @@
 import { BG_W, BG_H, CANVAS_HEIGHT, GROUND_H } from '../constants.js';
-
-const BG_SRC = require('../../assets/sprites/background.png');
+import bgSrc from '../../assets/sprites/background.png';
 
 interface BackgroundProps {
   bgX: number;
@@ -24,11 +23,11 @@ export default function Background({ bgX }: BackgroundProps) {
         transform: `translateX(${bgX}px)`,
       }}
     >
-      <image src={BG_SRC} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
-      <image src={BG_SRC} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
-      <image src={BG_SRC} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
-      <image src={BG_SRC} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
-      <image src={BG_SRC} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
+      <image src={bgSrc} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
+      <image src={bgSrc} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
+      <image src={bgSrc} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
+      <image src={bgSrc} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
+      <image src={bgSrc} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
     </view>
   );
 }

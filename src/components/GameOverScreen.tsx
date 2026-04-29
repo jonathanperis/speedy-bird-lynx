@@ -1,20 +1,19 @@
 import { CANVAS_HEIGHT } from '../constants.js';
-
-const GAME_OVER_SRC = require('../../assets/sprites/game-over.png');
-const MEDAL_BRONZE = require('../../assets/sprites/medals/medal-bronze.png');
-const MEDAL_SILVER = require('../../assets/sprites/medals/medal-silver.png');
-const MEDAL_GOLD = require('../../assets/sprites/medals/medal-gold.png');
-const MEDAL_PLATINUM = require('../../assets/sprites/medals/medal-platinum.png');
+import gameOverSrc from '../../assets/sprites/game-over.png';
+import medalBronze from '../../assets/sprites/medals/medal-bronze.png';
+import medalSilver from '../../assets/sprites/medals/medal-silver.png';
+import medalGold from '../../assets/sprites/medals/medal-gold.png';
+import medalPlatinum from '../../assets/sprites/medals/medal-platinum.png';
 
 const IMG_W = 226;
 const IMG_H = 158;
 const MEDAL_SIZE = 44;
 
 function getMedalSrc(score: number): string | null {
-  if (score >= 100) return MEDAL_PLATINUM;
-  if (score >= 50) return MEDAL_GOLD;
-  if (score >= 25) return MEDAL_SILVER;
-  if (score >= 10) return MEDAL_BRONZE;
+  if (score >= 100) return medalPlatinum;
+  if (score >= 50) return medalGold;
+  if (score >= 25) return medalSilver;
+  if (score >= 10) return medalBronze;
   return null;
 }
 
@@ -51,7 +50,7 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
       >
         {/* Game over panel sprite */}
         <image
-          src={GAME_OVER_SRC}
+          src={gameOverSrc}
           style={{
             position: 'absolute',
             top: '0px',

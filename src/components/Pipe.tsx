@@ -1,9 +1,8 @@
 import { PIPE_W, PIPE_H, PIPE_GAP } from '../constants.js';
-
-const PIPE_TOP_BODY = require('../../assets/sprites/pipes/pipe-top.png');
-const PIPE_TOP_MOUTH = require('../../assets/sprites/pipes/pipe-top-mouth.png');
-const PIPE_BOTTOM_BODY = require('../../assets/sprites/pipes/pipe-bottom.png');
-const PIPE_BOTTOM_MOUTH = require('../../assets/sprites/pipes/pipe-bottom-mouth.png');
+import pipeTopBody from '../../assets/sprites/pipes/pipe-top.png';
+import pipeTopMouth from '../../assets/sprites/pipes/pipe-top-mouth.png';
+import pipeBottomBody from '../../assets/sprites/pipes/pipe-bottom.png';
+import pipeBottomMouth from '../../assets/sprites/pipes/pipe-bottom-mouth.png';
 
 const TILE_H = Math.round(25 * (PIPE_W / 26)); // ~53px display height per tile
 
@@ -25,7 +24,7 @@ export default function Pipe({ x, y }: PipeProps) {
     topTiles.push(
       <image
         key={`tb${i}`}
-        src={PIPE_TOP_BODY}
+        src={pipeTopBody}
         style={{
           position: 'absolute',
           top: `${topMouthY - (i + 1) * TILE_H}px`,
@@ -40,7 +39,7 @@ export default function Pipe({ x, y }: PipeProps) {
   topTiles.push(
     <image
       key="tm"
-      src={PIPE_TOP_MOUTH}
+      src={pipeTopMouth}
       style={{
         position: 'absolute',
         top: `${topMouthY}px`,
@@ -61,7 +60,7 @@ export default function Pipe({ x, y }: PipeProps) {
   bottomTiles.push(
     <image
       key="bm"
-      src={PIPE_BOTTOM_MOUTH}
+      src={pipeBottomMouth}
       style={{
         position: 'absolute',
         top: '0px',
@@ -77,7 +76,7 @@ export default function Pipe({ x, y }: PipeProps) {
     bottomTiles.push(
       <image
         key={`bb${i}`}
-        src={PIPE_BOTTOM_BODY}
+        src={pipeBottomBody}
         style={{
           position: 'absolute',
           top: `${(i + 1) * TILE_H}px`,

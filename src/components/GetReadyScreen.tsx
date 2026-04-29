@@ -1,6 +1,5 @@
 import { CANVAS_HEIGHT } from '../constants.js';
-
-const GET_READY_SRC = require('../../assets/sprites/get-ready.png');
+import getReadySrc from '../../assets/sprites/get-ready.png';
 
 const IMG_W = 174;
 const IMG_H = 160;
@@ -25,7 +24,7 @@ export default function GetReadyScreen({ visible }: GetReadyScreenProps) {
       }}
     >
       <image
-        src={GET_READY_SRC}
+        src={getReadySrc}
         style={{
           width: `${IMG_W}px`,
           height: `${IMG_H}px`,
