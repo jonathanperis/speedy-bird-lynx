@@ -20,9 +20,11 @@ jobs:
       # Compute version from tag or short SHA
       - name: Set version
         id: version
+        env:
+          GH_REF: ${{ github.ref }}
         run: |
-          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
-            VERSION="${GITHUB_REF#refs/tags/v}"
+          if [[ "$GH_REF" == refs/tags/v* ]]; then
+            VERSION="${GH_REF#refs/tags/v}"
           else
             VERSION="0.0.0-$(git rev-parse --short HEAD)"
           fi
@@ -32,13 +34,16 @@ jobs:
           echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_OUTPUT"
           echo "Version: $VERSION (code: $VERSION_CODE)"
 
-      # Build Lynx JS bundle
-      - uses: actions/setup-node@v6
+      # Build Lynx JS bundle (bun per CLAUDE.md convention for Pages projects)
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
-      - run: npm run build
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build Lynx bundle
+        run: bun run build
 
       # Copy bundle into Android assets
       - run: cp dist/main.lynx.bundle android/app/src/main/assets/
@@ -101,14 +106,17 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION_NAME: ${{ steps.version.outputs.VERSION_NAME }}
           VERSION_CODE: ${{ steps.version.outputs.VERSION_CODE }}
+          GH_REF: ${{ github.ref }}
+          GH_SHA: ${{ github.sha }}
+          GH_REPO: ${{ github.repository }}
         run: |
-          COMMIT_SHA="${{ github.sha }}"
+          COMMIT_SHA="$GH_SHA"
           SHORT_SHA="${COMMIT_SHA:0:7}"
           APK_FILE="speedy-bird-${VERSION_NAME}.apk"
           APK_SIZE=$(du -h "android/app/build/outputs/apk/release/$APK_FILE" | cut -f1)
 
-          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
-            TAG="${GITHUB_REF#refs/tags/}"
+          if [[ "$GH_REF" == refs/tags/v* ]]; then
+            TAG="${GH_REF#refs/tags/}"
             TITLE="Speedy Bird $TAG"
             PRERELEASE=""
           else
@@ -117,7 +125,7 @@ jobs:
             PRERELEASE=""
           fi
 
-          BODY="Automated release built from commit [\`${COMMIT_SHA}\`](https://github.com/${{ github.repository }}/commit/${COMMIT_SHA}).
+          BODY="Automated release built from commit [\`${COMMIT_SHA}\`](https://github.com/${GH_REPO}/commit/${COMMIT_SHA}).
 
           ### Downloads
 
@@ -131,7 +139,7 @@ jobs:
           |-------|-------|
           | Version | \`${VERSION_NAME}\` |
           | Version Code | \`${VERSION_CODE}\` |
-          | Commit | [\`${SHORT_SHA}\`](https://github.com/${{ github.repository }}/commit/${COMMIT_SHA}) |
+          | Commit | [\`${SHORT_SHA}\`](https://github.com/${GH_REPO}/commit/${COMMIT_SHA}) |
           | Lynx SDK | 3.7.0 |
           | Min Android | API 21 (5.0 Lollipop) |
 
