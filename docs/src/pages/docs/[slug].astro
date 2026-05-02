@@ -7,16 +7,14 @@ export function getStaticPaths() {
 
   for (const [path, module] of Object.entries(globModules)) {
     const fileName = path.split('/').pop()!.replace('.md', '');
-    const slug = fileName === 'index' ? 'index' : fileName;
-    const label = fileName === 'index'
-      ? 'Home'
-      : fileName
-          .split('-')
-          .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-          .join(' ');
+    if (fileName === 'index') continue;
+    const label = fileName
+        .split('-')
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
     pages.push({
-      params: { slug },
-      props: { page: { module, slug: fileName === 'index' ? '' : fileName, label } },
+      params: { slug: fileName },
+      props: { page: { module, slug: fileName, label } },
     });
   }
 
@@ -482,33 +480,7 @@ navItems.sort((a, b) => {
       if(menuToggle) menuToggle.addEventListener('click', toggleMenu);
       if(overlay) overlay.addEventListener('click', toggleMenu);
 
-      // Scrollspy - observe h2 elements
-      const headings = document.querySelectorAll('.content h2');
       const navItems = document.querySelectorAll('.nav-item');
-
-      const observerOptions = {
-        root: null,
-        rootMargin: '-80px 0px -60% 0px',
-        threshold: 0
-      };
-
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const headingId = entry.target.id;
-            navItems.forEach(item => {
-              item.classList.remove('active');
-              const href = item.getAttribute('href');
-              if (href && href.includes('#' + headingId)) {
-                item.classList.add('active');
-                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-              }
-            });
-          }
-        });
-      }, observerOptions);
-
-      headings.forEach(heading => observer.observe(heading));
 
       // Click on nav items (mobile close)
       navItems.forEach(item => {
