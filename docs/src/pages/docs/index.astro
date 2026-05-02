@@ -1,9 +1,32 @@
 ---
 import DocsLayout from '@/layouts/DocsLayout.astro';
-import mainContent from '@/data/docs-main.html?raw';
+import Content from '../../../wiki/index.md';
+
+const globModules = import.meta.glob('../../../wiki/*.md', { eager: true });
+const navItems: { slug: string; label: string; href: string }[] = [];
+
+for (const [path, module] of Object.entries(globModules)) {
+  const fileName = path.split('/').pop()!.replace('.md', '');
+  const slug = fileName === 'index' ? '' : fileName;
+  const label = fileName === 'index'
+    ? 'Home'
+    : fileName
+        .split('-')
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
+  navItems.push({ slug, label, href: slug === '' ? '/docs/' : `/docs/${slug}` });
+}
+
+navItems.sort((a, b) => {
+  if (a.slug === '') return -1;
+  if (b.slug === '') return 1;
+  return a.label.localeCompare(b.label);
+});
+
+const currentSlug = '';
 ---
 
-<DocsLayout title="Speedy Bird Lynx - Documentation">
+<DocsLayout title="Speedy Bird Lynx">
   <style is:global>
     :root {
       --bg: #04111e;
@@ -21,12 +44,12 @@ import mainContent from '@/data/docs-main.html?raw';
     }
 
     * { box-sizing: border-box; }
-    
+
     html {
       scroll-behavior: smooth;
       font-family: 'Space Grotesk', sans-serif;
     }
-    
+
     body {
       margin: 0;
       padding: 0;
@@ -36,7 +59,6 @@ import mainContent from '@/data/docs-main.html?raw';
       display: flex;
     }
 
-    /* Sidebar */
     .sidebar {
       position: fixed;
       top: 0;
@@ -152,7 +174,6 @@ import mainContent from '@/data/docs-main.html?raw';
       color: var(--text-primary);
     }
 
-    /* Main Content */
     .content-wrapper {
       margin-left: var(--sidebar-width);
       flex: 1;
@@ -163,11 +184,10 @@ import mainContent from '@/data/docs-main.html?raw';
 
     .content {
       width: 100%;
-      max-width: 860px;
-      padding: 48px 64px;
+      max-width: 1100px;
+      padding: 48px 48px;
     }
 
-    /* Typography */
     h1 {
       font-size: 32px;
       font-weight: 700;
@@ -184,6 +204,7 @@ import mainContent from '@/data/docs-main.html?raw';
       padding-bottom: 8px;
       border-bottom: 1px solid var(--border);
       color: var(--text-primary);
+      scroll-margin-top: 80px;
     }
 
     h3 {
@@ -191,6 +212,7 @@ import mainContent from '@/data/docs-main.html?raw';
       font-weight: 600;
       margin: 32px 0 12px;
       color: var(--text-primary);
+      scroll-margin-top: 80px;
     }
 
     p {
@@ -209,7 +231,6 @@ import mainContent from '@/data/docs-main.html?raw';
       text-decoration: underline;
     }
 
-    /* Code */
     pre {
       background: var(--code-bg);
       border: 1px solid var(--code-border);
@@ -217,9 +238,8 @@ import mainContent from '@/data/docs-main.html?raw';
       padding: 16px 20px;
       overflow-x: auto;
       margin: 24px 0;
-      position: relative;
     }
-    
+
     pre code {
       background: transparent;
       padding: 0;
@@ -237,7 +257,6 @@ import mainContent from '@/data/docs-main.html?raw';
       font-size: 13px;
     }
 
-    /* Tables */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -268,12 +287,11 @@ import mainContent from '@/data/docs-main.html?raw';
     tr:nth-child(even) {
       background: rgba(255, 255, 255, 0.02);
     }
-    
+
     tr:last-child td {
       border-bottom: none;
     }
 
-    /* Blockquotes */
     blockquote {
       margin: 24px 0;
       padding: 12px 20px;
@@ -287,30 +305,24 @@ import mainContent from '@/data/docs-main.html?raw';
       margin: 0;
     }
 
-    /* HR */
     hr {
       border: none;
       border-top: 1px solid var(--border);
       margin: 40px 0;
     }
 
-    /* Sections */
-    section.doc-section {
-      scroll-margin-top: 80px;
-      margin-bottom: 80px;
-    }
-    
-    .hidden-section {
-      display: none;
-    }
-    
-    .search-highlight {
-      background: rgba(255, 107, 53, 0.3);
-      border-radius: 2px;
-      padding: 0 2px;
+    ul, ol {
+      padding-left: 24px;
+      margin: 16px 0;
     }
 
-    /* Mobile */
+    li {
+      margin-bottom: 8px;
+      color: var(--text-body);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
     .mobile-header {
       display: none;
       position: sticky;
@@ -341,7 +353,7 @@ import mainContent from '@/data/docs-main.html?raw';
       background: currentColor;
       border-radius: 2px;
     }
-    
+
     .overlay {
       display: none;
       position: fixed;
@@ -374,7 +386,6 @@ import mainContent from '@/data/docs-main.html?raw';
     }
   </style>
 
-  <!-- Mobile Header -->
   <div class="mobile-header">
     <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
       <span></span>
@@ -386,7 +397,6 @@ import mainContent from '@/data/docs-main.html?raw';
 
   <div class="overlay" id="overlay"></div>
 
-  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h1 class="repo-title">Speedy Bird Lynx</h1>
@@ -395,31 +405,33 @@ import mainContent from '@/data/docs-main.html?raw';
     </div>
     <div class="sidebar-nav-container">
       <ul>
-        <li><a href="#home" class="nav-item">Home</a></li>
-        <li><a href="#about-lynx" class="nav-item">About Lynx</a></li>
-        <li><a href="#architecture" class="nav-item">Architecture</a></li>
-        <li><a href="#assets-and-sprites" class="nav-item">Assets And Sprites</a></li>
-        <li><a href="#ci-cd-pipeline" class="nav-item">CI CD Pipeline</a></li>
-        <li><a href="#game-engine" class="nav-item">Game Engine</a></li>
-        <li><a href="#getting-started" class="nav-item">Getting Started</a></li>
-        <li><a href="#native-host-apps" class="nav-item">Native Host Apps</a></li>
+        {navItems.map(item => (
+          <li>
+            <a
+              href={item.href}
+              class={`nav-item${item.slug === currentSlug ? ' active' : ''}`}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
       </ul>
     </div>
     <div class="sidebar-footer">
-      <a href="../" class="back-home">← Back to home</a>
+      <a href="/" class="back-home">← Back to home</a>
       <a href="https://github.com/jonathanperis/speedy-bird-lynx" target="_blank" rel="noopener noreferrer">View on GitHub</a>
       <div>Built by Jonathan Peris</div>
     </div>
   </aside>
 
-  <!-- Main Content -->
   <div class="content-wrapper">
-    <main class="content" id="mainContent" set:html={mainContent} />
+    <main class="content" id="mainContent">
+      <Content />
+    </main>
   </div>
 
   <script is:inline>
     document.addEventListener('DOMContentLoaded', () => {
-      // Mobile menu toggle
       const menuToggle = document.getElementById('menuToggle');
       const sidebar = document.getElementById('sidebar');
       const overlay = document.getElementById('overlay');
@@ -432,34 +444,8 @@ import mainContent from '@/data/docs-main.html?raw';
       if(menuToggle) menuToggle.addEventListener('click', toggleMenu);
       if(overlay) overlay.addEventListener('click', toggleMenu);
 
-      // Scrollspy
-      const sections = document.querySelectorAll('section.doc-section');
       const navItems = document.querySelectorAll('.nav-item');
-      
-      const observerOptions = {
-        root: null,
-        rootMargin: '-80px 0px -60% 0px',
-        threshold: 0
-      };
 
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            navItems.forEach(item => {
-              item.classList.remove('active');
-              if (item.getAttribute('href') === `#${entry.target.id}`) {
-                item.classList.add('active');
-                // Scroll sidebar if needed
-                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-              }
-            });
-          }
-        });
-      }, observerOptions);
-
-      sections.forEach(section => observer.observe(section));
-
-      // Click on nav items (mobile close)
       navItems.forEach(item => {
         item.addEventListener('click', () => {
           if (window.innerWidth <= 768) {
@@ -468,24 +454,23 @@ import mainContent from '@/data/docs-main.html?raw';
         });
       });
 
-      // Search
       const searchInput = document.getElementById('searchInput');
       if (searchInput) {
         searchInput.addEventListener('input', (e) => {
           const query = e.target.value.toLowerCase();
-          
-          sections.forEach(section => {
-            const text = section.textContent.toLowerCase();
-            const navItem = document.querySelector(`.nav-item[href="#${section.id}"]`);
-            const li = navItem ? navItem.parentElement : null;
-            
-            if (text.includes(query) || query === '') {
-              section.classList.remove('hidden-section');
-              if(li) li.style.display = '';
-            } else {
-              section.classList.add('hidden-section');
-              if(li) li.style.display = 'none';
-            }
+          const content = document.getElementById('mainContent');
+          if (!content) return;
+
+          const sections = content.querySelectorAll('h1, h2, h3, p, li, table, pre, blockquote');
+
+          if (query === '') {
+            sections.forEach(el => el.style.opacity = '');
+            return;
+          }
+
+          sections.forEach(el => {
+            const text = el.textContent.toLowerCase();
+            el.style.opacity = text.includes(query) ? '' : '0.2';
           });
         });
       }
