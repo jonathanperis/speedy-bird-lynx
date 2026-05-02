@@ -387,7 +387,7 @@ const currentSlug = '';
   </style>
 
   <div class="mobile-header">
-    <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu" aria-controls="sidebar" aria-expanded="false">
       <span></span>
       <span></span>
       <span></span>
@@ -401,7 +401,7 @@ const currentSlug = '';
     <div class="sidebar-header">
       <h1 class="repo-title">Speedy Bird Lynx</h1>
       <p class="repo-description">Flappy Bird clone built with ReactLynx and TypeScript — runs natively on iOS, Android, and Web</p>
-      <input type="text" id="searchInput" class="search-box" placeholder="Search documentation...">
+      <input type="text" id="searchInput" class="search-box" placeholder="Search documentation..." aria-label="Search documentation">
     </div>
     <div class="sidebar-nav-container">
       <ul>
@@ -437,8 +437,9 @@ const currentSlug = '';
       const overlay = document.getElementById('overlay');
 
       function toggleMenu() {
-        sidebar.classList.toggle('open');
+        const isOpen = sidebar.classList.toggle('open');
         overlay.classList.toggle('open');
+        if (menuToggle) menuToggle.setAttribute('aria-expanded', String(isOpen));
       }
 
       if(menuToggle) menuToggle.addEventListener('click', toggleMenu);
