@@ -70,7 +70,7 @@ const backHomeUrl = base.replace(/\/$/, '') + '/';
     <div class="sidebar-header">
       <h1 class="repo-title">Speedy Bird Lynx</h1>
       <p class="repo-description">Flappy Bird clone built with ReactLynx and TypeScript — runs natively on iOS, Android, and Web</p>
-      <input type="text" id="searchInput" class="search-box" placeholder="Search documentation..." aria-label="Search documentation">
+      <input type="text" id="searchInput" class="search-box" placeholder="Search documentation..." aria-label="Search documentation" hidden={!isRoot}>
     </div>
     <div class="sidebar-nav-container">
       <ul>
