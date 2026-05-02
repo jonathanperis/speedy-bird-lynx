@@ -16,8 +16,11 @@
 * { box-sizing: border-box; }
 
 html {
-  scroll-behavior: smooth;
   font-family: 'Space Grotesk', sans-serif;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
 }
 
 body {
