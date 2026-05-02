@@ -1,32 +1,51 @@
 ---
 import DocsLayout from '@/layouts/DocsLayout.astro';
-import Content from '../../../wiki/index.md';
 
-const globModules = import.meta.glob('../../../wiki/*.md', { eager: true });
-const navItems: { slug: string; label: string; href: string }[] = [];
+const ORDER = ['index', 'about-lynx', 'architecture', 'assets-and-sprites', 'ci-cd-pipeline', 'game-engine', 'getting-started', 'native-host-apps'];
+const SLUG_LABEL: Record<string, string> = {
+  index: 'Home',
+  'about-lynx': 'About Lynx',
+  architecture: 'Architecture',
+  'assets-and-sprites': 'Assets And Sprites',
+  'ci-cd-pipeline': 'CI CD Pipeline',
+  'game-engine': 'Game Engine',
+  'getting-started': 'Getting Started',
+  'native-host-apps': 'Native Host Apps',
+};
 
-for (const [path, module] of Object.entries(globModules)) {
+const globResult = import.meta.glob('../../../wiki/*.md', { eager: true });
+
+const pagesBySlug: Record<string, any> = {};
+for (const [path, module] of Object.entries(globResult)) {
   const fileName = path.split('/').pop()!.replace('.md', '');
-  const slug = fileName === 'index' ? '' : fileName;
-  const label = fileName === 'index'
-    ? 'Home'
-    : fileName
-        .split('-')
-        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(' ');
-  navItems.push({ slug, label, href: slug === '' ? '/docs/' : `/docs/${slug}` });
+  const slug = fileName === 'index' ? 'home' : fileName;
+  pagesBySlug[slug] = module;
 }
 
-navItems.sort((a, b) => {
-  if (a.slug === '') return -1;
-  if (b.slug === '') return 1;
-  return a.label.localeCompare(b.label);
-});
+const sectionsToRender = ORDER
+  .map(slug => {
+    const key = slug === 'index' ? 'home' : slug;
+    return { slug, page: pagesBySlug[key] };
+  })
+  .filter(s => s.page);
 
-const currentSlug = '';
+export function getStaticPaths() {
+  const order = ['index', 'about-lynx', 'architecture', 'assets-and-sprites', 'ci-cd-pipeline', 'game-engine', 'getting-started', 'native-host-apps'];
+  return [
+    { params: { slug: undefined } },
+    ...order.filter(s => s !== 'index').map(slug => ({ params: { slug } })),
+  ];
+}
+
+const requestedSlug = Astro.params.slug;
+const isRoot = requestedSlug === undefined;
+
+const pageTitle = isRoot ? 'Speedy Bird Lynx - Documentation' : `${SLUG_LABEL[requestedSlug] ?? requestedSlug} - Speedy Bird Lynx`;
+const base = import.meta.env.BASE_URL;
+const backHomeUrl = base.replace(/\/$/, '') + '/';
 ---
 
-<DocsLayout title="Speedy Bird Lynx">
+<DocsLayout title={pageTitle}>
   <style is:global>
     :root {
       --bg: #04111e;
@@ -323,6 +342,14 @@ const currentSlug = '';
       line-height: 1.6;
     }
 
+    section.doc-section {
+      scroll-margin-top: 80px;
+    }
+
+    section.doc-section + section.doc-section {
+      margin-top: 80px;
+    }
+
     .mobile-header {
       display: none;
       position: sticky;
@@ -405,20 +432,21 @@ const currentSlug = '';
     </div>
     <div class="sidebar-nav-container">
       <ul>
-        {navItems.map(item => (
-          <li>
-            <a
-              href={item.href}
-              class={`nav-item${item.slug === currentSlug ? ' active' : ''}`}
-            >
-              {item.label}
-            </a>
-          </li>
-        ))}
+        {ORDER.map(slug => {
+          const label = SLUG_LABEL[slug];
+          const anchor = slug === 'index' ? 'home' : slug;
+          return (
+            <li>
+              <a href={`#${anchor}`} class="nav-item" data-section={anchor}>
+                {label}
+              </a>
+            </li>
+          );
+        })}
       </ul>
     </div>
     <div class="sidebar-footer">
-      <a href="/" class="back-home">← Back to home</a>
+      <a href={backHomeUrl} class="back-home">← Back to home</a>
       <a href="https://github.com/jonathanperis/speedy-bird-lynx" target="_blank" rel="noopener noreferrer">View on GitHub</a>
       <div>Built by Jonathan Peris</div>
     </div>
@@ -426,7 +454,15 @@ const currentSlug = '';
 
   <div class="content-wrapper">
     <main class="content" id="mainContent">
-      <Content />
+      {sectionsToRender.map(({ slug, page: wikiPage }) => {
+        const sectionId = slug === 'index' ? 'home' : slug;
+        const Content = wikiPage.default ?? wikiPage;
+        return (
+          <section id={sectionId} class="doc-section">
+            <Content />
+          </section>
+        );
+      })}
     </main>
   </div>
 
@@ -442,16 +478,31 @@ const currentSlug = '';
         if (menuToggle) menuToggle.setAttribute('aria-expanded', String(isOpen));
       }
 
-      if(menuToggle) menuToggle.addEventListener('click', toggleMenu);
-      if(overlay) overlay.addEventListener('click', toggleMenu);
+      if (menuToggle) menuToggle.addEventListener('click', toggleMenu);
+      if (overlay) overlay.addEventListener('click', toggleMenu);
 
+      const sections = document.querySelectorAll('section.doc-section');
       const navItems = document.querySelectorAll('.nav-item');
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const sectionId = entry.target.id;
+            navItems.forEach(item => {
+              item.classList.toggle('active', item.dataset.section === sectionId);
+              if (item.dataset.section === sectionId) {
+                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              }
+            });
+          }
+        });
+      }, { root: null, rootMargin: '-80px 0px -60% 0px', threshold: 0 });
+
+      sections.forEach(section => observer.observe(section));
 
       navItems.forEach(item => {
         item.addEventListener('click', () => {
-          if (window.innerWidth <= 768) {
-            toggleMenu();
-          }
+          if (window.innerWidth <= 768) toggleMenu();
         });
       });
 
@@ -462,16 +513,24 @@ const currentSlug = '';
           const content = document.getElementById('mainContent');
           if (!content) return;
 
-          const sections = content.querySelectorAll('h1, h2, h3, p, li, table, pre, blockquote');
-
           if (query === '') {
-            sections.forEach(el => el.style.opacity = '');
+            sections.forEach(s => s.classList.remove('hidden-section'));
+            navItems.forEach(item => item.parentElement.style.display = '');
             return;
           }
 
-          sections.forEach(el => {
-            const text = el.textContent.toLowerCase();
-            el.style.opacity = text.includes(query) ? '' : '0.2';
+          sections.forEach(section => {
+            const text = section.textContent.toLowerCase();
+            const navItem = document.querySelector(`.nav-item[data-section="${section.id}"]`);
+            const li = navItem ? navItem.parentElement : null;
+
+            if (text.includes(query)) {
+              section.classList.remove('hidden-section');
+              if (li) li.style.display = '';
+            } else {
+              section.classList.add('hidden-section');
+              if (li) li.style.display = 'none';
+            }
           });
         });
       }
