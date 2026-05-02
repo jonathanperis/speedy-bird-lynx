@@ -37,15 +37,14 @@ assets/
 
 ## How Assets Are Loaded
 
-In the Lynx app, assets are loaded via `require()` at the module level:
+In the Lynx app, assets are loaded via top-level `import` statements at the module level:
 
 ```tsx
-const BIRD_SPRITES = [
-  require('../../assets/sprites/bird-0.png'),
-  require('../../assets/sprites/bird-1.png'),
-  require('../../assets/sprites/bird-2.png'),
-  require('../../assets/sprites/bird-1.png'),  // ping-pong cycle
-];
+import bird0 from '../../assets/sprites/bird-0.png';
+import bird1 from '../../assets/sprites/bird-1.png';
+import bird2 from '../../assets/sprites/bird-2.png';
+
+const BIRD_SPRITES = [bird0, bird1, bird2, bird1]; // ping-pong cycle
 ```
 
 The Rspeedy bundler resolves these to URLs (dev server) or embeds them in the bundle (production).
@@ -74,6 +73,6 @@ The game-over panel score uses `<text>` elements positioned absolutely over the 
 
 ## Credits
 
-- Sprites from [The Spriters ResourceL(https://www.spriters-resource.com/fullview/59894/.md)
-- Sound effects from [The Sounds ResourceL(https://www.sounds-resource.com/mobile/flappybird/sound/5309/.md)
+- Sprites from [The Spriters Resource](https://www.spriters-resource.com/fullview/59894/)
+- Sound effects from [The Sounds Resource](https://www.sounds-resource.com/mobile/flappybird/sound/5309/)
 - Original game by [Dong Nguyen](https://en.wikipedia.org/wiki/Flappy_Bird)

@@ -20,7 +20,7 @@ This starts the Rspeedy dev server with hot module replacement. The game is acce
 - **Web preview**: `http://localhost:3000/__web_preview?casename=main.web.bundle`
 - **Lynx bundle**: `http://localhost:3000/main.lynx.bundle`
 
-To view on a mobile device, open the Lynx bundle URL in [Lynx ExplorerL(https://github.com/lynx-family/lynx.md) or [Lynx GoL(https://apps.apple.com/us/app/lynx-go-dev-explorer/id6743227790.md) (replace `localhost` with your machine's IP).
+To view on a mobile device, open the Lynx bundle URL in [Lynx Explorer](https://github.com/lynx-family/lynx) or [Lynx Go](https://apps.apple.com/us/app/lynx-go-dev-explorer/id6743227790) (replace `localhost` with your machine's IP).
 
 ## Building for Production
 
@@ -43,11 +43,11 @@ cd android && ./gradlew assembleDebug
 
 The APK is at `android/app/build/outputs/apk/debug/app-debug.apk`. Install via `adb install` or transfer to your device.
 
-For release builds with signing, see [CI/CD PipelineL(CI-CD-Pipeline.md).
+For release builds with signing, see [CI/CD Pipeline](ci-cd-pipeline).
 
 ## iOS
 
-> Requires Xcode and an Xcode project (.xcodeproj). See [Native Host AppsL(Native-Host-Apps.md) for setup instructions.
+> Requires Xcode and an Xcode project (.xcodeproj). See [Native Host Apps](native-host-apps) for setup instructions.
 
 ```bash
 npm run build

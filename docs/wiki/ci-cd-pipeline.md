@@ -17,9 +17,9 @@ All automation runs on GitHub Actions. Workflows are in `.github/workflows/`.
 
 Runs on every push and pull request. Validates the codebase compiles and builds:
 
-1. `npm ci` — install dependencies
-2. `npx tsc --noEmit` — TypeScript type-checking
-3. `npm run build` — build Lynx and web bundles
+1. `bun install --frozen-lockfile` — install dependencies
+2. `bunx tsc --noEmit` — TypeScript type-checking
+3. `bun run build` — build Lynx and web bundles
 4. Upload bundles as artifact (14-day retention)
 
 ## Deploy Web
@@ -31,7 +31,7 @@ Deploys the `docs/` directory (standalone canvas game) to GitHub Pages on every 
 The main production workflow. On every push to `main`:
 
 1. **Version computation** — from git tag (`v1.2.3` → `1.2.3`) or short SHA (`0.0.0-a1b2c3d`)
-2. **Build Lynx bundle** — `npm run build`
+2. **Build Lynx bundle** — `bun run build`
 3. **Copy bundle** — into `android/app/src/main/assets/`
 4. **Decode keystore** — from `KEYSTORE_BASE64` secret
 5. **Gradle build** — `./gradlew assembleRelease` with signing env vars
@@ -58,7 +58,7 @@ The main production workflow. On every push to `main`:
 
 Scaffolded but requires manual setup:
 
-1. Create Xcode project (see [Native Host AppsL(Native-Host-Apps.md))
+1. Create Xcode project (see [Native Host Apps](native-host-apps))
 2. Enroll in Apple Developer Program ($99/year)
 3. Configure signing secrets
 
