@@ -470,6 +470,8 @@ const backHomeUrl = base.replace(/\/$/, '') + '/';
     </main>
   </div>
 
+  {requestedSlug && <script is:inline define:vars={{ slug: requestedSlug === 'index' ? 'home' : requestedSlug }}>window.__docsSlug = slug;</script>}
+
   <script is:inline>
     document.addEventListener('DOMContentLoaded', () => {
       const menuToggle = document.getElementById('menuToggle');
@@ -485,10 +487,12 @@ const backHomeUrl = base.replace(/\/$/, '') + '/';
       if (menuToggle) menuToggle.addEventListener('click', toggleMenu);
       if (overlay) overlay.addEventListener('click', toggleMenu);
 
-      // Auto-scroll to target section when landing on /docs/<slug>
+      // Auto-scroll to target section from route param or hash
+      const targetSlug = window.__docsSlug;
       const hash = window.location.hash;
-      if (hash && hash.length > 1) {
-        const target = document.getElementById(hash.slice(1));
+      const sectionId = targetSlug || (hash && hash.length > 1 ? hash.slice(1) : null);
+      if (sectionId) {
+        const target = document.getElementById(sectionId);
         if (target) {
           setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 100);
         }
