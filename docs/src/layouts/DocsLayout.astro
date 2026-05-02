@@ -1,31 +1,68 @@
 ---
+import Analytics from '../components/Analytics.astro';
+
 interface Props {
   title?: string;
+  description?: string;
 }
 
-const { title = 'Speedy Bird Lynx - Documentation' } = Astro.props;
-const gaId = import.meta.env.PUBLIC_GA_ID;
+const {
+  title = 'Speedy Bird Lynx - Documentation',
+  description = 'Flappy Bird clone built with ReactLynx and TypeScript — runs natively on iOS, Android, and Web',
+} = Astro.props;
+
+const pageUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : `https://jonathanperis.github.io${Astro.url.pathname}`;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  name: "Speedy Bird Lynx",
+  description,
+  url: pageUrl,
+  genre: ["Arcade", "Casual", "Flappy Bird Clone"],
+  gamePlatform: ["Web Browser", "iOS", "Android"],
+  applicationCategory: "Game",
+  operatingSystem: ["iOS", "Android", "Web"],
+  programmingLanguage: "TypeScript",
+  author: { "@type": "Person", name: "Jonathan Peris", url: "https://github.com/jonathanperis" },
+  isAccessibleForFree: true,
+  license: "https://github.com/jonathanperis/speedy-bird-lynx/blob/master/LICENSE",
+  codeRepository: "https://github.com/jonathanperis/speedy-bird-lynx",
+};
 ---
 
 <!doctype html>
 <html lang="en">
 <head>
-  {gaId && (
-    <>
-      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
-      <script define:vars={{ gaId }}>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', gaId);
-      </script>
-    </>
-  )}
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#04111e" />
+  <meta name="description" content={description} />
+  <meta name="keywords" content="Speedy Bird, Flappy Bird, ReactLynx, TypeScript, iOS, Android, Web, cross-platform, game, arcade, open source" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={pageUrl} />
+  <meta property="og:site_name" content="Speedy Bird Lynx" />
+  <meta property="og:locale" content="en_US" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:creator" content="@jperis_silva" />
+
+  <link rel="canonical" href={pageUrl} />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
+
   <title>{title}</title>
-  <meta name="description" content="Flappy Bird clone built with ReactLynx and TypeScript — runs natively on iOS, Android, and Web">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+  <Analytics />
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 </head>
 <body>
   <slot />
