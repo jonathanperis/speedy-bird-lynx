@@ -1,6 +1,32 @@
 ---
 import DocsLayout from '@/layouts/DocsLayout.astro';
-import Content from '../../../wiki/index.md';
+
+export function getStaticPaths() {
+  const globModules = import.meta.glob('../../../wiki/*.md', { eager: true });
+  const pages: { params: { slug: string }; props: { page: any } }[] = [];
+
+  for (const [path, module] of Object.entries(globModules)) {
+    const fileName = path.split('/').pop()!.replace('.md', '');
+    const slug = fileName === 'index' ? 'index' : fileName;
+    const label = fileName === 'index'
+      ? 'Home'
+      : fileName
+          .split('-')
+          .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(' ');
+    pages.push({
+      params: { slug },
+      props: { page: { module, slug: fileName === 'index' ? '' : fileName, label } },
+    });
+  }
+
+  return pages;
+}
+
+const { page } = Astro.props;
+const Content = page.module.default ?? page.module;
+const pageTitle = page.label === 'Home' ? 'Speedy Bird Lynx' : `${page.label} - Speedy Bird Lynx`;
+const currentSlug = page.slug;
 
 const globModules = import.meta.glob('../../../wiki/*.md', { eager: true });
 const navItems: { slug: string; label: string; href: string }[] = [];
@@ -22,11 +48,9 @@ navItems.sort((a, b) => {
   if (b.slug === '') return 1;
   return a.label.localeCompare(b.label);
 });
-
-const currentSlug = '';
 ---
 
-<DocsLayout title="Speedy Bird Lynx">
+<DocsLayout title={pageTitle}>
   <style is:global>
     :root {
       --bg: #04111e;
@@ -59,6 +83,7 @@ const currentSlug = '';
       display: flex;
     }
 
+    /* Sidebar */
     .sidebar {
       position: fixed;
       top: 0;
@@ -174,6 +199,7 @@ const currentSlug = '';
       color: var(--text-primary);
     }
 
+    /* Main Content */
     .content-wrapper {
       margin-left: var(--sidebar-width);
       flex: 1;
@@ -188,6 +214,7 @@ const currentSlug = '';
       padding: 48px 48px;
     }
 
+    /* Typography */
     h1 {
       font-size: 32px;
       font-weight: 700;
@@ -231,6 +258,7 @@ const currentSlug = '';
       text-decoration: underline;
     }
 
+    /* Code */
     pre {
       background: var(--code-bg);
       border: 1px solid var(--code-border);
@@ -238,6 +266,7 @@ const currentSlug = '';
       padding: 16px 20px;
       overflow-x: auto;
       margin: 24px 0;
+      position: relative;
     }
 
     pre code {
@@ -257,6 +286,7 @@ const currentSlug = '';
       font-size: 13px;
     }
 
+    /* Tables */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -292,6 +322,7 @@ const currentSlug = '';
       border-bottom: none;
     }
 
+    /* Blockquotes */
     blockquote {
       margin: 24px 0;
       padding: 12px 20px;
@@ -305,12 +336,14 @@ const currentSlug = '';
       margin: 0;
     }
 
+    /* HR */
     hr {
       border: none;
       border-top: 1px solid var(--border);
       margin: 40px 0;
     }
 
+    /* Lists */
     ul, ol {
       padding-left: 24px;
       margin: 16px 0;
@@ -323,6 +356,7 @@ const currentSlug = '';
       line-height: 1.6;
     }
 
+    /* Mobile */
     .mobile-header {
       display: none;
       position: sticky;
@@ -386,6 +420,7 @@ const currentSlug = '';
     }
   </style>
 
+  <!-- Mobile Header -->
   <div class="mobile-header">
     <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
       <span></span>
@@ -397,6 +432,7 @@ const currentSlug = '';
 
   <div class="overlay" id="overlay"></div>
 
+  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h1 class="repo-title">Speedy Bird Lynx</h1>
@@ -424,6 +460,7 @@ const currentSlug = '';
     </div>
   </aside>
 
+  <!-- Main Content -->
   <div class="content-wrapper">
     <main class="content" id="mainContent">
       <Content />
@@ -432,6 +469,7 @@ const currentSlug = '';
 
   <script is:inline>
     document.addEventListener('DOMContentLoaded', () => {
+      // Mobile menu toggle
       const menuToggle = document.getElementById('menuToggle');
       const sidebar = document.getElementById('sidebar');
       const overlay = document.getElementById('overlay');
@@ -444,8 +482,35 @@ const currentSlug = '';
       if(menuToggle) menuToggle.addEventListener('click', toggleMenu);
       if(overlay) overlay.addEventListener('click', toggleMenu);
 
+      // Scrollspy - observe h2 elements
+      const headings = document.querySelectorAll('.content h2');
       const navItems = document.querySelectorAll('.nav-item');
 
+      const observerOptions = {
+        root: null,
+        rootMargin: '-80px 0px -60% 0px',
+        threshold: 0
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const headingId = entry.target.id;
+            navItems.forEach(item => {
+              item.classList.remove('active');
+              const href = item.getAttribute('href');
+              if (href && href.includes('#' + headingId)) {
+                item.classList.add('active');
+                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              }
+            });
+          }
+        });
+      }, observerOptions);
+
+      headings.forEach(heading => observer.observe(heading));
+
+      // Click on nav items (mobile close)
       navItems.forEach(item => {
         item.addEventListener('click', () => {
           if (window.innerWidth <= 768) {
@@ -454,6 +519,7 @@ const currentSlug = '';
         });
       });
 
+      // Search
       const searchInput = document.getElementById('searchInput');
       if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -462,15 +528,22 @@ const currentSlug = '';
           if (!content) return;
 
           const sections = content.querySelectorAll('h1, h2, h3, p, li, table, pre, blockquote');
+          let hasMatch = false;
 
           if (query === '') {
             sections.forEach(el => el.style.opacity = '');
+            navItems.forEach(item => item.parentElement.style.display = '');
             return;
           }
 
           sections.forEach(el => {
             const text = el.textContent.toLowerCase();
-            el.style.opacity = text.includes(query) ? '' : '0.2';
+            if (text.includes(query)) {
+              el.style.opacity = '';
+              hasMatch = true;
+            } else {
+              el.style.opacity = '0.2';
+            }
           });
         });
       }
