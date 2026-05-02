@@ -42,6 +42,7 @@ const isRoot = requestedSlug === undefined;
 
 const pageTitle = isRoot ? 'Speedy Bird Lynx - Documentation' : `${SLUG_LABEL[requestedSlug] ?? requestedSlug} - Speedy Bird Lynx`;
 const base = import.meta.env.BASE_URL;
+const docsBase = base.replace(/\/$/, '') + '/docs';
 const backHomeUrl = base.replace(/\/$/, '') + '/';
 ---
 
@@ -441,7 +442,7 @@ const backHomeUrl = base.replace(/\/$/, '') + '/';
           const anchor = slug === 'index' ? 'home' : slug;
           return (
             <li>
-              <a href={`#${anchor}`} class="nav-item" data-section={anchor}>
+              <a href={`${docsBase}/#${anchor}`} class="nav-item" data-section={anchor}>
                 {label}
               </a>
             </li>
