@@ -350,6 +350,10 @@ const backHomeUrl = base.replace(/\/$/, '') + '/';
       margin-top: 80px;
     }
 
+    section.doc-section.hidden-section {
+      display: none;
+    }
+
     .mobile-header {
       display: none;
       position: sticky;
@@ -480,6 +484,15 @@ const backHomeUrl = base.replace(/\/$/, '') + '/';
 
       if (menuToggle) menuToggle.addEventListener('click', toggleMenu);
       if (overlay) overlay.addEventListener('click', toggleMenu);
+
+      // Auto-scroll to target section when landing on /docs/<slug>
+      const hash = window.location.hash;
+      if (hash && hash.length > 1) {
+        const target = document.getElementById(hash.slice(1));
+        if (target) {
+          setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 100);
+        }
+      }
 
       const sections = document.querySelectorAll('section.doc-section');
       const navItems = document.querySelectorAll('.nav-item');
