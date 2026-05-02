@@ -21,4 +21,3 @@ ios/Podfile.lock
 *.xcarchive
 
 # Docs generation
-wiki/
