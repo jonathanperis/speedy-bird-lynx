@@ -108,7 +108,7 @@ const backHomeUrl = base.replace(/\/$/, '') + '/';
     </main>
   </div>
 
-  {requestedSlug && <script is:inline define:vars={{ slug: requestedSlug === 'index' ? 'home' : requestedSlug }}>window.__docsSlug = slug;</script>}
+  {requestedSlug && <script is:inline define:vars={{ slug: requestedSlug === 'index' ? 'home' : requestedSlug, isRoot: isRoot }}>window.__docsSlug = slug; window.__isRoot = isRoot;</script>}
 
   <script is:inline>
     document.addEventListener('DOMContentLoaded', () => {
@@ -125,69 +125,78 @@ const backHomeUrl = base.replace(/\/$/, '') + '/';
       if (menuToggle) menuToggle.addEventListener('click', toggleMenu);
       if (overlay) overlay.addEventListener('click', toggleMenu);
 
-      // Auto-scroll to target section from route param or hash
-      const targetSlug = window.__docsSlug;
-      const hash = window.location.hash;
-      const sectionId = targetSlug || (hash && hash.length > 1 ? hash.slice(1) : null);
-      if (sectionId) {
-        const target = document.getElementById(sectionId);
-        if (target) {
-          setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 100);
-        }
-      }
-
+      const isRoot = window.__isRoot !== false;
       const sections = document.querySelectorAll('section.doc-section');
       const navItems = document.querySelectorAll('.nav-item');
 
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const sectionId = entry.target.id;
-            navItems.forEach(item => {
-              item.classList.toggle('active', item.dataset.section === sectionId);
-              if (item.dataset.section === sectionId) {
-                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-              }
-            });
+      // Auto-scroll: root uses section slug; single-section lets browser handle deep-link hashes
+      if (isRoot) {
+        const targetSlug = window.__docsSlug;
+        const hash = window.location.hash;
+        const sectionId = targetSlug || (hash && hash.length > 1 ? hash.slice(1) : null);
+        if (sectionId) {
+          const target = document.getElementById(sectionId);
+          if (target) {
+            setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 100);
           }
-        });
-      }, { root: null, rootMargin: '-80px 0px -60% 0px', threshold: 0 });
+        }
+      }
 
-      sections.forEach(section => observer.observe(section));
-
-      navItems.forEach(item => {
-        item.addEventListener('click', () => {
-          if (window.innerWidth <= 768) toggleMenu();
-        });
-      });
-
-      const searchInput = document.getElementById('searchInput');
-      if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-          const query = e.target.value.toLowerCase();
-          const content = document.getElementById('mainContent');
-          if (!content) return;
-
-          if (query === '') {
-            sections.forEach(s => s.classList.remove('hidden-section'));
-            navItems.forEach(item => item.parentElement.style.display = '');
-            return;
-          }
-
-          sections.forEach(section => {
-            const text = section.textContent.toLowerCase();
-            const navItem = document.querySelector(`.nav-item[data-section="${section.id}"]`);
-            const li = navItem ? navItem.parentElement : null;
-
-            if (text.includes(query)) {
-              section.classList.remove('hidden-section');
-              if (li) li.style.display = '';
-            } else {
-              section.classList.add('hidden-section');
-              if (li) li.style.display = 'none';
+      // Scrollspy + nav click: only meaningful with multiple sections
+      if (isRoot && sections.length > 1) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const sectionId = entry.target.id;
+              navItems.forEach(item => {
+                item.classList.toggle('active', item.dataset.section === sectionId);
+                if (item.dataset.section === sectionId) {
+                  item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+              });
             }
           });
+        }, { root: null, rootMargin: '-80px 0px -60% 0px', threshold: 0 });
+
+        sections.forEach(section => observer.observe(section));
+
+        navItems.forEach(item => {
+          item.addEventListener('click', () => {
+            if (window.innerWidth <= 768) toggleMenu();
+          });
         });
+      }
+
+      // Search: only on root (full tree); single-section has nothing to filter
+      if (isRoot) {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+          searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const content = document.getElementById('mainContent');
+            if (!content) return;
+
+            if (query === '') {
+              sections.forEach(s => s.classList.remove('hidden-section'));
+              navItems.forEach(item => item.parentElement.style.display = '');
+              return;
+            }
+
+            sections.forEach(section => {
+              const text = section.textContent.toLowerCase();
+              const navItem = document.querySelector(`.nav-item[data-section="${section.id}"]`);
+              const li = navItem ? navItem.parentElement : null;
+
+              if (text.includes(query)) {
+                section.classList.remove('hidden-section');
+                if (li) li.style.display = '';
+              } else {
+                section.classList.add('hidden-section');
+                if (li) li.style.display = 'none';
+              }
+            });
+          });
+        }
       }
     });
   </script>
