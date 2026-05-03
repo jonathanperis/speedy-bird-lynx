@@ -10,6 +10,7 @@ const SECTION_CATEGORIES = [
 ];
 
 const SLUG_LABEL: Record<string, string> = {
+  home: 'Home',
   index: 'Home',
   'about-lynx': 'About Lynx',
   architecture: 'Architecture',
@@ -47,10 +48,12 @@ const sectionsToRender = isRoot
     })();
 
 export function getStaticPaths() {
-  const order = ['index', 'about-lynx', 'architecture', 'assets-and-sprites', 'ci-cd-pipeline', 'game-engine', 'getting-started', 'native-host-apps'];
+  // SECTION_CATEGORIES.flatMap(({ ids }) => ids) — duplicated due to Astro hoisting
+  const order = ['home', 'about-lynx', 'architecture', 'game-engine', 'assets-and-sprites', 'getting-started', 'native-host-apps', 'ci-cd-pipeline'];
+  const routeOrder = order.map(id => (id === 'home' ? 'index' : id));
   return [
     { params: { slug: undefined } },
-    ...order.filter(s => s !== 'index').map(slug => ({ params: { slug } })),
+    ...routeOrder.filter(s => s !== 'index').map(slug => ({ params: { slug } })),
   ];
 }
 
