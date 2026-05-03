@@ -30,6 +30,20 @@ for (const [path, module] of Object.entries(globResult)) {
   pagesBySlug[slug] = module;
 }
 
+// Build-time assertion: validate SECTION_CATEGORIES IDs against discovered slugs
+const availableSlugs = new Set(Object.keys(pagesBySlug));
+for (const cat of SECTION_CATEGORIES) {
+  for (const id of cat.ids) {
+    if (!availableSlugs.has(id)) {
+      const catName = cat.label || "root";
+      const wikiFile = id === "home" ? "index" : id;
+      throw new Error(
+        `SECTION_CATEGORIES references id "${id}" (category: "${catName}") but no matching wiki/${wikiFile}.md was found. Available slugs: ${Array.from(availableSlugs).join(", ")}`
+      );
+    }
+  }
+}
+
 const requestedSlug = Astro.params.slug;
 const isRoot = requestedSlug === undefined;
 const requestedKey = requestedSlug === 'index' ? 'home' : (requestedSlug ?? 'home');
@@ -195,7 +209,10 @@ const backHomeUrl = base.replace(/\/$/, '') + '/';
 
             if (query === '') {
               sections.forEach(s => s.classList.remove('hidden-section'));
-              navItems.forEach(item => item.parentElement.style.display = '');
+              navItems.forEach(item => {
+                item.style.display = '';
+                item.parentElement.style.display = '';
+              });
               document.querySelectorAll('.sidebar-category-group').forEach(group => {
                 group.style.display = '';
                 const catLabel = group.querySelector('.sidebar-category');
