@@ -261,7 +261,7 @@ pre:not(.astro-code) {
   margin: 24px 0;
 }
 
-pre:not(.astro-code) code {
+pre:not(.astro-code) > code {
   background: transparent;
   padding: 0;
   border-radius: 0;
@@ -276,7 +276,14 @@ pre.astro-code {
   margin: 24px 0;
 }
 
-code {
+pre.astro-code > code {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+}
+
+:not(pre) > code {
   font-family: 'Space Grotesk', monospace;
   background: var(--code-bg);
   color: var(--code-text);
