@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import '../../styles/docs.css';
-import { SECTION_CATEGORIES, SECTION_ORDER } from './sidebar.config';
+import { SECTION_CATEGORIES, SECTION_ORDER } from '../../lib/docs-sidebar.config';
 
 const SLUG_LABEL: Record<string, string> = {
   home: 'Home',
@@ -69,22 +69,22 @@ const docsBase = base.replace(/\/$/, '') + '/docs';
 const backHomeUrl = base.replace(/\/$/, '') + '/';
 ---
 
-<BaseLayout title={pageTitle}>
+<BaseLayout title={pageTitle} description="Speedy Bird builder manual: ReactLynx architecture, game engine, assets, native builds, and CI/CD.">
   <div class="mobile-header">
     <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu" aria-controls="sidebar" aria-expanded="false">
       <span></span>
       <span></span>
       <span></span>
     </button>
-    <div class="repo-title">Speedy Bird Lynx</div>
+    <div class="repo-title">Speedy Bird Manual</div>
   </div>
 
   <div class="overlay" id="overlay"></div>
 
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <h1 class="repo-title">Speedy Bird Lynx</h1>
-      <p class="repo-description">Flappy Bird clone built with ReactLynx and TypeScript — runs natively on iOS, Android, and Web</p>
+      <h1 class="repo-title">Speedy Bird Manual</h1>
+      <p class="repo-description">Arcade service notes for the ReactLynx game: speed curve, engine, sprites, native shells, and deploy pipeline.</p>
       <input type="text" id="searchInput" class="search-box" placeholder="Search documentation..." aria-label="Search documentation" hidden={!isRoot}>
     </div>
     <div class="sidebar-nav-container">
@@ -118,6 +118,30 @@ const backHomeUrl = base.replace(/\/$/, '') + '/';
 
   <div class="content-wrapper">
     <main class="content" id="mainContent">
+      <header class="docs-marquee" aria-label="Speedy Bird documentation overview">
+        <div>
+          <p class="manual-kicker">Builder's Manual · Night Arcade Cabinet</p>
+          <h1>{isRoot ? 'Speedy Bird Service Manual' : pageTitle.replace(' - Speedy Bird Lynx', '')}</h1>
+          <p class="manual-lede">
+            The technical docs now sit inside the same arcade world as the game: a service panel for the speed curve,
+            ReactLynx architecture, sprite engine, native hosts, and release pipeline.
+          </p>
+        </div>
+        <div class="manual-scoreboard" aria-label="Documentation quick stats">
+          <div><strong>{SECTION_ORDER.length}</strong><span>Manual pages</span></div>
+          <div><strong>+1%</strong><span>Speed / pipe</span></div>
+          <div><strong>3</strong><span>Build targets</span></div>
+        </div>
+      </header>
+
+      <nav class="manual-jumpbar" aria-label="Manual quick links">
+        <a href={backHomeUrl}>Play</a>
+        <a href={`${docsBase}/#game-engine`}>Engine</a>
+        <a href={`${docsBase}/#assets-and-sprites`}>Sprites</a>
+        <a href={`${docsBase}/#ci-cd-pipeline`}>Deploy</a>
+        <a href="https://github.com/jonathanperis/speedy-bird-lynx" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </nav>
+
       {sectionsToRender.map(({ slug, page: wikiPage }) => {
         const sectionId = slug === 'index' ? 'home' : slug;
         const Content = wikiPage.default ?? wikiPage;
