@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-16T22:37:33Z",
+  "title": "Design System: Speedy Bird",
+  "extensions": {
+    "colorMeta": {
+      "sky-deep": {
+        "role": "neutral",
+        "displayName": "Deep Night Sky",
+        "canonical": "#04111e",
+        "tonalRamp": ["oklch(15% 0.025 250)", "oklch(24% 0.04 250)", "oklch(34% 0.055 250)", "oklch(45% 0.06 250)", "oklch(58% 0.055 250)", "oklch(72% 0.04 250)", "oklch(84% 0.025 250)", "oklch(94% 0.012 250)"]
+      },
+      "arcade-gold": {
+        "role": "primary",
+        "displayName": "Arcade Gold",
+        "canonical": "#ffd166",
+        "tonalRamp": ["oklch(20% 0.04 85)", "oklch(32% 0.07 85)", "oklch(45% 0.10 85)", "oklch(58% 0.13 85)", "oklch(70% 0.15 85)", "oklch(80% 0.13 85)", "oklch(88% 0.09 85)", "oklch(95% 0.04 85)"]
+      },
+      "speed-orange": {
+        "role": "secondary",
+        "displayName": "Speed Orange",
+        "canonical": "#ff6b35",
+        "tonalRamp": ["oklch(18% 0.045 45)", "oklch(30% 0.08 45)", "oklch(43% 0.12 45)", "oklch(56% 0.16 45)", "oklch(66% 0.18 45)", "oklch(76% 0.14 45)", "oklch(86% 0.08 45)", "oklch(95% 0.035 45)"]
+      },
+      "pipe-green": {
+        "role": "secondary",
+        "displayName": "Pipe Green",
+        "canonical": "#2d6a4f",
+        "tonalRamp": ["oklch(18% 0.035 155)", "oklch(28% 0.055 155)", "oklch(38% 0.075 155)", "oklch(50% 0.09 155)", "oklch(62% 0.08 155)", "oklch(74% 0.06 155)", "oklch(86% 0.035 155)", "oklch(95% 0.015 155)"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Marquee Display", "purpose": "Hero title and arcade cabinet moments only." },
+      "headline": { "displayName": "Section Headline", "purpose": "Major in-world sections such as Medal Cabinet and Builder's Manual." },
+      "body": { "displayName": "Technical Body", "purpose": "Readable game and implementation explanations." },
+      "label": { "displayName": "HUD Label", "purpose": "Short arcade labels, stat captions, and nav labels." }
+    },
+    "shadows": [
+      { "name": "button-press", "value": "0 4px 0 #07131f", "purpose": "Tactile arcade button depth." },
+      { "name": "cabinet-depth", "value": "0 24px 60px rgba(4, 17, 30, 0.55)", "purpose": "Embedded play surface and major cabinet panel only." },
+      { "name": "hud-focus", "value": "0 0 0 3px rgba(255, 209, 102, 0.18)", "purpose": "Focus-visible and selected HUD state." }
+    ],
+    "motion": [
+      { "name": "ease-out-arcade", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Default transform/opacity transitions." },
+      { "name": "press-duration", "value": "120ms", "purpose": "Button press and release feedback." },
+      { "name": "reveal-duration", "value": "480ms", "purpose": "Section reveal when motion is allowed." }
+    ],
+    "breakpoints": [
+      { "name": "mobile", "value": "640px" },
+      { "name": "tablet", "value": "900px" },
+      { "name": "desktop", "value": "1200px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Arcade Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary play/start action with tactile arcade feedback.",
+      "html": "<button class=\"ds-btn-primary\">START RUN</button>",
+      "css": ".ds-btn-primary { background: #ffd166; color: #07131f; border: 2px solid #07131f; border-radius: 4px; padding: 1rem 2.5rem; font-family: Nunito, system-ui, sans-serif; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; box-shadow: 0 4px 0 #07131f; cursor: pointer; transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 120ms cubic-bezier(0.16, 1, 0.3, 1), background-color 160ms; } .ds-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #07131f; } .ds-btn-primary:active { transform: translateY(3px); box-shadow: 0 1px 0 #07131f; } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 4px 0 #07131f, 0 0 0 4px rgba(255, 209, 102, 0.28); }"
+    },
+    {
+      "name": "Speed HUD Chip",
+      "kind": "chip",
+      "refersTo": "hud-chip",
+      "description": "Compact game-state panel for multiplier, pipe count, or medal threshold.",
+      "html": "<div class=\"ds-hud-chip\"><span class=\"ds-hud-value\">1.50×</span><span class=\"ds-hud-label\">Speed Multiplier</span></div>",
+      "css": ".ds-hud-chip { display: inline-flex; flex-direction: column; gap: 0.35rem; align-items: center; background: #0d1e3a; color: #e8f8ff; border: 2px solid #2d6a4f; border-radius: 4px; padding: 0.75rem 1rem; box-shadow: 0 3px 0 #07131f; } .ds-hud-value { color: #ff6b35; font-family: Nunito, system-ui, sans-serif; font-size: 2rem; font-weight: 900; line-height: 1; } .ds-hud-label { color: #6ba8c8; font-family: Nunito, system-ui, sans-serif; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }"
+    },
+    {
+      "name": "Arcade Panel Card",
+      "kind": "card",
+      "refersTo": "card-panel",
+      "description": "Structured content panel for rules, docs, or build notes without generic glass styling.",
+      "html": "<article class=\"ds-panel-card\"><p class=\"ds-panel-kicker\">Builder's Manual</p><h3>Game Engine</h3><p>Physics, collision, scoring, and the game state machine.</p></article>",
+      "css": ".ds-panel-card { background: #0a1e3c; color: #e8f8ff; border: 2px solid rgba(74, 158, 111, 0.75); border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 0 #07131f; max-width: 22rem; } .ds-panel-card h3 { margin: 0 0 0.6rem; font-family: Nunito, system-ui, sans-serif; font-size: 1.25rem; font-weight: 900; line-height: 1.2; } .ds-panel-card p { margin: 0; color: #6ba8c8; font-family: Space Grotesk, system-ui, sans-serif; line-height: 1.55; } .ds-panel-kicker { color: #ffd166 !important; font-family: Nunito, system-ui, sans-serif !important; font-size: 0.72rem !important; font-weight: 900 !important; letter-spacing: 0.12em !important; text-transform: uppercase; margin-bottom: 0.5rem !important; }"
+    },
+    {
+      "name": "HUD Navigation",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Short game-world navigation that reads as a cabinet HUD instead of glassmorphism.",
+      "html": "<nav class=\"ds-hud-nav\"><a class=\"is-active\" href=\"#play\">Play</a><a href=\"#rules\">Rules</a><a href=\"#docs\">Docs</a><a href=\"#github\">GitHub</a></nav>",
+      "css": ".ds-hud-nav { display: inline-flex; gap: 0.25rem; background: #07131f; border: 2px solid #2d6a4f; border-radius: 4px; padding: 0.35rem; box-shadow: 0 4px 0 rgba(0,0,0,0.25); } .ds-hud-nav a { color: #e8f8ff; text-decoration: none; font-family: Nunito, system-ui, sans-serif; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.65rem 0.9rem; border-radius: 3px; transition: background-color 160ms, color 160ms, transform 160ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-hud-nav a:hover, .ds-hud-nav a:focus-visible { background: #0d1e3a; color: #ffd166; outline: none; } .ds-hud-nav a.is-active { background: #ffd166; color: #07131f; }"
+    },
+    {
+      "name": "Medal Cabinet Slot",
+      "kind": "custom",
+      "refersTo": "medal-cabinet",
+      "description": "Achievement-style medal slot for score thresholds and multiplier motivation.",
+      "html": "<div class=\"ds-medal-slot\"><span class=\"ds-medal-name\">Gold</span><span class=\"ds-medal-score\">50 pipes</span><span class=\"ds-medal-note\">1.50× danger zone</span></div>",
+      "css": ".ds-medal-slot { width: 10rem; min-height: 8rem; display: grid; place-items: center; text-align: center; gap: 0.35rem; background: linear-gradient(180deg, #0d1e3a, #0a1e3c); border: 2px solid #ffd166; border-radius: 4px; color: #e8f8ff; box-shadow: inset 0 0 0 3px rgba(255, 209, 102, 0.12), 0 4px 0 #07131f; padding: 1rem; } .ds-medal-name { color: #ffd166; font-family: Nunito, system-ui, sans-serif; font-weight: 900; font-size: 1.35rem; text-transform: uppercase; } .ds-medal-score { color: #e8f8ff; font-family: Space Grotesk, system-ui, sans-serif; font-weight: 700; } .ds-medal-note { color: #ff6b35; font-family: Nunito, system-ui, sans-serif; font-size: 0.72rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Night Arcade Cabinet",
+    "overview": "Speedy Bird is a playable night-sky arcade cabinet, not a generic project page with game decoration. The system should feel like a familiar Flappy-style world sharpened around one escalating mechanic: every pipe makes the run faster. The page uses deep sky blues, pipe greens, arcade gold, and speed orange to stage a small but energetic game world.",
+    "keyCharacteristics": [
+      "Deep night-sky surfaces with arcade gold and speed orange accents.",
+      "Pixel-inspired outlines, tactile buttons, HUD chips, scoreboards, and medal slots.",
+      "Play-first hierarchy: the run, multiplier, controls, and medals come before explanatory density.",
+      "Technical credibility framed as an in-world builder's manual.",
+      "Motion that suggests speed, but stops cleanly for reduced-motion users."
+    ],
+    "rules": [
+      { "name": "The Gold Is the Button Rule", "body": "Arcade Gold is reserved for action, achievement, and critical HUD state. Do not use it as generic decoration across every card.", "section": "colors" },
+      { "name": "The Orange Means Speed Rule", "body": "Speed Orange means acceleration, danger, or multiplier. If orange appears, it should teach the player something about intensity.", "section": "colors" },
+      { "name": "The No Pure Fill Rule", "body": "Pure black and pure white are allowed only as tiny sprite-like strokes when preserving pixel-art language. Large surfaces must use tinted night-sky tokens.", "section": "colors" },
+      { "name": "The Scoreboard Number Rule", "body": "Multipliers, scores, medal thresholds, and pipe counts must be visually stronger than their labels. The game is understood through numbers.", "section": "typography" },
+      { "name": "The No Costume Mono Rule", "body": "Do not use monospace as a lazy signal for technical credibility. Use it only for real code or command snippets in the builder manual.", "section": "typography" },
+      { "name": "The No Ambient Glow Rule", "body": "Glows must explain state: focus, active, selected, or danger. Decorative glow on dark surfaces is prohibited.", "section": "elevation" },
+      { "name": "The Pixel Layer Rule", "body": "Prefer hard offsets, strokes, and stepped color ramps over blurred glass and floating cards.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep the night-sky, bird, pipe, medal, and arcade-gold identity intact.",
+      "Do make the speed multiplier visually central through HUD chips, timelines, and threshold markers.",
+      "Do use pipes, scoreboards, medals, and cabinet panels as structure, not decoration.",
+      "Do cap body copy at 65-75ch and let numbers carry the game mechanic.",
+      "Do add prefers-reduced-motion behavior for clouds, particles, CTA pulse, pipe sway, and reveal animations.",
+      "Do use focus-visible rings that are as intentional as hover states.",
+      "Do keep docs and GitHub links visible, but frame them as a builder's manual."
+    ],
+    "donts": [
+      "Don't turn the page into a generic SaaS landing page wearing game colors.",
+      "Don't use gradient text for the hero title or major headings.",
+      "Don't use glassmorphism as the default surface treatment.",
+      "Don't rely on dark glows as the main source of visual energy.",
+      "Don't repeat identical feature-card grids when a game-native module would communicate better.",
+      "Don't use pure black or pure white as large fills; reserve them for tiny sprite strokes only.",
+      "Don't animate layout properties such as width, padding, or margin.",
+      "Don't hide primary play or contact actions behind novelty interactions.",
+      "Don't use monospace as developer cosplay; use it for real code only."
+    ]
+  }
+}
