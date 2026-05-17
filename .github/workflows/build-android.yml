@@ -34,7 +34,7 @@ jobs:
           echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_OUTPUT"
           echo "Version: $VERSION (code: $VERSION_CODE)"
 
-      # Build Lynx JS bundle (bun per CLAUDE.md convention for Pages projects)
+      # Build Lynx JS bundle (Bun is the standardized AGENTS.md convention for this repo)
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest

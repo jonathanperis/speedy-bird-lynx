@@ -51,7 +51,7 @@ jobs:
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
-      # Build Lynx JS bundle (bun per CLAUDE.md convention)
+      # Build Lynx JS bundle (Bun is the standardized AGENTS.md convention for this repo)
       - uses: oven-sh/setup-bun@v2
         if: steps.check.outputs.exists == 'true'
         with:
