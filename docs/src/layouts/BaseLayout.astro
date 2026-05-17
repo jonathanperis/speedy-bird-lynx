@@ -12,6 +12,9 @@ const {
   description = 'A pixel art Speedy Bird clone built with the Lynx cross-platform framework. Play in your browser or on mobile iOS and Android.'
 } = Astro.props;
 
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+const faviconHref = `${basePath}/favicon.ico`;
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'VideoGame',
@@ -40,6 +43,7 @@ const jsonLd = {
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
     <meta name="description" content={description} />
     <meta name="keywords" content="Speedy Bird, pixel art, Lynx, ReactLynx, cross-platform, mobile game, side-scroller, open source, flappy bird" />
+    <link rel="icon" href={faviconHref} sizes="any" />
     <link rel="canonical" href="https://jonathanperis.github.io/speedy-bird-lynx/" />
     <meta name="theme-color" content="#04111e" />
 
