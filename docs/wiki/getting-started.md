@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- **Node.js** 18+ and **npm**
+- **Node.js** 18+ and **Bun** (CI and lockfiles use Bun; npm scripts also work)
 - **Java 17** and **Android SDK** (for Android builds)
 - **Xcode 15+** and **CocoaPods** (for iOS builds)
 
@@ -11,8 +11,8 @@
 ```bash
 git clone https://github.com/jonathanperis/speedy-bird-lynx.git
 cd speedy-bird-lynx
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 This starts the Rspeedy dev server with hot module replacement. The game is accessible at:
@@ -25,7 +25,7 @@ To view on a mobile device, open the Lynx bundle URL in [Lynx Explorer](https://
 ## Building for Production
 
 ```bash
-npm run build
+bun run build
 ```
 
 This outputs:
@@ -36,21 +36,21 @@ This outputs:
 ## Android
 
 ```bash
-npm run build
+bun run build
 cp dist/main.lynx.bundle android/app/src/main/assets/
 cd android && ./gradlew assembleDebug
 ```
 
 The APK is at `android/app/build/outputs/apk/debug/app-debug.apk`. Install via `adb install` or transfer to your device.
 
-For release builds with signing, see [CI/CD Pipeline](ci-cd-pipeline).
+For release builds with signing, see [CI/CD Pipeline](/speedy-bird-lynx/docs/ci-cd-pipeline/).
 
 ## iOS
 
-> Requires Xcode and an Xcode project (.xcodeproj). See [Native Host Apps](native-host-apps) for setup instructions.
+> Requires Xcode and an Xcode project (.xcodeproj). See [Native Host Apps](/speedy-bird-lynx/docs/native-host-apps/) for setup instructions.
 
 ```bash
-npm run build
+bun run build
 cp dist/main.lynx.bundle ios/SpeedyBird/Resources/
 cd ios && pod install
 open SpeedyBird.xcworkspace
@@ -58,15 +58,32 @@ open SpeedyBird.xcworkspace
 
 Build and run from Xcode on a simulator or device.
 
-## Web (Standalone)
+## Web / GitHub Pages
 
-Open `docs/index.html` directly in any browser. This is a self-contained canvas-based version that requires no build step — the same version deployed to GitHub Pages.
+The public web surface is the Astro site in `docs/`. It renders the landing page, embeds the playable canvas demo, and generates wiki pages from `docs/wiki/*.md`.
+
+```bash
+cd docs
+bun install
+bun run dev
+```
+
+For a production build:
+
+```bash
+bun run build
+bun run preview
+```
+
+The static output is written to `docs/out/` and is deployed to GitHub Pages by the shared Pages workflow.
 
 ## Project Commands
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start dev server with HMR |
-| `npm run build` | Production build (Lynx + Web bundles) |
+| `bun run dev` | Start Rspeedy dev server with HMR |
+| `bun run build` | Production build (Lynx + Web bundles) |
+| `cd docs && bun run dev` | Start Astro docs/dev site |
+| `cd docs && bun run build` | Build Astro GitHub Pages output to `docs/out/` |
 | `cd android && ./gradlew assembleDebug` | Build debug Android APK |
 | `cd android && ./gradlew assembleRelease` | Build release Android APK |

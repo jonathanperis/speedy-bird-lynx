@@ -16,7 +16,7 @@ Flappy Bird clone built with [ReactLynx](https://lynxjs.org/) and TypeScript. Ru
 
 ## Key Features
 
-- Tap or press Space to flap; fly through pipe gaps to score
+- Tap/click to flap in the ReactLynx app; the GitHub Pages canvas demo also supports Space
 - Speed increases 1% per pipe cleared
 - Medal system: Bronze (10+), Silver (25+), Gold (50+), Platinum (100+)
 - Element-based rendering with CSS transforms (no canvas)
