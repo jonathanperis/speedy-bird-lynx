@@ -46,7 +46,7 @@ The `build.gradle.kts` reads signing configuration from environment variables:
 - `KEY_ALIAS` — key alias
 - `KEY_PASSWORD` — key password
 
-These are populated by CI from GitHub Secrets. For local release builds, set them in your shell or use a `local.properties` file.
+These are populated by CI from GitHub Secrets. For local release builds, export the same environment variables in your shell before running Gradle.
 
 ## iOS
 

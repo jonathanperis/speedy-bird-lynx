@@ -16,7 +16,7 @@ STATE_READY (0) ──tap──> STATE_PLAY (1) ──collision──> STATE_OVE
 |-------|------|-------|-------|
 | **Ready** | Hovers at Y=280, wing animation (20-frame interval) | None on screen | Tap starts game |
 | **Play** | Falls with gravity, flaps on tap, fast animation (4-frame interval) | Spawn, scroll left, score on pass | Tap = flap |
-| **Over** | Falls to ground, no animation | Frozen | Tap resets to Ready |
+| **Over** | Continues falling until ground contact; frame/rotation follow the same falling logic, then clamp on ground | Frozen | Tap resets to Ready |
 
 ## Game Loop
 
@@ -46,11 +46,11 @@ Rotation is determined by vertical velocity:
 
 | Velocity | Rotation | Visual |
 |----------|----------|--------|
-| <= -7.25 (rising fast) | -15 deg | Nose up |
-| Between -7.25 and -5.25 | 0 deg | Level |
-| >= -5.25 (falling) | 70 deg | Nose dive |
+| <= `BIRD_FLAP` (`7.25`) | -15 deg | Nose up |
+| Between `BIRD_FLAP` and `BIRD_FLAP + 2` (`7.25`–`9.25`) | 0 deg | Level |
+| >= `BIRD_FLAP + 2` (`9.25`) | 70 deg | Nose dive |
 
-During nose dive, the animation frame is locked to frame 1 (wings level).
+During nose dive, the animation frame is set to frame 1 (wings level). A flap starts with velocity `-BIRD_FLAP`, so the bird stays nose-up until gravity increases velocity past the positive threshold.
 
 ## Bird Animation
 
@@ -58,7 +58,7 @@ The bird has a 4-frame cycle: `bird-0, bird-1, bird-2, bird-1` (ping-pong).
 
 - **Ready state**: frame advances every 20 ticks (slow flutter)
 - **Play state**: frame advances every 4 ticks (fast flapping)
-- **Over state**: locked to frame 2 (wings up) with nose-dive rotation
+- **Over state**: after pipe collision, the same falling/rotation branch continues while pipes stay frozen; ground collision clamps the bird to frame 2 with nose-dive rotation
 
 ## Collision Detection
 
