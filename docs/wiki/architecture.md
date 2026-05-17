@@ -25,7 +25,7 @@ speedy-bird-lynx/
 ├── android/                      # Native Android host app
 ├── ios/                          # Native iOS host app (source files)
 ├── assets/                       # Sprites, audio, medals, digits
-├── docs/                         # GitHub Pages (standalone canvas version)
+├── docs/                         # Astro GitHub Pages site + playable canvas demo
 ├── web-host/                     # Web preview host (dev only)
 ├── .github/workflows/            # CI/CD pipelines
 ├── lynx.config.ts                # Lynx build configuration

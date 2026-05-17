@@ -16,17 +16,17 @@
 
 | Technology | Version | Purpose |
 |-----------|---------|---------|
-| [ReactLynx](https://lynxjs.org/) | 0.117.0 | Cross-platform native UI framework |
+| [ReactLynx](https://lynxjs.org/) | 0.119.0 | Cross-platform native UI framework |
 | [React](https://react.dev/) | 18.3.1 | Component model and hooks |
-| [TypeScript](https://www.typescriptlang.org/) | 5.6.0 | Type-safe application code |
-| [Rspack / rspeedy](https://rspack.dev/) | 0.13.6 | Build toolchain with HMR |
+| [TypeScript](https://www.typescriptlang.org/) | 6.0.3 | Type-safe application code |
+| [Rspack / rspeedy](https://rspack.dev/) | 0.14.3 | Build toolchain with HMR |
 | Android (Kotlin) | Lynx SDK 3.7.0 | Native Android host app |
 | iOS (Swift + CocoaPods) | Lynx SDK 3.7.0 | Native iOS host app |
 | GitHub Actions | — | CI/CD build, sign, deploy, release |
 
 ## Features
 
-- Tap or press Space to flap; fly through pipe gaps to score
+- Tap/click to flap in the ReactLynx app; the GitHub Pages canvas demo also supports Space
 - Speed increases 1% per pipe cleared
 - Medal system: Bronze (10+), Silver (25+), Gold (50+), Platinum (100+)
 - Element-based rendering using `<view>` and `<image>` with CSS transforms (no canvas)
@@ -35,13 +35,13 @@
 - Sprite-based digit rendering for in-game score
 - AABB collision detection with circular bird hitbox approximation
 - Audio support via web `HTMLAudioElement` with native module stubs
-- Standalone canvas-based web version in `docs/` deployed to GitHub Pages
+- Astro-powered GitHub Pages site in `docs/`, including a playable canvas demo and generated wiki pages
 
 ## Getting Started
 
 ### Prerequisites
 
-- **Node.js** 18+ and **npm**
+- **Node.js** 18+ and **Bun** (CI and lockfiles use Bun; npm scripts are also available)
 - **Java 17** and **Android SDK** (for Android builds)
 - **Xcode 15+** and **CocoaPods** (for iOS builds)
 
@@ -50,14 +50,14 @@
 ```bash
 git clone https://github.com/jonathanperis/speedy-bird-lynx.git
 cd speedy-bird-lynx
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 Open in [Lynx Explorer](https://github.com/lynx-family/lynx) or [Lynx Go](https://apps.apple.com/us/app/lynx-go-dev-explorer/id6743227790) at `http://<your-ip>:3000/main.lynx.bundle`.
 
 ```bash
-npm run build
+bun run build
 ```
 
 Outputs `dist/main.lynx.bundle` (native) and `dist/main.web.bundle` (web).
@@ -83,7 +83,7 @@ src/
 android/                       # Native Android host app (Kotlin)
 ios/                           # Native iOS host app (Swift)
 assets/                        # Sprites, audio, medals, digits
-docs/                          # GitHub Pages — standalone web version
+docs/                          # Astro GitHub Pages site + playable canvas demo
 .github/workflows/             # CI/CD pipelines
 ```
 
@@ -91,10 +91,10 @@ docs/                          # GitHub Pages — standalone web version
 
 | Workflow | File | Trigger | Description |
 |----------|------|---------|-------------|
-| Build Check | `ci.yml` | Push/PR to `main` | Type-check (`tsc --noEmit`) and build Lynx bundles |
+| Build Check | `ci.yml` | Manual, push to `main`/`lynx-migration`, PR to `main` | Type-check (`tsc --noEmit`) and build Lynx bundles |
 | CodeQL | `codeql.yml` | Push/PR to `main`, weekly | Security and quality analysis |
-| Deploy Web | `deploy.yml` | Push to `main` | Deploy `docs/` to GitHub Pages |
-| Build Android | `build-android.yml` | Push to `main`, `v*` tags | Build signed APK, create GitHub Release |
+| Deploy Web | `deploy.yml` | Push to `main`, manual | Build and deploy the Astro `docs/` site to GitHub Pages via the shared Pages workflow |
+| Build Android | `build-android.yml` | Push to `main`, `v*` tags, manual | Build release APK, sign when secrets are configured, create GitHub Release |
 | Build iOS | `build-ios.yml` | `v*` tags, manual | Build iOS archive (unsigned without Apple Developer Program) |
 | Release | `release.yml` | `v*` tags, manual | Full release pipeline: build + Android + iOS + GitHub Release |
 
