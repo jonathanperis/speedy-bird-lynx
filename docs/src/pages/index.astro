@@ -1602,8 +1602,9 @@ const jsonLd = `{
       <p class="section-kicker">Builder's manual</p>
       <h2>BUILT AS A REAL CROSS-PLATFORM GAME</h2>
       <p class="section-lede">
-        The web canvas above mirrors the ReactLynx implementation: the same physics constants,
-        tile-based pipes, sprite digits, sound cues, and state machine used by the native build.
+        The web canvas above mirrors the ReactLynx implementation: the same core physics constants,
+        tile-based pipes, sprite digits, sound cues, and state machine used by the native build, with
+        the viewport adapted to the landing-page phone frame.
       </p>
 
       <div class="manual-grid">
@@ -1754,7 +1755,7 @@ const jsonLd = `{
   (function() {
     'use strict';
 
-    /* ── Constants (matching Lynx build exactly) ─────────────────── */
+    /* ── Constants (core physics match Lynx; viewport is adapted to 400x600 phone frame) ── */
     var W = 400, H = 600;
     var BIRD_X = 80, BIRD_Y_START = 280, BIRD_W = 34, BIRD_H = 24, BIRD_R = 12;
     var FLAP = 7.25, GRAVITY = 0.28;

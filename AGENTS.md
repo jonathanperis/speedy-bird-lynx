@@ -2,7 +2,7 @@
 
 Harness-neutral operating guide for automated coding agents working in this repository.
 
-Cross-platform Flappy Bird clone built with ReactLynx + TypeScript. Runs natively on iOS, Android, and Web from a single codebase.
+Cross-platform Flappy Bird clone built with ReactLynx + TypeScript. The checked-in project runs on Android and Web from a single codebase; iOS host source is included, but an Xcode project/workspace must be created locally before building.
 
 **Play online:** https://jonathanperis.github.io/speedy-bird-lynx/
 
@@ -25,7 +25,7 @@ Cross-platform Flappy Bird clone built with ReactLynx + TypeScript. Runs nativel
 
 ## Build Commands
 
-Use Bun for installs and command examples because the lockfiles and CI use Bun.
+Use Bun for root ReactLynx/Rspeedy installs and command examples because the root lockfile and CI use Bun. Use Node.js >=22.12 with npm scripts for the Astro 6.4+ docs site in `docs/`.
 
 ```sh
 bun install --frozen-lockfile       # Install exact dependencies
@@ -107,7 +107,7 @@ speedy-bird-lynx/
 ├── assets/sprites/                  # PNG sprites (bird, pipes, medals, digits)
 ├── assets/audio/                    # WAV sound effects
 ├── docs/                            # Astro GitHub Pages site + playable canvas demo
-├── web-host/                        # Web preview host tooling
+├── web-host/                        # Advanced/dev-only standalone <lynx-view> host
 ├── lynx.config.ts                   # Lynx build config
 ├── rsbuild.web-host.config.ts       # Web host build config
 ├── tsconfig.json                    # strict: true, react-jsx

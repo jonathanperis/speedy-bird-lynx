@@ -1,6 +1,6 @@
 # speedy-bird-lynx
 
-> Flappy Bird clone built with ReactLynx and TypeScript — runs natively on iOS, Android, and Web from a single codebase
+> Flappy Bird clone built with ReactLynx and TypeScript — runs on Android and Web from a single codebase, with iOS host source included for Xcode project setup
 
 [![Build Check](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/ci.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/ci.yml) [![Release](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/release.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/release.yml) [![CodeQL](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/codeql.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/codeql.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -10,7 +10,7 @@
 
 ## About
 
-[Lynx](https://lynxjs.org/) is an open-source cross-platform native UI framework created by ByteDance. It uses a native C++ rendering engine (not a WebView) and a dual-threaded architecture where React reconciliation runs on a background thread while the main thread handles native rendering and touch events. This project is a Flappy Bird clone that demonstrates how to build a complete game with ReactLynx, covering element-based rendering, 60 FPS state updates, touch input, asset loading, and automated CI/CD pipelines for all three platforms.
+[Lynx](https://lynxjs.org/) is an open-source cross-platform native UI framework created by ByteDance. It uses a native C++ rendering engine (not a WebView) and a dual-threaded architecture where React reconciliation runs on a background thread while the main thread handles native rendering and touch events. This project is a Flappy Bird clone that demonstrates how to build a complete game with ReactLynx, covering element-based rendering, 60 FPS state updates, touch input, asset loading, and automated CI/CD pipelines. Android and the web preview are ready to run from the checked-in project; iOS source files are included, but an Xcode project/workspace must be created locally before building.
 
 ## Tech Stack
 
@@ -34,16 +34,17 @@
 - Parallax scrolling background and ground layers
 - Sprite-based digit rendering for in-game score
 - AABB collision detection with circular bird hitbox approximation
-- Audio support via web `HTMLAudioElement` with native module stubs
+- Audio support via web `HTMLAudioElement`; native builds include stubs and continue without sound until an Android/iOS `AudioModule` is implemented and registered
 - Astro-powered GitHub Pages site in `docs/`, including a playable canvas demo and generated wiki pages
 
 ## Getting Started
 
 ### Prerequisites
 
-- **Node.js** 18+ and **Bun** (CI and lockfiles use Bun; npm scripts are also available)
+- **Bun** for the root ReactLynx/Rspeedy app (`bun install`, `bun run dev`, `bun run build`)
+- **Node.js** >=22.12 for the Astro 6.4+ documentation site in `docs/` (`npm run dev/build/preview`)
 - **Java 17** and **Android SDK** (for Android builds)
-- **Xcode 15+** and **CocoaPods** (for iOS builds)
+- **Xcode 15+** and **CocoaPods** (for iOS builds after creating the Xcode project from the included source scaffold)
 
 ### Quick Start
 
@@ -61,6 +62,30 @@ bun run build
 ```
 
 Outputs `dist/main.lynx.bundle` (native) and `dist/main.web.bundle` (web).
+
+### Documentation Site
+
+The public GitHub Pages site lives in `docs/`. It uses Astro 6.4+, so run it with Node.js >=22.12:
+
+```bash
+cd docs
+bun install
+npm run dev
+npm run build
+npm run preview
+```
+
+The docs build writes static output to `docs/out/`; the `deploy.yml` workflow publishes that output to GitHub Pages through the shared reusable Pages workflow.
+
+### Web Surfaces
+
+There are three web-related surfaces in the repository:
+
+| Surface | Location | Purpose |
+|---------|----------|---------|
+| ReactLynx web preview | `bun run dev`, then `http://localhost:3000/__web_preview?casename=main.web.bundle` | Development preview of the compiled `main.web.bundle` |
+| GitHub Pages canvas demo | `docs/src/pages/index.astro` | Public playable browser demo; it mirrors the game physics but uses a 400x600 viewport to fit the phone frame |
+| Standalone web host | `web-host/` + `rsbuild.web-host.config.ts` | Advanced/dev-only host that renders `main.web.bundle` inside `<lynx-view>`; it expects the bundle URL configured in `web-host/index.html` |
 
 ## Project Structure
 
@@ -91,12 +116,23 @@ docs/                          # Astro GitHub Pages site + playable canvas demo
 
 | Workflow | File | Trigger | Description |
 |----------|------|---------|-------------|
-| Build Check | `ci.yml` | Manual, push to `main`/`lynx-migration`, PR to `main` | Type-check (`tsc --noEmit`) and build Lynx bundles |
+| Build Check | `ci.yml` | Manual, push to `main`/`lynx-migration`, PR to `main` | Type-check (`tsc --noEmit`) and build Lynx bundles; no unit-test framework is configured yet |
 | CodeQL | `codeql.yml` | Push/PR to `main`, weekly | Security and quality analysis |
 | Deploy Web | `deploy.yml` | Push to `main`, manual | Build and deploy the Astro `docs/` site to GitHub Pages via the shared Pages workflow |
 | Build Android | `build-android.yml` | Push to `main`, `v*` tags, manual | Build release APK, sign when secrets are configured, create GitHub Release |
 | Build iOS | `build-ios.yml` | `v*` tags, manual | Build iOS archive (unsigned without Apple Developer Program) |
 | Release | `release.yml` | `v*` tags, manual | Full release pipeline: build + Android + iOS + GitHub Release |
+
+### Release Artifact Matrix
+
+| Artifact | How it is produced | Signing/status |
+|----------|--------------------|----------------|
+| Local Android debug APK | `bun run build`, copy `dist/main.lynx.bundle` into Android assets, then `cd android && ./gradlew assembleDebug` | Debug-signed by Android tooling; intended for local install/testing |
+| CI Android build APK | `build-android.yml` on `main`, tags, or manual dispatch | Release build; signed only when keystore secrets are configured |
+| Tagged Android release APK | `build-android.yml` or `release.yml` on `v*` tags | Attached to the GitHub Release; signed when `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD` are configured |
+| iOS archive | `build-ios.yml` or `release.yml` | Source scaffold only until an Xcode project and Apple signing assets are configured; unsigned archives are expected without Apple Developer Program setup |
+
+Current quality gates are TypeScript type-checking, production bundle builds, CodeQL, and Pages deployment. Unit tests, browser smoke tests, and lint/format checks are not configured yet.
 
 ## License
 
