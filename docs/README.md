@@ -1,6 +1,6 @@
 # Docs
 
-Astro static site deployed to GitHub Pages.
+Astro static site deployed to GitHub Pages. The site uses Astro 6.4's pluggable Markdown processor API with the Rust-based Sätteri processor for wiki Markdown rendering.
 
 ## Commands
 
@@ -8,10 +8,10 @@ Run from this directory (`docs/`):
 
 | Command | Action |
 |---|---|
-| `bun install` | Install dependencies |
-| `bun run dev` | Start dev server |
-| `bun run build` | Build to `./out/` |
-| `bun run preview` | Preview production build locally |
+| `bun install` | Install dependencies from `bun.lock` |
+| `npm run dev` | Start dev server with Node >=22.12 |
+| `npm run build` | Build to `./out/` with Node >=22.12 |
+| `npm run preview` | Preview production build locally with Node >=22.12 |
 
 ## Environment
 
