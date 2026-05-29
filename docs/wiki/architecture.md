@@ -26,7 +26,7 @@ speedy-bird-lynx/
 ├── ios/                          # Native iOS host app (source files)
 ├── assets/                       # Sprites, audio, medals, digits
 ├── docs/                         # Astro GitHub Pages site + playable canvas demo
-├── web-host/                     # Web preview host (dev only)
+├── web-host/                     # Advanced/dev-only standalone <lynx-view> host
 ├── .github/workflows/            # CI/CD pipelines
 ├── lynx.config.ts                # Lynx build configuration
 ├── rsbuild.web-host.config.ts    # Web host build configuration
@@ -75,3 +75,13 @@ The `useGameEngine` hook manages all game state:
 - **`renderState`** — React state snapshot pushed to components via `setRenderState()`. Only updated at the end of each tick.
 
 This separation means physics calculations do not allocate React objects — only the final render snapshot does.
+
+## Web Rendering Surfaces
+
+| Surface | Source | Purpose |
+|---------|--------|---------|
+| ReactLynx web preview | `bun run dev` and `http://localhost:3000/__web_preview?casename=main.web.bundle` | Development preview of the compiled `main.web.bundle` |
+| GitHub Pages canvas demo | `docs/src/pages/index.astro` | Public playable browser demo; it ports the game state machine and physics to an inline `<canvas>` script for zero-dependency Pages playback |
+| Standalone web host | `web-host/` with `rsbuild.web-host.config.ts` | Advanced/dev-only host that renders `main.web.bundle` inside `<lynx-view>`; `web-host/index.html` currently points at the configured bundle URL |
+
+The canvas demo intentionally uses a 400x600 viewport to fit the landing-page phone frame. Core physics values such as flap force, gravity, pipe gap, speed ramp, and medal thresholds mirror `src/constants.ts`; the viewport height is adapted from the ReactLynx game's 400x750 canvas height.

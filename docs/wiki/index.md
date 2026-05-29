@@ -1,6 +1,6 @@
 # Speedy Bird Lynx
 
-Flappy Bird clone built with [ReactLynx](https://lynxjs.org/) and TypeScript. Runs natively on iOS, Android, and Web from a single codebase using Lynx's native C++ rendering engine and dual-threaded architecture.
+Flappy Bird clone built with [ReactLynx](https://lynxjs.org/) and TypeScript. The checked-in project runs on Android and Web from a single codebase and includes iOS host source files for Xcode project setup. Lynx uses a native C++ rendering engine and dual-threaded architecture instead of a WebView.
 
 ## Wiki Pages
 
@@ -22,7 +22,7 @@ Flappy Bird clone built with [ReactLynx](https://lynxjs.org/) and TypeScript. Ru
 - Element-based rendering with CSS transforms (no canvas)
 - Tile-based pipe construction and parallax scrolling
 - AABB collision detection with circular hitbox approximation
-- Automated CI/CD for all three platforms
+- Automated CI/CD for type-checking, bundle builds, CodeQL, Pages deployment, and release artifacts
 
 ---
 
