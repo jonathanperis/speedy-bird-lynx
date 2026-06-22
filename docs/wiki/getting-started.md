@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - **Bun** for the root ReactLynx/Rspeedy app (`bun install`, `bun run dev`, `bun run build`)
-- **Node.js** >=22.12 for the Astro 6.4+ documentation site in `docs/` (`npm run dev/build/preview`)
+- **Node.js** >=22.12 for the Astro 7 documentation site in `docs/` (`npm run dev/build/preview`)
 - **Java 17** and **Android SDK** (for Android builds)
 - **Xcode 15+** and **CocoaPods** (for iOS builds after creating the Xcode project from the included source scaffold)
 
@@ -61,7 +61,7 @@ Build and run from Xcode on a simulator or device.
 
 ## Web / GitHub Pages
 
-The public web surface is the Astro site in `docs/`. It renders the landing page, embeds the playable canvas demo, and generates wiki pages from `docs/wiki/*.md`. Astro 6.4+ requires Node.js >=22.12, so use the npm scripts for the docs dev server/build even though dependencies are installed from `bun.lock`.
+The public web surface is the Astro site in `docs/`. It renders the landing page, embeds the playable canvas demo, and generates wiki pages from `docs/wiki/*.md`. Astro 7 requires Node.js >=22.12, so use the npm scripts for the docs dev server/build even though dependencies are installed from `bun.lock`.
 
 ```bash
 cd docs

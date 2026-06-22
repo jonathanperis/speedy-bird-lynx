@@ -9,9 +9,8 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/markdown-satteri": "^0.2.1",
-    "@astrojs/sitemap": "^3",
-    "astro": "^6.4.2"
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.0.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4",
