@@ -42,7 +42,7 @@
 ### Prerequisites
 
 - **Bun** for the root ReactLynx/Rspeedy app (`bun install`, `bun run dev`, `bun run build`)
-- **Node.js** >=22.12 for the Astro 6.4+ documentation site in `docs/` (`npm run dev/build/preview`)
+- **Node.js** >=22.12 for the Astro 7 documentation site in `docs/` (`npm run dev/build/preview`)
 - **Java 17** and **Android SDK** (for Android builds)
 - **Xcode 15+** and **CocoaPods** (for iOS builds after creating the Xcode project from the included source scaffold)
 
@@ -65,7 +65,7 @@ Outputs `dist/main.lynx.bundle` (native) and `dist/main.web.bundle` (web).
 
 ### Documentation Site
 
-The public GitHub Pages site lives in `docs/`. It uses Astro 6.4+, so run it with Node.js >=22.12:
+The public GitHub Pages site lives in `docs/`. It uses Astro 7, so run it with Node.js >=22.12:
 
 ```bash
 cd docs
