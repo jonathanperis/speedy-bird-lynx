@@ -25,7 +25,7 @@ Cross-platform Flappy Bird clone built with ReactLynx + TypeScript. The checked-
 
 ## Build Commands
 
-Use Bun for root ReactLynx/Rspeedy installs and command examples because the root lockfile and CI use Bun. Use Node.js >=22.12 with npm scripts for the Astro 6.4+ docs site in `docs/`.
+Use Bun for root ReactLynx/Rspeedy installs and command examples because the root lockfile and CI use Bun. Use Node.js >=22.12 with npm scripts for the Astro 7 docs site in `docs/`.
 
 ```sh
 bun install --frozen-lockfile       # Install exact dependencies

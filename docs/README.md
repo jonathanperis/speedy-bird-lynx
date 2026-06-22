@@ -1,6 +1,6 @@
 # Docs
 
-Astro static site deployed to GitHub Pages. The site uses Astro 6.4's pluggable Markdown processor API with the Rust-based Sätteri processor for wiki Markdown rendering.
+Astro static site deployed to GitHub Pages. The site uses Astro 7 with the default Rust-powered Markdown pipeline for wiki Markdown rendering.
 
 ## Commands
 

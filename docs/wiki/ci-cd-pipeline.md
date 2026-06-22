@@ -26,7 +26,7 @@ Current quality gates are TypeScript type-checking, production bundle builds, Co
 
 ## Deploy Web
 
-Deploys the Astro site in `docs/` to GitHub Pages on pushes to `main` or manual dispatch. The repository delegates deployment to the shared reusable workflow `jonathanperis/.github/.github/workflows/pages-docs-deploy.yml@main`; that shared workflow installs dependencies, uses Node.js 22 for Astro 6.4+, builds the docs site, and publishes the static output.
+Deploys the Astro site in `docs/` to GitHub Pages on pushes to `main` or manual dispatch. The repository delegates deployment to the shared reusable workflow `jonathanperis/.github/.github/workflows/pages-docs-deploy.yml@main`; that shared workflow installs dependencies, uses Node.js 22 for Astro 7, builds the docs site, and publishes the static output.
 
 ## Build Android
 
