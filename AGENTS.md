@@ -17,9 +17,9 @@ Cross-platform Flappy Bird clone built with ReactLynx + TypeScript. The checked-
 | ReactLynx | 0.119.0 | Cross-platform native UI framework |
 | React | 18.3.1 | Component model and hooks |
 | TypeScript | 6.0.3 | Type-safe source code |
-| RSpeedy / Rspack | 0.14.3 | Lynx bundler with HMR |
-| Rsbuild | 2.0.0 | Web build target |
-| Lynx SDK | 3.7.0 | Native runtime types and Android/iOS hosts |
+| RSpeedy / Rspack | 0.14.5 | Lynx bundler with HMR |
+| Rsbuild | 2.2.7 | Web build target |
+| Lynx SDK | 3.7.0 | Android/iOS hosts; TypeScript bindings use `@lynx-js/types` 3.9.0 |
 
 ---
 
@@ -136,12 +136,12 @@ speedy-bird-lynx/
 
 | Workflow | File | Trigger | Actions |
 |----------|------|---------|---------|
-| Build Check | `ci.yml` | Manual, push to `main`/`lynx-migration`, PR to `main` | `bunx tsc --noEmit` + `bun run build` |
-| CodeQL | `codeql.yml` | Push/PR to `main`, weekly | Security & quality analysis |
+| Build Check | `ci.yml` | Manual, push to `main`/`lynx-migration`, PR to `main` | Root/docs audits, type-check/build, docs build, unsigned Android compilation |
+| CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript and Actions analysis |
 | Deploy Web | `deploy.yml` | Push to `main`, manual | Reusable GitHub Pages docs deploy for `docs/` |
-| Build Android | `build-android.yml` | Push to `main`, `v*` tags, manual | Build release APK, sign if secrets exist, create release |
+| Build Android | `build-android.yml` | Push to `main`, manual from `main` | Build/sign APK with a read-only job; separate job publishes the immutable build release |
 | Build iOS | `build-ios.yml` | `v*` tags, manual | Build unsigned archive when Xcode project exists |
-| Release | `release.yml` | `v*` tags, manual | Full artifact/release pipeline |
+| Release | `release.yml` | `v*` tags, manual from `main` or a version tag | Sole versioned-release publisher; upload all assets before immutable publication |
 
 ---
 

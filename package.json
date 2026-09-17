@@ -9,18 +9,18 @@
   },
   "dependencies": {
     "@lynx-js/react": "^0.119.0",
-    "@lynx-js/web-core": "^0.20.1",
-    "@lynx-js/web-elements": "^0.12.0",
-    "@rsbuild/core": "^2.0.0",
+    "@lynx-js/web-core": "^0.20.4",
+    "@lynx-js/web-elements": "^0.12.11",
+    "@rsbuild/core": "^2.2.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@lynx-js/react-rsbuild-plugin": "^0.16.1",
-    "@lynx-js/rspeedy": "^0.14.3",
-    "@lynx-js/types": "^3.7.0",
-    "@types/react": "^18.3.0",
-    "sharp": "^0.34.5",
+    "@lynx-js/react-rsbuild-plugin": "^0.16.3",
+    "@lynx-js/rspeedy": "^0.14.5",
+    "@lynx-js/types": "^3.9.0",
+    "@types/react": "^18.3.31",
+    "sharp": "^0.35.4",
     "typescript": "^6.0.3"
   },
   "overrides": {
