@@ -11,6 +11,7 @@ Last reviewed: **2026-09-17**. Versions below describe this checkout, not a prom
 | Rspeedy | 0.17.2 | Native and web bundle builds; uses Rsbuild 2.2.4 internally |
 | Rsbuild | 2.2.7 | Standalone web host |
 | Lynx web core / elements | 0.26.1 / 0.12.11 | Browser runtime |
+| Lynx core | 0.1.4 | Explicit runtime peer required by the standalone web host |
 | React / React DOM / React types | 19.3.0 | Compatibility dependencies and typings; the game imports ReactLynx |
 | Lynx TypeScript bindings | 4.2.1 | API declarations; host support must still be checked against the native SDK |
 | App TypeScript | 6.0.3 | Latest release within Rspeedy's supported peer range |
@@ -21,6 +22,8 @@ Last reviewed: **2026-09-17**. Versions below describe this checkout, not a prom
 The ReactLynx, compiler plugin, and Rspeedy versions must be upgraded together. ReactLynx 0.126 moves to Preact 11 internally: effect cleanup on component removal is deferred until the after-paint flush; page destruction still drains cleanup synchronously. This app mounts one root game engine and cleans up its timer in its effect cleanup.
 
 React 19 typings require `jsxImportSource: "@lynx-js/react"` so `<view>` and `<image>` are typed as Lynx elements. Web core now exports its browser entry at `@lynx-js/web-core/client`. Rspeedy 0.17 uses `.lynx` intermediate directories. These migrations are applied in this checkout.
+
+The standalone host also requires `@lynx-js/lynx-core` 0.1.4 explicitly: web core marks it as an optional peer, but its background-thread loader imports `@lynx-js/lynx-core/web`. A previously populated `node_modules` directory can hide this missing declaration; the clean CI install verifies it is reproducible.
 
 ## Native toolchains and compatibility holds
 
