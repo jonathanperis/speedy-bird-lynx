@@ -1,5 +1,7 @@
 # Design: Lynx Port
 
+> Historical migration design, archived 2026-09-16. The proposed imperative renderer and original dimensions below were superseded by the shared simulation and snapshot renderers. Current architecture is documented in `docs/wiki/architecture.md`.
+
 ## Architecture Overview
 
 ```

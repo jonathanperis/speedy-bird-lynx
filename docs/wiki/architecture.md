@@ -1,87 +1,52 @@
 # Architecture
 
-## Project Structure
+The simulation is shared; rendering and host effects are adapters.
 
-```
-speedy-bird-lynx/
-├── src/                          # Lynx/ReactLynx application
-│   ├── index.tsx                 # Entry point
-│   ├── App.tsx                   # Root component
-│   ├── types.ts                  # TypeScript types (GameState, PipeData)
-│   ├── constants.ts              # All game constants
-│   ├── hooks/
-│   │   └── useGameEngine.ts      # Core game loop and physics
-│   ├── components/
-│   │   ├── Bird.tsx              # Animated bird sprite
-│   │   ├── Pipe.tsx              # Tile-based pipe rendering
-│   │   ├── Background.tsx        # Parallax scrolling background
-│   │   ├── Ground.tsx            # Scrolling ground layer
-│   │   ├── ScoreDisplay.tsx      # Sprite-based digit rendering
-│   │   ├── GetReadyScreen.tsx    # Start screen overlay
-│   │   └── GameOverScreen.tsx    # Game over panel with medals
-│   └── audio/
-│       └── audio.ts              # Audio abstraction (web + native)
-│
-├── android/                      # Native Android host app
-├── ios/                          # Native iOS host app (source files)
-├── assets/                       # Sprites, audio, medals, digits
-├── docs/                         # Astro GitHub Pages site + playable canvas demo
-├── web-host/                     # Advanced/dev-only standalone <lynx-view> host
-├── .github/workflows/            # CI/CD pipelines
-├── lynx.config.ts                # Lynx build configuration
-├── rsbuild.web-host.config.ts    # Web host build configuration
-└── tsconfig.json                 # TypeScript configuration
+```text
+GameSession: clock, input recording, replay, pause
+    └── engine: physics, seeded RNG, collision, score → snapshot + sound events
+          ├── ReactLynx App → native view/image/text elements
+          └── Canvas renderer → drawImage / shapes / text
+
+Platform boundary: audio, versioned preferences, lifecycle
+    ├── Android: SoundPool + SharedPreferences
+    ├── iOS: AVAudioPlayer + UserDefaults
+    └── Browser: HTMLAudioElement + localStorage
 ```
 
-## Component Hierarchy
+## Key files
 
-```
-App
-├── Background          (z-index: 0, parallax scroll)
-├── Pipe[]              (z-index: 1, tile-based, scroll left)
-├── Bird                (z-index: 2, animated sprite + rotation)
-├── Ground              (z-index: 3, scroll matches pipe speed)
-├── ScoreDisplay        (z-index: 4, visible during play)
-├── GetReadyScreen      (z-index: 5, visible on ready)
-└── GameOverScreen      (z-index: 5, visible on game over)
-```
+| Path | Responsibility |
+|---|---|
+| `src/game/engine.ts` | Fixed-step state transition and shared geometry |
+| `src/game/session.ts` | Bounded elapsed-time scheduling and replay |
+| `src/game/preferences.ts` | Versioned persisted-data parsing |
+| `src/hooks/useGameEngine.ts` | ReactLynx background effects, snapshots, lifecycle events |
+| `src/App.tsx` | Logical viewport mapping and scene composition |
+| `src/components/Pipe.tsx` | Moving wrapper with memoized static body tiles |
+| `src/components/LearningControls.tsx` | Background-only learning panel |
+| `docs/src/game/controller.ts` | Browser input, loading/retry, accessibility, scheduling |
+| `docs/src/game/renderer.ts` | Canvas drawing over shared state |
+| `src/platform/browser.ts` | Browser resources and storage |
+| `web-host/native-module.js` | Background-worker factory forwarding host calls |
+| `scripts/assets.mjs` | Asset synchronization, native packaging, verification |
 
-## Rendering Approach
+## ReactLynx thread boundary
 
-Lynx has no canvas element. All visuals are composed from built-in elements:
+ReactLynx renders a first frame on the main thread and hydrates/updates from the background thread. Native module calls belong on the background thread. The hook's command/effect paths are explicitly background-only. `<background-only>` defers learning controls while providing a lightweight initial fallback.
 
-- `<view>` — containers and positioning via CSS transforms
-- `<image>` — sprites loaded as individual PNGs
-- `<text>` — score display on the game over panel
+The renderer deliberately keeps React snapshots as a readable reference implementation. Performance-sensitive changes should compare a recorded run before and after modification. Debug timing is a callback interval, not a GPU performance claim.
 
-Every game entity is absolutely positioned at `top: 0, left: 0` and moved using CSS `transform: translate(Xpx, Ypx)`. This avoids layout recalculations — the engine only updates transform strings.
+## Web surfaces
 
-## Dual-Threaded Model
+1. Rspeedy's built-in web preview loads the compiled ReactLynx bundle but does not supply the app-specific native bridge.
+2. `web-host/` supplies that bridge, keyboard controls, and a complete distributable runtime.
+3. `docs/` contains the Canvas cabinet and manual, using the shared simulation directly.
 
-Lynx runs on two threads:
+The Canvas cabinet uses a 400×600 configuration; ReactLynx uses 400×750 and letterboxes into the measured viewport. Strict renderer comparisons must use the same world configuration.
 
-| Thread | Responsibility |
-|--------|---------------|
-| **Background** | React reconciliation, game logic, state management |
-| **Main** | Native rendering, layout, touch event delivery |
+## Resource and lifecycle ownership
 
-The game loop (`setInterval` at 17ms) runs on the background thread. It updates a React state object (`RenderState`) which triggers reconciliation. Lynx's main thread then applies the resulting native element updates.
+Bundle images are embedded. The host owns native audio players and closes/releases them with its lifecycle. A browser or native background event pauses the simulation. Component cleanup cancels timers/listeners, and renderers stop rescheduling settled game-over states.
 
-## State Management
-
-The `useGameEngine` hook manages all game state:
-
-- **`engine.current`** — mutable ref holding physics state (position, velocity, pipe list). Updated every tick without triggering renders.
-- **`renderState`** — React state snapshot pushed to components via `setRenderState()`. Only updated at the end of each tick.
-
-This separation means physics calculations do not allocate React objects — only the final render snapshot does.
-
-## Web Rendering Surfaces
-
-| Surface | Source | Purpose |
-|---------|--------|---------|
-| ReactLynx web preview | `bun run dev` and `http://localhost:3000/__web_preview?casename=main.web.bundle` | Development preview of the compiled `main.web.bundle` |
-| GitHub Pages canvas demo | `docs/src/pages/index.astro` | Public playable browser demo; it ports the game state machine and physics to an inline `<canvas>` script for zero-dependency Pages playback |
-| Standalone web host | `web-host/` with `rsbuild.web-host.config.ts` | Advanced/dev-only host that renders `main.web.bundle` inside `<lynx-view>`; `web-host/index.html` currently points at the configured bundle URL |
-
-The canvas demo intentionally uses a 400x600 viewport to fit the landing-page phone frame. Core physics values such as flap force, gravity, pipe gap, speed ramp, and medal thresholds mirror `src/constants.ts`; the viewport height is adapted from the ReactLynx game's 400x750 canvas height.
+Audio readiness is optional for gameplay. Required image failure produces a retryable Canvas loading state; it never counts as a successful load.

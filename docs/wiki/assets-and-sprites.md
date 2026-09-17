@@ -1,78 +1,39 @@
 # Assets and Sprites
 
-All game assets are pre-sliced individual PNG files. Lynx has no canvas or sprite sheet slicing — each visual element is a separate `<image>` element.
+`assets/` is canonical: 25 PNG sprites and five WAV effects. Individual sprites are the maintained inputs; the original first sprite sheet is not included.
 
-## Directory Structure
+## Packaging
 
-```
-assets/
-├── sprites/
-│   ├── bird-0.png              # Wings down
-│   ├── bird-1.png              # Wings level
-│   ├── bird-2.png              # Wings up
-│   ├── background.png          # Sky + city background tile (276x228)
-│   ├── ground.png              # Ground tile (224x129)
-│   ├── get-ready.png           # "Get Ready" overlay (174x160)
-│   ├── game-over.png           # Game over panel with score boxes (226x158)
-│   ├── pipes/
-│   │   ├── pipe-top.png        # Top pipe body tile
-│   │   ├── pipe-top-mouth.png  # Top pipe mouth (lip)
-│   │   ├── pipe-bottom.png     # Bottom pipe body tile
-│   │   └── pipe-bottom-mouth.png # Bottom pipe mouth (lip)
-│   ├── digits/
-│   │   └── digit-0.png … digit-9.png  # Score display (18x27 each)
-│   └── medals/
-│       ├── medal-bronze.png
-│       ├── medal-silver.png
-│       ├── medal-gold.png
-│       └── medal-platinum.png
-│
-└── audio/
-    ├── sfx_wing.wav            # Flap
-    ├── sfx_point.wav           # Score
-    ├── sfx_hit.wav             # Pipe collision
-    ├── sfx_die.wav             # Ground collision
-    └── sfx_swooshing.wav       # Game reset
+- `lynx.config.ts` embeds images up to 64 KiB, covering every game sprite. Native bundles need no image server.
+- `bun run build` prepares each native host's bundle and named WAV files and emits `dist/assets-manifest.json`.
+- `bun run assets:sync` copies canonical resources to `docs/public/assets/`; the docs build also synchronizes them.
+- `bun run assets:check` verifies sprite payloads in both bundles and compares native/docs resources byte-for-byte.
+- The standalone web distribution includes its sounds and worker-to-host bridge.
+
+## Rendering
+
+The bird cycles through down, mid, up, mid frames. Pipe mouths align with shared gap geometry; body tiles fill toward world edges. Static pipe tiles are memoized independently of scrolling wrappers.
+
+Ground and background tile horizontally. Ground displays at height 129; source and display dimensions are intentionally different. Score digits display at 18×27, while source widths vary. Do not derive crop coordinates from displayed dimensions.
+
+Medal thresholds are shared: bronze 10, silver 25, gold 50, platinum 100.
+
+## Extraction exercise
+
+The ESM extraction tool takes explicit inputs:
+
+```sh
+node extract-sprites.js --help
+node extract-sprites.js assets/sprites/unused/og-theme-2.png assets/crops.example.json .specs/extracted
 ```
 
-## How Assets Are Loaded
+The example extracts two digit crops into an ignored scratch directory. Each manifest entry has `name`, `x`, `y`, `w`, and `h`; output paths stay inside the selected directory. Supply your own sheet/manifest for an art experiment. The example is not a complete regeneration recipe for all third-party game art.
 
-In the Lynx app, assets are loaded via top-level `import` statements at the module level:
+## Provenance
 
-```tsx
-import bird0 from '../../assets/sprites/bird-0.png';
-import bird1 from '../../assets/sprites/bird-1.png';
-import bird2 from '../../assets/sprites/bird-2.png';
+- Original Flappy Bird: Dong Nguyen.
+- Implementation inspiration: [noanonoa](https://github.com/noanonoa).
+- Sprites: [The Spriters Resource](https://www.spriters-resource.com/fullview/59894/).
+- Sounds: [The Sounds Resource](https://www.sounds-resource.com/mobile/flappybird/sound/5309/).
 
-const BIRD_SPRITES = [bird0, bird1, bird2, bird1]; // ping-pong cycle
-```
-
-The Rspeedy bundler resolves these to URLs (dev server) or embeds them in the bundle (production).
-
-## Pipe Rendering
-
-Pipes use a tile-based approach instead of stretching a single image. Each pipe is composed of:
-
-1. **Body tiles** — repeated vertically to fill the pipe height (extends well past the screen edge)
-2. **Mouth tile** — placed at the opening where the bird flies through
-
-This avoids visual stretching artifacts and matches the original game's pixel-art style. Each tile is 55px wide and ~53px tall.
-
-## Background and Ground Tiling
-
-Both the background and ground use 5 copies laid out horizontally in a flex row. The container is translated left via CSS transform to create seamless scrolling. When the offset exceeds one tile width, it wraps back.
-
-- **Background**: 5 tiles at 276px each = 1380px total, scrolls at `0.2 * speedMultiplier` px/frame
-- **Ground**: 5 tiles at 224px each = 1120px total, scrolls at `2.7 * speedMultiplier` px/frame
-
-## Score Display
-
-The in-game score uses sprite-based digit rendering (`ScoreDisplay.tsx`). Each digit is a separate `<image>` element (18x27px) laid out horizontally with 2px gaps, centered on screen.
-
-The game-over panel score uses `<text>` elements positioned absolutely over the panel sprite.
-
-## Credits
-
-- Sprites from [The Spriters Resource](https://www.spriters-resource.com/fullview/59894/)
-- Sound effects from [The Sounds Resource](https://www.sounds-resource.com/mobile/flappybird/sound/5309/)
-- Original game by [Dong Nguyen](https://en.wikipedia.org/wiki/Flappy_Bird)
+The repository's MIT license covers application source. These provenance records do not assert an independent MIT license for third-party resources. Replacement-art experiments should record source and license alongside their crop manifest.

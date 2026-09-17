@@ -13,6 +13,8 @@ const SLUG_LABEL: Record<string, string> = {
   'game-engine': 'Game Engine',
   'getting-started': 'Getting Started',
   'native-host-apps': 'Native Host Apps',
+  'learning-labs': 'Learning Labs',
+  'reactlynx-upgrade': 'ReactLynx Upgrade',
 };
 
 const globResult = import.meta.glob('../../../wiki/*.md', { eager: true });
@@ -40,13 +42,12 @@ for (const cat of SECTION_CATEGORIES) {
 
 const requestedSlug = Astro.params.slug;
 const isRoot = requestedSlug === undefined;
-const requestedKey = requestedSlug === 'index' ? 'home' : (requestedSlug ?? 'home');
+const requestedKey = requestedSlug ?? 'home';
 
 const sectionsToRender = isRoot
   ? SECTION_CATEGORIES.flatMap(cat => cat.ids)
       .map(slug => {
-        const key = slug === 'index' ? 'home' : slug;
-        return { slug, page: pagesBySlug[key] };
+        return { slug, page: pagesBySlug[slug] };
       })
       .filter(s => s.page)
   : (() => {
@@ -95,7 +96,7 @@ const backHomeUrl = base.replace(/\/$/, '') + '/';
             {cat.label && <div class="sidebar-category">{cat.label}</div>}
             <ul>
               {catIds.map((id) => {
-                const anchor = id === 'index' ? 'home' : id;
+                const anchor = id;
                 return (
                   <li>
                     <a class="nav-item" href={`${docsBase}/#${anchor}`} data-nav-id={anchor}>
@@ -143,7 +144,7 @@ const backHomeUrl = base.replace(/\/$/, '') + '/';
       </nav>
 
       {sectionsToRender.map(({ slug, page: wikiPage }) => {
-        const sectionId = slug === 'index' ? 'home' : slug;
+        const sectionId = slug;
         const Content = wikiPage.default ?? wikiPage;
         return (
           <section id={sectionId} class="doc-section">
@@ -154,7 +155,7 @@ const backHomeUrl = base.replace(/\/$/, '') + '/';
     </main>
   </div>
 
-  {requestedSlug && <script is:inline define:vars={{ slug: requestedSlug === 'index' ? 'home' : requestedSlug, isRoot: isRoot }}>window.__docsSlug = slug; window.__isRoot = isRoot;</script>}
+  {requestedSlug && <script is:inline define:vars={{ slug: requestedSlug, isRoot: isRoot }}>window.__docsSlug = slug; window.__isRoot = isRoot;</script>}
 
   <script is:inline>
     document.addEventListener('DOMContentLoaded', () => {

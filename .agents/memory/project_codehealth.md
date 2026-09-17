@@ -1,28 +1,11 @@
 ---
-name: Code Health and Quality Gaps
-description: Known code quality gaps, missing infrastructure, and improvement areas identified 2026-04-02
+name: Code Health and Verification
+description: Current checks and remaining validation boundaries after the September 2026 modernization
 type: project
 ---
 
-## No Test Infrastructure
+`bun run test` covers shared engine geometry/state/replay, Canvas media/input/lifecycle behavior, and release ownership. Root `check`, docs `check`, both builds, and asset validation are CI gates. Source snapshots must remain immutable; pipe hitboxes extend through ground.
 
-No test files, test runner, or test dependencies exist. Game logic (collision, physics, scoring) and state machine transitions are untested.
+Native/browser builds are distinct from device playtesting and profiling. Browser UI checks require explicit opt-in. Native sound/background-resume and frame timing need real platform evidence; never infer them from compilation.
 
-**Why:** Early-stage project focused on shipping features first.
-
-**How to apply:** If adding tests, Vitest is the natural fit (Rspack ecosystem). Priority targets: useGameEngine tick logic, collision detection, state transitions.
-
-## No Linting or Formatting Config
-
-No ESLint, Prettier, or Biome configuration. TypeScript strict mode is the only quality gate.
-
-**Why:** Not yet set up.
-
-**How to apply:** If the user asks to add linting, Biome is a good fit (fast, TypeScript-native, replaces both ESLint and Prettier).
-
-## Minor Code Issues (non-blocking)
-
-- `audio.ts:53`: `(globalThis as any).__lynx_requireModule` — unavoidable for Lynx native bridge
-- `useGameEngine.ts`: `let nextPipeId = 0` is module-scoped (safe for single instance, but won't reset on remount)
-- `tsconfig.json`: `@/*` path alias defined but never used in imports (all relative)
-- `ci.yml`: still monitors `lynx-migration` branch (may be stale)
+Lockfiles are pinned and advisory scans should be rerun after dependency changes. Full Android API lint gates native builds. No JavaScript linter/formatter configuration is currently established. Prefer focused behavior tests over per-branch or exact-constant coverage.

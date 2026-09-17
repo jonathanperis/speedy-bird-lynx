@@ -1,53 +1,23 @@
-const sharp = require('sharp');
-const path = require('path');
+import sharp from 'sharp';
+import { mkdir, readFile } from 'node:fs/promises';
+import path from 'node:path';
 
-const outDir = path.join(__dirname, 'speedy-bird-lynx/assets/sprites');
-
-const sheet1 = path.join(__dirname, 'img/og-theme.png');
-const sheet2 = path.join(__dirname, 'img/og-theme-2.png');
-
-const sprites1 = [
-  { name: 'background.png', x: 0, y: 0, w: 276, h: 228 },
-  { name: 'ground.png', x: 276, y: 0, w: 224, h: 112 },
-  { name: 'bird-0.png', x: 276, y: 114, w: 34, h: 24 },
-  { name: 'bird-1.png', x: 276, y: 140, w: 34, h: 24 },
-  { name: 'bird-2.png', x: 276, y: 166, w: 34, h: 24 },
-  { name: 'get-ready.png', x: 0, y: 228, w: 174, h: 160 },
-  { name: 'game-over.png', x: 174, y: 228, w: 226, h: 158 },
-];
-
-const sprites2 = [
-  { name: 'pipe-top.png', x: 56, y: 323, w: 26, h: 160 },
-  { name: 'pipe-bottom.png', x: 84, y: 323, w: 26, h: 160 },
-  { name: 'digit-0.png', x: 496, y: 60, w: 12, h: 18 },
-  { name: 'digit-1.png', x: 135, y: 455, w: 10, h: 18 },
-  { name: 'digit-2.png', x: 292, y: 160, w: 12, h: 18 },
-  { name: 'digit-3.png', x: 306, y: 160, w: 12, h: 18 },
-  { name: 'digit-4.png', x: 320, y: 160, w: 12, h: 18 },
-  { name: 'digit-5.png', x: 334, y: 160, w: 12, h: 18 },
-  { name: 'digit-6.png', x: 292, y: 184, w: 12, h: 18 },
-  { name: 'digit-7.png', x: 306, y: 184, w: 12, h: 18 },
-  { name: 'digit-8.png', x: 320, y: 184, w: 12, h: 18 },
-  { name: 'digit-9.png', x: 334, y: 184, w: 12, h: 18 },
-];
-
-async function extractSprites(sheetPath, sprites) {
-  for (const s of sprites) {
-    const outPath = path.join(outDir, s.name);
-    await sharp(sheetPath)
-      .extract({ left: s.x, top: s.y, width: s.w, height: s.h })
-      .toFile(outPath);
-    console.log(`Extracted: ${s.name} (${s.w}x${s.h})`);
+const [sheet, manifestPath, output] = process.argv.slice(2);
+if (sheet === '--help') {
+  console.log('Usage: node extract-sprites.js <sheet.png> <crops.json> <output-directory>');
+  console.log('Manifest: [{"name":"digits/digit-0.png","x":496,"y":60,"w":12,"h":18}]');
+} else {
+  if (!sheet || !manifestPath || !output) throw new Error('Provide a source sheet, crop manifest, and output directory. See --help.');
+  const crops = JSON.parse(await readFile(manifestPath, 'utf8'));
+  if (!Array.isArray(crops)) throw new Error('Crop manifest must be an array.');
+  const directory = path.resolve(output);
+  for (const crop of crops) {
+    if (typeof crop.name !== 'string' || !['x', 'y', 'w', 'h'].every(key => Number.isInteger(crop[key]))
+      || crop.x < 0 || crop.y < 0 || crop.w <= 0 || crop.h <= 0) throw new Error('Each crop needs a name and valid integer x/y/w/h.');
+    const target = path.resolve(directory, crop.name);
+    if (!target.startsWith(directory + path.sep)) throw new Error('Crop filename must stay inside the output directory.');
+    await mkdir(path.dirname(target), { recursive: true });
+    await sharp(sheet).extract({ left: crop.x, top: crop.y, width: crop.w, height: crop.h }).toFile(target);
+    console.log(`Extracted ${crop.name} (${crop.w}×${crop.h})`);
   }
 }
-
-(async () => {
-  try {
-    await extractSprites(sheet1, sprites1);
-    await extractSprites(sheet2, sprites2);
-    console.log('\nAll sprites extracted successfully.');
-  } catch (err) {
-    console.error('Error:', err);
-    process.exit(1);
-  }
-})();

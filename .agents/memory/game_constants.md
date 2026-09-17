@@ -6,7 +6,7 @@ type: reference
 
 ## Game Mechanics
 
-Source of truth: `src/constants.ts` and `src/hooks/useGameEngine.ts`.
+Source of truth: `src/constants.ts`, `src/game/engine.ts`, and `src/game/session.ts`.
 
 - **Bird impulse**: `BIRD_FLAP = 7.25`
 - **Gravity**: `BIRD_GRAVITY = 0.28`
@@ -28,9 +28,10 @@ Source of truth: `src/constants.ts` and `src/hooks/useGameEngine.ts`.
 | Web bundle | `bun run build` | `dist/main.web.bundle` |
 | Android debug | `./gradlew assembleDebug` | Debug APK |
 | Android release | `./gradlew assembleRelease` | Release APK, signed only when signing env vars exist |
-| iOS | `pod install` + Xcode | Archive/app build when an Xcode project exists |
+| iOS | `bundle exec ruby ../scripts/generate-ios-project.rb`, `bundle exec pod install --deployment` + Xcode | Generated project/shared scheme and app/archive build |
 
 ## Android Signing (CI)
 
-Secrets are used only when configured: `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`.
-Version comes from tag (`v1.2.3`) or commit SHA (`0.0.0-<sha>`).
+Default CI APKs are debug-signed. Explicit release signing requires `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD`. Only `release.yml` publishes releases; manual runs are sandbox prereleases.
+
+Simulation steps are 17 ms. Practice uses gap 190 and clock scale 0.65. Replay records seeded input ticks. Best score/preferences persist through the host adapter.

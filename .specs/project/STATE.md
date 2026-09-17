@@ -1,5 +1,7 @@
 # State
 
+> Historical migration notes, archived 2026-09-16. The imperative-rendering recommendation below is an unmeasured original design assumption. Current code uses shared fixed-step simulation and renderer snapshots; performance changes require replay-based measurement.
+
 ## Decisions
 - 2026-03-31: Chose Lynx as target framework for cross-platform port
 - 2026-03-31: Will use element-based rendering (no canvas) with CSS transforms

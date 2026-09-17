@@ -20,18 +20,19 @@ android, bytedance, cross-platform, flappy-bird, game, ios, lynx, native-ui, rea
 ## Release Strategy
 
 - Semver tags: `v*`
-- Auto-build tags: `build/0.0.0-{sha}` created by CI on main pushes
-- Release assets can include APK, Lynx bundle, web bundle, and iOS archive when available
+- Only `release.yml` publishes; manual runs create `sandbox-*` prereleases.
+- Publishing requires checks, signed Android artifact validation, and an actual unsigned iOS archive.
+- Complete bundle/web-host distributions include required resource payloads.
 
 ## CI/CD Workflows
 
 | File | Purpose |
 |------|---------|
-| `ci.yml` | Type check + build (manual, push/PR paths) |
+| `ci.yml` | Root/docs checks, behavior tests, builds, assets, distributions |
 | `codeql.yml` | Security analysis (push/PR to main + weekly) |
-| `deploy.yml` | GitHub Pages deployment through shared reusable workflow |
-| `build-android.yml` | Release APK build + GitHub Release |
-| `build-ios.yml` | iOS archive when Xcode project exists |
+| `deploy.yml` | Pinned-toolchain game/docs checks followed by Pages deployment |
+| `build-android.yml` | Reusable debug-signed or explicitly release-signed APK build |
+| `build-ios.yml` | Reproducible generated host project and real unsigned archive |
 | `release.yml` | Full release pipeline for `v*` tags/manual dispatch |
 
 ## Notable Config

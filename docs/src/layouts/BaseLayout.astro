@@ -20,6 +20,7 @@ const faviconPngHref = `${basePath}/favicon.png`;
 const favicon32Href = `${basePath}/favicon-32x32.png`;
 const appleTouchIconHref = `${basePath}/apple-touch-icon.png`;
 const socialImageUrl = 'https://jonathanperis.github.io/speedy-bird-lynx/og-image.png';
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -54,14 +55,14 @@ const jsonLd = {
     <link rel="icon" type="image/png" href={faviconPngHref} />
     <link rel="icon" type="image/png" sizes="32x32" href={favicon32Href} />
     <link rel="apple-touch-icon" href={appleTouchIconHref} />
-    <link rel="canonical" href="https://jonathanperis.github.io/speedy-bird-lynx/" />
+    <link rel="canonical" href={canonicalUrl} />
     <meta name="theme-color" content="#04111e" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content="https://jonathanperis.github.io/speedy-bird-lynx/" />
+    <meta property="og:url" content={canonicalUrl} />
     <meta property="og:image" content={socialImageUrl} />
     <meta property="og:image:secure_url" content={socialImageUrl} />
     <meta property="og:image:type" content="image/png" />
@@ -86,19 +87,11 @@ const jsonLd = {
     <Analytics />
   </head>
   <body>
-    <div class="particles">
-      <div class="particle"></div>
-      <div class="particle"></div>
-      <div class="particle"></div>
-      <div class="particle"></div>
-      <div class="particle"></div>
-      <div class="particle"></div>
-    </div>
-
     <!-- Pill nav (hidden until hero scrolls off) -->
     <nav id="pill-nav" class="pill-nav">
       <a href={`${homeHref}#play`}>Play</a>
-      <a href={`${homeHref}#about`}>About</a>
+      <a href={`${homeHref}#rules`}>Rules</a>
+      <a href={`${homeHref}#build`}>Build</a>
       <a href={`${homeHref}#docs`}>Docs</a>
       <a href={docsHref}>Full Docs</a>
     </nav>
@@ -115,40 +108,6 @@ const jsonLd = {
         ).observe(heroEl);
       }
 
-      // Speed counter loop
-      let spd = 1.0;
-      const spdEl = document.getElementById('speedNum');
-      if (spdEl) {
-        setInterval(() => {
-          spd += 0.01;
-          if (spd > 1.73) spd = 1.0;
-          spdEl.textContent = spd.toFixed(2);
-        }, 50);
-      }
-
-      // Section reveals
-      if (window.IntersectionObserver) {
-        document.querySelectorAll('.reveal').forEach(el => {
-          new IntersectionObserver(
-            ([e]) => { if (e.isIntersecting) el.classList.add('visible'); },
-            { threshold: 0.1 }
-          ).observe(el);
-        });
-
-        const meter = document.getElementById('speedMeter');
-        if (meter) {
-          new IntersectionObserver(
-            ([e]) => { if (e.isIntersecting) meter.classList.add('visible'); },
-            { threshold: 0.5 }
-          ).observe(meter);
-        }
-      } else {
-        document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
-      }
-
-      setTimeout(() => {
-        document.querySelector('.hero-content')?.classList.add('visible');
-      }, 100);
     </script>
   </body>
 </html>

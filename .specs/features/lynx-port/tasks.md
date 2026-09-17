@@ -1,5 +1,7 @@
 # Tasks: Lynx Port
 
+> Historical migration checklist, archived 2026-09-16. Do not execute these original scaffold/physics tasks against the current implementation. Use the current manual, tests, and `.specs/SPEC.md` for active work.
+
 ## Task Dependency Graph
 
 ```

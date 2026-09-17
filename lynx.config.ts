@@ -2,7 +2,7 @@ import { defineConfig } from '@lynx-js/rspeedy';
 import { pluginReactLynx } from '@lynx-js/react-rsbuild-plugin';
 
 export default defineConfig({
-  plugins: [pluginReactLynx()],
+  plugins: [pluginReactLynx({ engineVersion: '3.9' })],
   environments: {
     web: {},
     lynx: {},
@@ -12,6 +12,10 @@ export default defineConfig({
       main: './src/index.tsx',
     },
     assetsInclude: [/\.wav$/],
+  },
+  output: {
+    // Every game sprite is small; inline them so native bundles work offline.
+    dataUriLimit: { image: 64 * 1024 },
   },
   server: {
     headers: {

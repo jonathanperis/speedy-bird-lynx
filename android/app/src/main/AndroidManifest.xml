@@ -7,7 +7,7 @@
         android:name=".SpeedyBirdApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="Speedy Bird"
+        android:label="@string/app_name"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 
         <activity

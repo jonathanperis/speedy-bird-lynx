@@ -9,16 +9,29 @@
     body {
       background: rgba(0,0,0,0.95);
       display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+      flex-direction: column;
+      height: 100dvh;
     }
+    lynx-view { display: block; flex: 1; min-height: 0; width: 100%; }
+    nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 8px; background: #04111e; }
+    button { min-height: 44px; padding: 8px 12px; background: #ffd166; color: #04111e; border: 0; border-radius: 3px; font: bold 14px system-ui; cursor: pointer; }
+    button:focus-visible, lynx-view:focus-visible { outline: 3px solid #ff6b35; outline-offset: -3px; }
   </style>
 </head>
 <body>
   <lynx-view
-    style="width: 100vw; height: 100vh;"
-    url="http://localhost:3001/main.web.bundle"
+    tabindex="0"
+    aria-label="Speedy Bird ReactLynx game. Press Space or tap to flap."
   ></lynx-view>
+  <nav aria-label="Keyboard-accessible game controls">
+    <button data-command="tap">Flap</button>
+    <button data-command="pause">Pause / resume</button>
+    <button data-command="step">Single step</button>
+    <button data-command="restart">Restart run</button>
+    <button data-command="replay">Replay run</button>
+    <button data-command="practice">Toggle practice</button>
+    <button data-command="mute">Toggle sound</button>
+    <button data-command="debug">Toggle hitboxes</button>
+  </nav>
 </body>
 </html>

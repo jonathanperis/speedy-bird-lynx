@@ -1,152 +1,91 @@
 name: Build Android
-
 on:
   push:
     branches: [main]
-    tags: ['v*']
+  pull_request:
+    branches: [main]
   workflow_dispatch:
+    inputs:
+      signed-release:
+        description: Build with the configured release keystore (otherwise debug-signed)
+        type: boolean
+        default: false
+  workflow_call:
+    inputs:
+      signed-release:
+        type: boolean
+        default: false
+    secrets:
+      KEYSTORE_BASE64:
+        required: false
+      KEYSTORE_PASSWORD:
+        required: false
+      KEY_ALIAS:
+        required: false
+      KEY_PASSWORD:
+        required: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  build:
+  android:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          fetch-depth: 0
-
-      # Compute version from tag or short SHA
-      - name: Set version
-        id: version
-        env:
-          GH_REF: ${{ github.ref }}
-        run: |
-          if [[ "$GH_REF" == refs/tags/v* ]]; then
-            VERSION="${GH_REF#refs/tags/v}"
-          else
-            VERSION="0.0.0-$(git rev-parse --short HEAD)"
-          fi
-          # Version code: seconds since epoch / 10 (fits in 32-bit int for decades)
-          VERSION_CODE=$(( $(date +%s) / 10 ))
-          echo "VERSION_NAME=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_OUTPUT"
-          echo "Version: $VERSION (code: $VERSION_CODE)"
-
-      # Build Lynx JS bundle (Bun is the standardized AGENTS.md convention for this repo)
+          node-version-file: .node-version
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install
-
-      - name: Build Lynx bundle
-        run: bun run build
-
-      # Copy bundle into Android assets
-      - run: cp dist/main.lynx.bundle android/app/src/main/assets/
-
-      # Decode signing keystore (if secrets are configured)
-      - name: Decode keystore
-        if: env.KEYSTORE_BASE64 != ''
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-        run: echo "$KEYSTORE_BASE64" | base64 -d > android/app/release.keystore
-
-      # Build Android APK
+          bun-version: 1.3.12
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+      - run: bun run assets:check
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
-
       - uses: gradle/actions/setup-gradle@v6
-
-      - name: Build release APK
+      - name: Check Android API compatibility
+        working-directory: android
+        run: ./gradlew lintDebug
+      - name: Configure requested release signing
+        if: inputs.signed-release
         env:
-          KEYSTORE_FILE: ${{ secrets.KEYSTORE_BASE64 != '' && 'release.keystore' || '' }}
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          VERSION_NAME: ${{ steps.version.outputs.VERSION_NAME }}
-          VERSION_CODE: ${{ steps.version.outputs.VERSION_CODE }}
-        run: cd android && chmod +x gradlew && ./gradlew assembleRelease
-
-      # Tag the version in git (only on main, not for tag pushes)
-      - name: Create git tag
-        if: github.ref == 'refs/heads/main'
-        env:
-          VERSION_NAME: ${{ steps.version.outputs.VERSION_NAME }}
         run: |
-          if git rev-parse "build/$VERSION_NAME" >/dev/null 2>&1; then
-            echo "Tag build/$VERSION_NAME already exists, skipping"
-          else
-            git tag "build/$VERSION_NAME"
-            git push origin "build/$VERSION_NAME"
-          fi
-
+          test -n "$KEYSTORE_BASE64" && test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_ALIAS" && test -n "$KEY_PASSWORD"
+          printf '%s' "$KEYSTORE_BASE64" | base64 -d > android/app/release.keystore
+      - name: Build signed sandbox APK
+        if: ${{ !inputs.signed-release }}
+        working-directory: android
+        run: ./gradlew assembleDebug
+      - name: Build release-signed APK
+        if: inputs.signed-release
+        working-directory: android
+        env:
+          KEYSTORE_FILE: release.keystore
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          VERSION_NAME: ${{ github.ref_name }}
+          VERSION_CODE: ${{ github.run_number }}
+        run: ./gradlew assembleRelease
+      - name: Verify and collect APK
+        env:
+          BUILD_TYPE: ${{ inputs.signed-release && 'release' || 'debug' }}
+        run: |
+          APK="android/app/build/outputs/apk/$BUILD_TYPE/app-$BUILD_TYPE.apk"
+          python3 scripts/verify-apk.py "$APK"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify "$APK"
+          cp "$APK" "$RUNNER_TEMP/speedy-bird-$BUILD_TYPE.apk"
       - uses: actions/upload-artifact@v7
         with:
-          name: speedy-bird-${{ steps.version.outputs.VERSION_NAME }}-android
-          path: android/app/build/outputs/apk/release/*.apk
-          retention-days: 90
-
-      # Rename APK with version
-      - name: Rename APK
-        env:
-          VERSION_NAME: ${{ steps.version.outputs.VERSION_NAME }}
-        run: |
-          APK=$(ls android/app/build/outputs/apk/release/*.apk | head -1)
-          cp "$APK" "android/app/build/outputs/apk/release/speedy-bird-${VERSION_NAME}.apk"
-
-      # Create GitHub Release with APK attached
-      - name: Create GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION_NAME: ${{ steps.version.outputs.VERSION_NAME }}
-          VERSION_CODE: ${{ steps.version.outputs.VERSION_CODE }}
-          GH_REF: ${{ github.ref }}
-          GH_SHA: ${{ github.sha }}
-          GH_REPO: ${{ github.repository }}
-        run: |
-          COMMIT_SHA="$GH_SHA"
-          SHORT_SHA="${COMMIT_SHA:0:7}"
-          APK_FILE="speedy-bird-${VERSION_NAME}.apk"
-          APK_SIZE=$(du -h "android/app/build/outputs/apk/release/$APK_FILE" | cut -f1)
-
-          if [[ "$GH_REF" == refs/tags/v* ]]; then
-            TAG="${GH_REF#refs/tags/}"
-            TITLE="Speedy Bird $TAG"
-            PRERELEASE=""
-          else
-            TAG="build/$VERSION_NAME"
-            TITLE="Speedy Bird v${VERSION_NAME}"
-            PRERELEASE=""
-          fi
-
-          BODY="Automated release built from commit [\`${COMMIT_SHA}\`](https://github.com/${GH_REPO}/commit/${COMMIT_SHA}).
-
-          ### Downloads
-
-          | Platform | File | Size | Notes |
-          |----------|------|------|-------|
-          | Android | \`${APK_FILE}\` | ${APK_SIZE} | Signed release APK — install directly on device |
-
-          ### Build Info
-
-          | Field | Value |
-          |-------|-------|
-          | Version | \`${VERSION_NAME}\` |
-          | Version Code | \`${VERSION_CODE}\` |
-          | Commit | [\`${SHORT_SHA}\`](https://github.com/${GH_REPO}/commit/${COMMIT_SHA}) |
-          | Lynx SDK | 3.7.0 |
-          | Min Android | API 21 (5.0 Lollipop) |
-
-          > **[Play the web version](https://jonathanperis.github.io/speedy-bird-lynx/)** if you don't have an Android device."
-
-          gh release create "$TAG" \
-            --title "$TITLE" \
-            --notes "$BODY" \
-            $PRERELEASE \
-            "android/app/build/outputs/apk/release/$APK_FILE"
+          name: android-apk
+          path: ${{ runner.temp }}/speedy-bird-*.apk
+          if-no-files-found: error
+          retention-days: 30

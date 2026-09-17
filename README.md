@@ -1,139 +1,121 @@
 # speedy-bird-lynx
 
-> Flappy Bird clone built with ReactLynx and TypeScript — runs on Android and Web from a single codebase, with iOS host source included for Xcode project setup
+> A Flappy Bird-inspired arcade game and cross-platform learning sandbox: one deterministic TypeScript simulation, ReactLynx and Canvas renderers, native bridges, and verifiable build artifacts.
 
-[![Build Check](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/ci.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/ci.yml) [![Release](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/release.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/release.yml) [![CodeQL](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/codeql.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/codeql.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Build Check](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/ci.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/codeql.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/codeql.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**[Live demo →](https://jonathanperis.github.io/speedy-bird-lynx/)** | **[Documentation →](https://jonathanperis.github.io/speedy-bird-lynx/docs/)**
+**[Play](https://jonathanperis.github.io/speedy-bird-lynx/)** · **[Manual](https://jonathanperis.github.io/speedy-bird-lynx/docs/)** · **[Learning labs](https://jonathanperis.github.io/speedy-bird-lynx/docs/learning-labs/)**
 
----
+## Learn by changing something observable
 
-## About
+Fly through pipes; each pipe that leaves the screen adds a point and increases world speed by 1%. Bronze/silver/gold/platinum medals unlock at 10/25/50/100 points.
 
-[Lynx](https://lynxjs.org/) is an open-source cross-platform native UI framework created by ByteDance. It uses a native C++ rendering engine (not a WebView) and a dual-threaded architecture where React reconciliation runs on a background thread while the main thread handles native rendering and touch events. This project is a Flappy Bird clone that demonstrates how to build a complete game with ReactLynx, covering element-based rendering, 60 FPS state updates, touch input, asset loading, and automated CI/CD pipelines. Android and the web preview are ready to run from the checked-in project; iOS source files are included, but an Xcode project/workspace must be created locally before building.
+Open the learning controls to pause, single-step, replay a run, enable hitboxes, inspect velocity/tick timing, or try a slower, wider-gap practice mode. The Canvas cabinet also accepts a random seed. Best score and preferences persist locally through the host adapter.
 
-## Tech Stack
+This project explores rendering, simulation, native interoperability, assets, accessibility, and delivery. The engine stays small enough to read; experiments have explicit boundaries and verification commands.
 
-| Technology | Version | Purpose |
-|-----------|---------|---------|
-| [ReactLynx](https://lynxjs.org/) | 0.119.0 | Cross-platform native UI framework |
-| [React](https://react.dev/) | 18.3.1 | Component model and hooks |
-| [TypeScript](https://www.typescriptlang.org/) | 6.0.3 | Type-safe application code |
-| [Rspack / rspeedy](https://rspack.dev/) | 0.14.3 | Build toolchain with HMR |
-| Android (Kotlin) | Lynx SDK 3.7.0 | Native Android host app |
-| iOS (Swift + CocoaPods) | Lynx SDK 3.7.0 | Native iOS host app |
-| GitHub Actions | — | CI/CD build, sign, deploy, release |
+## Toolchain
 
-## Features
+| Component | Version |
+|---|---|
+| ReactLynx | **0.126.1** |
+| ReactLynx build plugin / Rspeedy | **0.20.2 / 0.17.2** |
+| Lynx for Web / web elements | **0.26.1 / 0.12.11** |
+| Native Lynx SDK / PrimJS | **4.1.0 / 4.1.1** |
+| Bundle engineVersion | **3.9**, current compiler's supported maximum |
+| TypeScript | **6.0.3**, within Rspeedy's supported range |
+| Astro | **7.3.3** |
+| Bun | **1.3.12** |
+| Node | `.node-version` (26.0.0); tools require >=22.12 |
 
-- Tap/click to flap in the ReactLynx app; the GitHub Pages canvas demo also supports Space
-- Speed increases 1% per pipe cleared
-- Medal system: Bronze (10+), Silver (25+), Gold (50+), Platinum (100+)
-- Element-based rendering using `<view>` and `<image>` with CSS transforms (no canvas)
-- Tile-based pipe construction to avoid sprite stretching
-- Parallax scrolling background and ground layers
-- Sprite-based digit rendering for in-game score
-- AABB collision detection with circular bird hitbox approximation
-- Audio support via web `HTMLAudioElement`; native builds include stubs and continue without sound until an Android/iOS `AudioModule` is implemented and registered
-- Astro-powered GitHub Pages site in `docs/`, including a playable canvas demo and generated wiki pages
+See [ReactLynx upgrade notes](docs/wiki/reactlynx-upgrade.md) for breaking changes and applicability decisions. Framework, native engine, and bundle-format versions are separate contracts.
 
-## Getting Started
+## Quick start
 
-### Prerequisites
-
-- **Bun** for the root ReactLynx/Rspeedy app (`bun install`, `bun run dev`, `bun run build`)
-- **Node.js** >=22.12 for the Astro 7 documentation site in `docs/` (`npm run dev/build/preview`)
-- **Java 17** and **Android SDK** (for Android builds)
-- **Xcode 15+** and **CocoaPods** (for iOS builds after creating the Xcode project from the included source scaffold)
-
-### Quick Start
-
-```bash
-git clone https://github.com/jonathanperis/speedy-bird-lynx.git
-cd speedy-bird-lynx
-bun install
-bun run dev
-```
-
-Open in [Lynx Explorer](https://github.com/lynx-family/lynx) or [Lynx Go](https://apps.apple.com/us/app/lynx-go-dev-explorer/id6743227790) at `http://<your-ip>:3000/main.lynx.bundle`.
-
-```bash
+```sh
+bun install --frozen-lockfile
+bun run check
+bun run test
 bun run build
+bun run assets:check
 ```
 
-Outputs `dist/main.lynx.bundle` (native) and `dist/main.web.bundle` (web).
+### Choose a game surface
 
-### Documentation Site
+| Surface | Command | Purpose |
+|---|---|---|
+| Native bundle / built-in Lynx preview | `bun run dev` | HMR server on :3000; Explorer must support engine >=3.9 |
+| Complete standalone Lynx web host | `bun run build`, then `bun run dev:web` | :4000, including worker-to-browser sound/storage bridge and keyboard controls |
+| Public Canvas cabinet and manual | Commands below | Astro site with learning panel, same simulation, 400×600 world |
 
-The public GitHub Pages site lives in `docs/`. It uses Astro 7, so run it with Node.js >=22.12:
-
-```bash
-cd docs
-bun install
+```sh
+# From docs/
+bun install --frozen-lockfile
 npm run dev
+npm run check
 npm run build
 npm run preview
 ```
 
-The docs build writes static output to `docs/out/`; the `deploy.yml` workflow publishes that output to GitHub Pages through the shared reusable Pages workflow.
+Use Node to execute Astro. The production site lives under `/speedy-bird-lynx/` and builds to `docs/out/`.
 
-### Web Surfaces
+The native/Lynx world is 400×750 and scales to fit its host. For a strict renderer comparison, use identical world configurations. Explorer's generic host does not provide this app's audio/storage module; the UI reports that capability gap. The standalone host can load another bundle using `?bundle=http://localhost:3000/main.web.bundle`.
 
-There are three web-related surfaces in the repository:
+## Native hosts
 
-| Surface | Location | Purpose |
-|---------|----------|---------|
-| ReactLynx web preview | `bun run dev`, then `http://localhost:3000/__web_preview?casename=main.web.bundle` | Development preview of the compiled `main.web.bundle` |
-| GitHub Pages canvas demo | `docs/src/pages/index.astro` | Public playable browser demo; it mirrors the game physics but uses a 400x600 viewport to fit the phone frame |
-| Standalone web host | `web-host/` + `rsbuild.web-host.config.ts` | Advanced/dev-only host that renders `main.web.bundle` inside `<lynx-view>`; it expects the bundle URL configured in `web-host/index.html` |
+### Android — Java 17+, Android SDK 34
 
-## Project Structure
-
-```
-src/
-├── App.tsx                    # Root component, fullscreen game
-├── hooks/useGameEngine.ts     # Game loop, physics, collision, scoring
-├── components/
-│   ├── Bird.tsx               # Animated bird with rotation
-│   ├── Pipe.tsx               # Tile-based pipes (no stretching)
-│   ├── Background.tsx         # Parallax scrolling background
-│   ├── Ground.tsx             # Scrolling ground layer
-│   ├── ScoreDisplay.tsx       # Sprite-based digit rendering
-│   ├── GetReadyScreen.tsx     # Start screen overlay
-│   └── GameOverScreen.tsx     # Game over with medals
-├── audio/audio.ts             # Audio module (web + native stubs)
-├── constants.ts               # All game constants
-└── types.ts                   # TypeScript types
-
-android/                       # Native Android host app (Kotlin)
-ios/                           # Native iOS host app (Swift)
-assets/                        # Sprites, audio, medals, digits
-docs/                          # Astro GitHub Pages site + playable canvas demo
-.github/workflows/             # CI/CD pipelines
+```sh
+bun run build
+# From android/
+./gradlew lintDebug assembleDebug
+# From the repository root
+python3 scripts/verify-apk.py android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-## CI/CD
+Debug APKs are signed and installable. Release signing uses `KEYSTORE_FILE`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD`; release publishing distinguishes those builds from sandbox debug signing. SDK-generated debug keys may differ between CI runs.
 
-| Workflow | File | Trigger | Description |
-|----------|------|---------|-------------|
-| Build Check | `ci.yml` | Manual, push to `main`/`lynx-migration`, PR to `main` | Type-check (`tsc --noEmit`) and build Lynx bundles; no unit-test framework is configured yet |
-| CodeQL | `codeql.yml` | Push/PR to `main`, weekly | Security and quality analysis |
-| Deploy Web | `deploy.yml` | Push to `main`, manual | Build and deploy the Astro `docs/` site to GitHub Pages via the shared Pages workflow |
-| Build Android | `build-android.yml` | Push to `main`, `v*` tags, manual | Build release APK, sign when secrets are configured, create GitHub Release |
-| Build iOS | `build-ios.yml` | `v*` tags, manual | Build iOS archive (unsigned without Apple Developer Program) |
-| Release | `release.yml` | `v*` tags, manual | Full release pipeline: build + Android + iOS + GitHub Release |
+### iOS — iOS 15+, Xcode, Ruby 3.3+, Bundler
 
-### Release Artifact Matrix
+```sh
+bun run build
+# From ios/
+bundle install
+bundle exec ruby ../scripts/generate-ios-project.rb
+bundle exec pod install --deployment
+open SpeedyBird.xcworkspace
+```
 
-| Artifact | How it is produced | Signing/status |
-|----------|--------------------|----------------|
-| Local Android debug APK | `bun run build`, copy `dist/main.lynx.bundle` into Android assets, then `cd android && ./gradlew assembleDebug` | Debug-signed by Android tooling; intended for local install/testing |
-| CI Android build APK | `build-android.yml` on `main`, tags, or manual dispatch | Release build; signed only when keystore secrets are configured |
-| Tagged Android release APK | `build-android.yml` or `release.yml` on `v*` tags | Attached to the GitHub Release; signed when `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD` are configured |
-| iOS archive | `build-ios.yml` or `release.yml` | Source scaffold only until an Xcode project and Apple signing assets are configured; unsigned archives are expected without Apple Developer Program setup |
+The host project and shared scheme are generated from checked-in Ruby configuration; `Gemfile.lock` and `Podfile.lock` pin dependencies. Audio resources and the game bundle are packaged by the root build. An unsigned archive is useful for inspection and subsequent signing, but is not an installable IPA.
 
-Current quality gates are TypeScript type-checking, production bundle builds, CodeQL, and Pages deployment. Unit tests, browser smoke tests, and lint/format checks are not configured yet.
+## Architecture
 
-## License
+```text
+src/game/             framework-independent physics, geometry, clock, replay, preferences
+src/hooks/            ReactLynx scheduling and native lifecycle integration
+src/components/       native-element sprite renderer and learning controls
+src/platform/         browser audio/storage and required image loading
+docs/src/game/        Canvas renderer + accessible browser controller
+web-host/             Lynx web runtime and worker/host native-module bridge
+android/ and ios/     host initialization, sound, storage, lifecycle
+scripts/              deterministic packaging, artifact checks, iOS project generation
+tests/                behavior and delivery-contract tests
+```
 
-MIT — see [LICENSE](LICENSE)
+Sprites are embedded in both bundles. Native WAVs are packaged by deterministic name. `assets/` is canonical; `bun run assets:sync` copies game resources into the public site, and `assets:check` verifies parity and bundle inclusion. See [asset notes](docs/wiki/assets-and-sprites.md) for extraction/provenance.
+
+## Verification and delivery
+
+- **Build Check:** frozen installs, core type checks/tests, native/web bundle build, asset checks, standalone web-host build, docs type check/build.
+- **Android:** PR/API compatibility lint, reusable builds, debug or explicitly configured release signing, APK signature/resource validation.
+- **iOS:** reproducible project generation and a real unsigned archive build; missing artifacts fail the workflow.
+- **Release:** the sole publisher, after checks and both native builds succeed. Manual snapshots are prereleases. Archives include the complete resource payload.
+- **Pages:** pinned-toolchain static deployment after game tests and docs checks. **CodeQL:** JavaScript/TypeScript analysis.
+
+Build success is distinct from device playtesting and performance measurement. [Learning labs](docs/wiki/learning-labs.md) explain replay-based profiling and platform checks.
+
+## License and credits
+
+Application source: [MIT](LICENSE). Sprites/audio originate from third-party Flappy Bird resource collections; see [asset provenance](docs/wiki/assets-and-sprites.md). Historical migration specifications are retained under `.specs/` with archive notices; the maintained behavior contract is code, tests, and the manual.

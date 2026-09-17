@@ -1,4 +1,5 @@
 import { CANVAS_HEIGHT } from '../constants.js';
+import { medalForScore } from '../game/engine.js';
 import gameOverSrc from '../../assets/sprites/game-over.png';
 import medalBronze from '../../assets/sprites/medals/medal-bronze.png';
 import medalSilver from '../../assets/sprites/medals/medal-silver.png';
@@ -10,11 +11,8 @@ const IMG_H = 158;
 const MEDAL_SIZE = 44;
 
 function getMedalSrc(score: number): string | null {
-  if (score >= 100) return medalPlatinum;
-  if (score >= 50) return medalGold;
-  if (score >= 25) return medalSilver;
-  if (score >= 10) return medalBronze;
-  return null;
+  const medal = medalForScore(score);
+  return medal ? { bronze: medalBronze, silver: medalSilver, gold: medalGold, platinum: medalPlatinum }[medal] : null;
 }
 
 interface GameOverScreenProps {

@@ -13,6 +13,10 @@ export default defineConfig({
     port: 4000,
   },
   output: {
+    copy: [
+      { from: './assets/audio', to: 'assets/audio' },
+      { from: './dist/main.web.bundle', to: 'main.web.bundle' },
+    ],
     distPath: {
       root: 'dist-web-host',
     },

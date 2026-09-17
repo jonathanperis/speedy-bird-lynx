@@ -49,19 +49,20 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    androidResources { noCompress += "wav" }
 }
 
 dependencies {
     // Lynx core
-    implementation("org.lynxsdk.lynx:lynx:3.7.0")
-    implementation("org.lynxsdk.lynx:lynx-jssdk:3.7.0")
-    implementation("org.lynxsdk.lynx:lynx-trace:3.7.0")
-    implementation("org.lynxsdk.lynx:primjs:3.7.0")
+    implementation("org.lynxsdk.lynx:lynx:4.1.0")
+    implementation("org.lynxsdk.lynx:lynx-jssdk:4.1.0")
+    implementation("org.lynxsdk.lynx:lynx-trace:4.1.0")
+    implementation("org.lynxsdk.lynx:primjs:4.1.1")
 
     // Lynx services
-    implementation("org.lynxsdk.lynx:lynx-service-image:3.7.0")
-    implementation("org.lynxsdk.lynx:lynx-service-log:3.7.0")
-    implementation("org.lynxsdk.lynx:lynx-service-http:3.7.0")
+    implementation("org.lynxsdk.lynx:lynx-service-image:4.1.0")
+    implementation("org.lynxsdk.lynx:lynx-service-log:4.1.0")
+    implementation("org.lynxsdk.lynx:lynx-service-http:4.1.0")
 
     // Image loading (required by lynx-service-image)
     implementation("com.facebook.fresco:fresco:2.3.0")
@@ -70,10 +71,6 @@ dependencies {
     implementation("com.facebook.fresco:webpsupport:2.3.0")
     implementation("com.facebook.fresco:animated-base:2.3.0")
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
-
-    // Extended elements
-    implementation("org.lynxsdk.lynx:xelement:3.7.0")
-    implementation("org.lynxsdk.lynx:xelement-input:3.7.0")
 
     // Gson (required by Lynx SDK internals)
     implementation("com.google.code.gson:gson:2.10.1")

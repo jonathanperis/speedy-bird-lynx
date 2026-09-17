@@ -15,6 +15,8 @@ The page should work first as a playable arcade surface and second as a credible
 
 ## Product Purpose
 
+The repository is also a learning sandbox: a small shared simulation supports renderer comparisons, deterministic replay, native bridges, accessibility experiments, and release engineering. Learning features should expose measurable behavior and keep the reference implementation understandable. The arcade landing page remains play-first, with experiments in the service panel and builder's manual.
+
 Speedy Bird is a Flappy Bird-inspired arcade game built with ReactLynx and TypeScript. Its product hook is simple: every pipe cleared increases the game speed, turning a familiar side-scroller into an escalating reflex challenge.
 
 The website exists to:

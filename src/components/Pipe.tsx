@@ -1,120 +1,25 @@
-import { PIPE_W, PIPE_H, PIPE_GAP } from '../constants.js';
+import { memo } from '@lynx-js/react';
+import { PIPE_W, PIPE_H, GROUND_H } from '../constants.js';
 import pipeTopBody from '../../assets/sprites/pipes/pipe-top.png';
 import pipeTopMouth from '../../assets/sprites/pipes/pipe-top-mouth.png';
 import pipeBottomBody from '../../assets/sprites/pipes/pipe-bottom.png';
 import pipeBottomMouth from '../../assets/sprites/pipes/pipe-bottom-mouth.png';
 
-const TILE_H = Math.round(25 * (PIPE_W / 26)); // ~53px display height per tile
+const TILE_H = Math.round(25 * PIPE_W / 26);
+const PipeTiles = memo(function PipeTiles({ y, gap, height }: { y: number; gap: number; height: number }) {
+  const mouthY = y + PIPE_H - TILE_H;
+  const bottomY = y + PIPE_H + gap;
+  const tiles: { key: string; src: string; top: number }[] = [
+    { key: 'top-mouth', src: pipeTopMouth, top: mouthY },
+    { key: 'bottom-mouth', src: pipeBottomMouth, top: bottomY },
+  ];
+  for (let top = mouthY - TILE_H; top > -TILE_H; top -= TILE_H) tiles.push({ key: `top-${top}`, src: pipeTopBody, top });
+  for (let top = bottomY + TILE_H; top < height - GROUND_H; top += TILE_H) tiles.push({ key: `bottom-${top}`, src: pipeBottomBody, top });
+  return <>{tiles.map(tile => <image key={tile.key} src={tile.src} style={{ position: 'absolute', left: '0px',
+    top: `${tile.top}px`, width: `${PIPE_W}px`, height: `${TILE_H + (tile.key.endsWith('mouth') ? 0 : 1)}px` }} />)}</>;
+});
 
-interface PipeProps {
-  x: number;
-  y: number;
-}
-
-export default function Pipe({ x, y }: PipeProps) {
-  // Top pipe: collision box from y to y+PIPE_H
-  // Mouth sits at the bottom of the collision box
-  // Body fills above the mouth, extending past top of screen
-  const topMouthY = y + PIPE_H - TILE_H; // mouth bottom edge = y + PIPE_H
-  const topTiles = [];
-
-  // Fill body tiles from mouth upward, well past screen top
-  const topBodyCount = Math.ceil((PIPE_H + 400) / TILE_H); // enough to overflow screen
-  for (let i = 0; i < topBodyCount; i++) {
-    topTiles.push(
-      <image
-        key={`tb${i}`}
-        src={pipeTopBody}
-        style={{
-          position: 'absolute',
-          top: `${topMouthY - (i + 1) * TILE_H}px`,
-          left: '0px',
-          width: `${PIPE_W}px`,
-          height: `${TILE_H + 1}px`,
-        }}
-      />
-    );
-  }
-  // Mouth at the exact collision boundary
-  topTiles.push(
-    <image
-      key="tm"
-      src={pipeTopMouth}
-      style={{
-        position: 'absolute',
-        top: `${topMouthY}px`,
-        left: '0px',
-        width: `${PIPE_W}px`,
-        height: `${TILE_H}px`,
-      }}
-    />
-  );
-
-  // Bottom pipe: collision box from (y+PIPE_H+PIPE_GAP) downward
-  // Mouth sits at the top of the collision box
-  // Body fills below the mouth, extending past ground
-  const bottomY = y + PIPE_H + PIPE_GAP;
-  const bottomTiles = [];
-
-  // Mouth at top
-  bottomTiles.push(
-    <image
-      key="bm"
-      src={pipeBottomMouth}
-      style={{
-        position: 'absolute',
-        top: '0px',
-        left: '0px',
-        width: `${PIPE_W}px`,
-        height: `${TILE_H}px`,
-      }}
-    />
-  );
-  // Body tiles extending down past ground
-  const bottomBodyCount = Math.ceil((PIPE_H + 400) / TILE_H);
-  for (let i = 0; i < bottomBodyCount; i++) {
-    bottomTiles.push(
-      <image
-        key={`bb${i}`}
-        src={pipeBottomBody}
-        style={{
-          position: 'absolute',
-          top: `${(i + 1) * TILE_H}px`,
-          left: '0px',
-          width: `${PIPE_W}px`,
-          height: `${TILE_H + 1}px`,
-        }}
-      />
-    );
-  }
-
-  return (
-    <view
-      style={{
-        position: 'absolute',
-        top: '0px',
-        left: '0px',
-        width: `${PIPE_W}px`,
-        height: '100%',
-        zIndex: 1,
-        transform: `translateX(${x}px)`,
-      }}
-    >
-      {/* Top pipe — positioned absolutely, tiles overflow upward */}
-      {topTiles}
-
-      {/* Bottom pipe */}
-      <view
-        style={{
-          position: 'absolute',
-          top: `${bottomY}px`,
-          left: '0px',
-          width: `${PIPE_W}px`,
-          height: `${(bottomBodyCount + 1) * TILE_H}px`,
-        }}
-      >
-        {bottomTiles}
-      </view>
-    </view>
-  );
+export default function Pipe({ x, y, gap, height }: { x: number; y: number; gap: number; height: number }) {
+  return <view style={{ position: 'absolute', top: '0px', left: '0px', width: `${PIPE_W}px`, height: '100%', zIndex: 1,
+    transform: `translateX(${x}px)` }}><PipeTiles y={y} gap={gap} height={height} /></view>;
 }

@@ -2,6 +2,7 @@ export const SECTION_CATEGORIES = [
   { label: "", ids: ["home"] },
   { label: "Overview", ids: ["about-lynx", "architecture"] },
   { label: "Engine", ids: ["game-engine", "assets-and-sprites"] },
+  { label: "Learning", ids: ["learning-labs", "reactlynx-upgrade"] },
   { label: "Deploy", ids: ["getting-started", "native-host-apps", "ci-cd-pipeline"] },
 ] as const;
 

@@ -1,6 +1,6 @@
 # Speedy Bird Lynx
 
-Flappy Bird clone built with [ReactLynx](https://lynxjs.org/) and TypeScript. The checked-in project runs on Android and Web from a single codebase and includes iOS host source files for Xcode project setup. Lynx uses a native C++ rendering engine and dual-threaded architecture instead of a WebView.
+An arcade game and learning sandbox built with [ReactLynx](https://lynxjs.org/) and TypeScript. Canvas and native-element renderers share deterministic physics, geometry, and replay. Android and iOS hosts implement audio, storage, and lifecycle integration; the iOS project is generated from checked-in configuration.
 
 ## Wiki Pages
 
@@ -13,16 +13,19 @@ Flappy Bird clone built with [ReactLynx](https://lynxjs.org/) and TypeScript. Th
 | [Game Engine](game-engine) | Physics, collision detection, state machine, scoring, and the game loop |
 | [Getting Started](getting-started) | Setup, dev server, production builds, and platform-specific instructions |
 | [Native Host Apps](native-host-apps) | Android and iOS native shells that embed the Lynx runtime |
+| [Learning Labs](learning-labs) | Inspect collisions, replay a seed, compare renderers, and trace native calls |
+| [ReactLynx Upgrade](reactlynx-upgrade) | Compatible versions and applicability of new features |
 
 ## Key Features
 
-- Tap/click to flap in the ReactLynx app; the GitHub Pages canvas demo also supports Space
+- Tap/click to flap; browser surfaces support scoped keyboard input and semantic controls
 - Speed increases 1% per pipe cleared
 - Medal system: Bronze (10+), Silver (25+), Gold (50+), Platinum (100+)
-- Element-based rendering with CSS transforms (no canvas)
+- Compare native-element transforms with Canvas drawing over the same simulation
 - Tile-based pipe construction and parallax scrolling
 - AABB collision detection with circular hitbox approximation
-- Automated CI/CD for type-checking, bundle builds, CodeQL, Pages deployment, and release artifacts
+- Pause, single-step, deterministic replay, practice mode, hitboxes, and local preferences
+- Automated behavior/type/build/asset checks and single-owner release publishing
 
 ---
 

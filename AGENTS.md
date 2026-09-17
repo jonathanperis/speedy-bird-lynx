@@ -1,166 +1,59 @@
 # Speedy Bird Lynx — Agent Guide
 
-Harness-neutral operating guide for automated coding agents working in this repository.
+Cross-platform arcade game and learning sandbox. Prioritize readable boundaries, observable experiments, and evidence-backed platform claims.
 
-Cross-platform Flappy Bird clone built with ReactLynx + TypeScript. The checked-in project runs on Android and Web from a single codebase; iOS host source is included, but an Xcode project/workspace must be created locally before building.
+## Stack and commands
 
-**Play online:** https://jonathanperis.github.io/speedy-bird-lynx/
-
-**Docs:** https://jonathanperis.github.io/speedy-bird-lynx/docs/
-
----
-
-## Tech Stack
-
-| Technology | Version | Purpose |
-|-----------|---------|---------|
-| ReactLynx | 0.119.0 | Cross-platform native UI framework |
-| React | 18.3.1 | Component model and hooks |
-| TypeScript | 6.0.3 | Type-safe source code |
-| RSpeedy / Rspack | 0.14.3 | Lynx bundler with HMR |
-| Rsbuild | 2.0.0 | Web build target |
-| Lynx SDK | 3.7.0 | Native runtime types and Android/iOS hosts |
-
----
-
-## Build Commands
-
-Use Bun for root ReactLynx/Rspeedy installs and command examples because the root lockfile and CI use Bun. Use Node.js >=22.12 with npm scripts for the Astro 7 docs site in `docs/`.
+- ReactLynx 0.126.1, plugin 0.20.2, Rspeedy 0.17.2, TypeScript 6.0.3.
+- Lynx for Web 0.26.1; native SDK/types 4.1.0 and PrimJS 4.1.1.
+- Bundle `engineVersion` is 3.9: the stable encoder does not accept 4.1.
+- Bun 1.3.12; Node pinned in `.node-version`. Execute Astro 7.3.3 through Node/npm.
 
 ```sh
-bun install --frozen-lockfile       # Install exact dependencies
-bun run dev                         # Dev server with HMR on :3000
-bunx tsc --noEmit                   # Type check only
-bun run build                       # Production build
-```
-
-`bun run build` emits `dist/main.lynx.bundle` for native hosts and `dist/main.web.bundle` for web-preview tooling.
-
-### Android
-
-```sh
+bun install --frozen-lockfile
+bun run check
+bun run test
 bun run build
-cp dist/main.lynx.bundle android/app/src/main/assets/
-cd android && ./gradlew assembleDebug
-cd android && ./gradlew assembleRelease
+bun run assets:check
+bun run build:web-host
 ```
 
-The Android workflow signs release builds only when signing secrets are configured.
+From `docs/`: `bun install --frozen-lockfile`, `npm run check`, `npm run build`.
 
-### iOS
+Android: build root first, then `./gradlew lintDebug assembleDebug` in `android/`; validate with `scripts/verify-apk.py`. Java 17+/SDK 34, minimum API 21. Compilation alone does not prove minimum-API compatibility.
 
-```sh
-bun run build
-cp dist/main.lynx.bundle ios/SpeedyBird/Resources/
-cd ios && pod install
-# Open SpeedyBird.xcworkspace in Xcode when a local Xcode project is present.
-```
+iOS: Ruby 3.3+, `bundle install` in `ios/`, `bundle exec ruby ../scripts/generate-ios-project.rb`, `bundle exec pod install --deployment`, then use the generated workspace/shared scheme. iOS minimum 15. Project/Pods are generated; lockfiles are tracked.
 
-The iOS workflow currently guards on the presence of an Xcode project and builds unsigned unless signing is configured.
+## Architecture and contracts
 
----
+- `src/game/engine.ts`: pure fixed-step physics, seeded randomness, geometry, scoring, immutable snapshots and sound events.
+- `src/game/session.ts`: elapsed-time accumulation, bounded catch-up, pause and tick-indexed replay.
+- `src/hooks/useGameEngine.ts`: ReactLynx timer, snapshot publication, host events and background-only side effects.
+- `src/components/`: native-element renderer; pipe tiles are memoized separately from translation.
+- `docs/src/game/`: Canvas renderer/controller over the same simulation.
+- `src/platform/browser.ts`: browser audio/storage and required-image loading.
+- Native `SpeedyBirdModule`: sound/preferences; host lifecycle pauses and releases resources.
+- `web-host/`: complete Lynx browser host, native-module worker bridge and semantic HTML controls.
 
-## Architecture
+Native world: 400×750 with viewport fitting. Canvas cabinet: explicit 400×600 configuration. Compare identical configurations for renderer parity. Every visible pipe body collides through the ground. Score remains awarded on pipe exit; medals remain 10/25/50/100. Standard flap/gravity remain 7.25/0.28 per fixed step.
 
-```text
-App (root, fullscreen, tap/click listener)
-├── Background (z:0, parallax @ 0.2px/frame, tiled)
-├── Pipe[] (z:1, tile-based, scroll @ 2.7px/frame + speed scaling)
-├── Bird (z:2, animated sprite with rotation)
-├── Ground (z:3, scroll matches pipe speed)
-├── ScoreDisplay (z:4, sprite-based digits)
-├── GetReadyScreen (z:5, overlay on STATE_READY)
-└── GameOverScreen (z:5, overlay on STATE_OVER with medals)
-```
+Use documented `NativeModules` only on the background thread. ReactLynx 0.126 effect cleanup is after-paint; lifecycle pauses are explicit. First-frame scenery stays available; learning controls use `<background-only>`.
 
-ReactLynx runs React work off the main rendering thread. Keep per-frame physics in refs and push only render snapshots through React state.
+## Assets and verification
 
----
+`assets/` is canonical. Root build embeds all PNGs and prepares named native WAV resources. Docs build synchronizes game assets; `assets:check` verifies bundle inclusion and byte parity. Never distribute only a bundle that references missing resources.
 
-## Key Patterns
+Tests focus on state/geometry/replay, loading/input/lifecycle boundaries, and release ownership. Type-checking and compilation do not prove device gameplay, audio, accessibility, or performance. Record unexecuted checks explicitly. Use measured replays before replacing readable React snapshots with imperative rendering.
 
-- **`useGameEngine` hook**: Core game loop, physics, collision, scoring, and state transitions.
-- **`useRef` for mutable state**: Physics engine state should not trigger every-frame React re-renders.
-- **`useState` for render snapshots**: Keep render state minimal and explicit.
-- **CSS transforms**: Movement uses `transform: translate(...)` rather than layout recalculation.
-- **State machine**: `STATE_READY` → `STATE_PLAY` → `STATE_OVER`.
-- **AABB collision**: Uses a circular bird hitbox approximation.
-- **Audio abstraction**: Web `HTMLAudioElement` implementation plus native module stubs.
-- **Controls**: ReactLynx app uses tap/click to flap. The GitHub Pages canvas demo also supports Space.
+The manual in `docs/wiki/` is maintained documentation. Older tracked migration specs carry historical notices; the ignored `.specs/SPEC.md` is the active task plan when present.
 
----
+## CI and repository conventions
 
-## Project Structure
-
-```text
-speedy-bird-lynx/
-├── src/
-│   ├── index.tsx                    # Entry point
-│   ├── App.tsx                      # Root component + tap/click handler
-│   ├── types.ts                     # GameState enum, PipeData, SoundName
-│   ├── constants.ts                 # Physics, dimensions, colors
-│   ├── hooks/useGameEngine.ts       # Core game loop + physics
-│   ├── components/                  # Bird, Pipe, Background, Ground, etc.
-│   └── audio/audio.ts               # Audio abstraction layer
-├── android/                         # Native Android host (Kotlin)
-├── ios/                             # Native iOS host (Swift/CocoaPods scaffold)
-├── assets/sprites/                  # PNG sprites (bird, pipes, medals, digits)
-├── assets/audio/                    # WAV sound effects
-├── docs/                            # Astro GitHub Pages site + playable canvas demo
-├── web-host/                        # Advanced/dev-only standalone <lynx-view> host
-├── lynx.config.ts                   # Lynx build config
-├── rsbuild.web-host.config.ts       # Web host build config
-├── tsconfig.json                    # strict: true, react-jsx
-├── AGENTS.md                        # Standardized agent instructions
-├── .agents/                         # Standardized agent memory/instrumentation
-└── .github/workflows/               # CI/CD workflows
-```
-
----
-
-## Game Constants
-
-| Constant | Value | Purpose |
-|---------|-------|---------|
-| `BIRD_FLAP` | `7.25` | Upward velocity impulse |
-| `BIRD_GRAVITY` | `0.28` | Downward acceleration |
-| `PIPE_DX` | `2.7` | Base pipe scroll speed |
-| `PIPE_GAP` | `150` | Space between top and bottom pipes |
-| `PIPE_SPAWN_INTERVAL` | `77` frames | Pipe spawn cadence |
-| `BG_DX` | `0.2` | Parallax background speed |
-| Medal thresholds | 10/25/50/100 | Bronze/Silver/Gold/Platinum |
-
----
-
-## CI/CD
-
-| Workflow | File | Trigger | Actions |
-|----------|------|---------|---------|
-| Build Check | `ci.yml` | Manual, push to `main`/`lynx-migration`, PR to `main` | `bunx tsc --noEmit` + `bun run build` |
-| CodeQL | `codeql.yml` | Push/PR to `main`, weekly | Security & quality analysis |
-| Deploy Web | `deploy.yml` | Push to `main`, manual | Reusable GitHub Pages docs deploy for `docs/` |
-| Build Android | `build-android.yml` | Push to `main`, `v*` tags, manual | Build release APK, sign if secrets exist, create release |
-| Build iOS | `build-ios.yml` | `v*` tags, manual | Build unsigned archive when Xcode project exists |
-| Release | `release.yml` | `v*` tags, manual | Full artifact/release pipeline |
-
----
-
-## Git & GitHub Conventions
-
-- **Branch + PR workflow**: All changes go through a branch and PR. Never push directly to main.
-- **Rebase-only merges**: Linear history is enforced. Do not use merge commits or squash merges.
-- **Use `gh` CLI**: Prefer `gh` for repository, PR, issue, release, and checks operations.
-- **Repo-wide files**: `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, issue/PR templates, `CODEOWNERS`, and `FUNDING.yml` live in the centralized `.github` repo; do not create duplicates here.
-- **Branch protection**: `main` has required linear history enabled and force pushes disabled.
-- **Release tags**: Semver `v*` tags trigger the release pipeline.
-- **Build tags**: `build/0.0.0-{sha}` tags are created by Android CI on main pushes.
-
----
-
-## Code Quality Notes
-
-- **TypeScript strict mode**: Enabled; all code must pass `bunx tsc --noEmit`.
-- **No test framework yet**: Vitest is a natural fit if tests are added.
-- **No linter/formatter yet**: Biome is a good fit if formatting/linting is added.
-- **CodeQL**: Runs on every push/PR and weekly for security analysis.
-- **Dependabot**: Weekly updates for npm packages and GitHub Actions.
+- Build Check validates root/docs and packages complete distributions.
+- Android builds are debug-signed by default; release signing is explicit and requires all secrets.
+- iOS must build an actual unsigned archive; no successful skip when project setup is missing.
+- `release.yml` is the only publisher and depends on all build/check jobs. Manual snapshots are prereleases.
+- Pages pins the same toolchain and runs game/docs checks; CodeQL scans JavaScript/TypeScript.
+- Branch + PR workflow; never push directly to main. Rebase-only merges, no force pushes. Commit/push only when requested.
+- GitHub operations use `gh`.
+- Organization-wide policy/templates/CODEOWNERS belong in the central `.github` repository; do not add duplicates here.
