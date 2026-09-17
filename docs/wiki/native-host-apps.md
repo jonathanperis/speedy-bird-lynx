@@ -57,7 +57,8 @@ These are populated by CI from GitHub Secrets. For local release builds, export 
 |------------|------------------|--------|---------|
 | Local debug | `bun run build`, copy `dist/main.lynx.bundle` into `android/app/src/main/assets/`, then `cd android && ./gradlew assembleDebug` | `android/app/build/outputs/apk/debug/app-debug.apk` | Debug-signed by Android tooling |
 | Local release | Same bundle copy, then `cd android && ./gradlew assembleRelease` | `android/app/build/outputs/apk/release/` | Signed only when `KEYSTORE_FILE`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD` are exported |
-| CI release | `build-android.yml` on `main`, `v*` tags, or manual dispatch | APK artifact and GitHub Release attachment | Signed only when `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD` GitHub Secrets are configured |
+| CI main-build release | `build-android.yml` on `main` or manual dispatch from `main` | APK artifact followed by separate immutable build-release publication | Signed only when `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD` GitHub Secrets are configured |
+| Tagged release | `release.yml` on `v*` tags | Sole versioned-release publisher; assets uploaded before publication | Signed only when the same keystore secrets are configured |
 
 ## Native Audio Status
 
