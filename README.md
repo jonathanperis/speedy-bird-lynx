@@ -116,10 +116,10 @@ docs/                          # Astro GitHub Pages site + playable canvas demo
 
 | Workflow | File | Trigger | Description |
 |----------|------|---------|-------------|
-| Build Check | `ci.yml` | Manual, push to `main`/`lynx-migration`, PR to `main` | Type-check (`tsc --noEmit`) and build Lynx bundles; no unit-test framework is configured yet |
-| CodeQL | `codeql.yml` | Push/PR to `main`, weekly | Security and quality analysis |
+| Build Check | `ci.yml` | Manual, push to `main`/`lynx-migration`, PR to `main` | Dependency audits, type-check/bundle/docs builds, and unsigned Android compilation |
+| CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript and Actions security-and-quality analysis |
 | Deploy Web | `deploy.yml` | Push to `main`, manual | Build and deploy the Astro `docs/` site to GitHub Pages via the shared Pages workflow |
-| Build Android | `build-android.yml` | Push to `main`, `v*` tags, manual | Build release APK, sign when secrets are configured, create GitHub Release |
+| Build Android | `build-android.yml` | Push to `main`, manual from `main` | Read-only build/signing job followed by separate immutable build-release publication |
 | Build iOS | `build-ios.yml` | `v*` tags, manual | Build iOS archive (unsigned without Apple Developer Program) |
 | Release | `release.yml` | `v*` tags, manual | Full release pipeline: build + Android + iOS + GitHub Release |
 
@@ -128,11 +128,11 @@ docs/                          # Astro GitHub Pages site + playable canvas demo
 | Artifact | How it is produced | Signing/status |
 |----------|--------------------|----------------|
 | Local Android debug APK | `bun run build`, copy `dist/main.lynx.bundle` into Android assets, then `cd android && ./gradlew assembleDebug` | Debug-signed by Android tooling; intended for local install/testing |
-| CI Android build APK | `build-android.yml` on `main`, tags, or manual dispatch | Release build; signed only when keystore secrets are configured |
-| Tagged Android release APK | `build-android.yml` or `release.yml` on `v*` tags | Attached to the GitHub Release; signed when `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD` are configured |
+| CI Android build APK | `build-android.yml` on `main` or manual dispatch from `main` | Release build; signed only when keystore secrets are configured |
+| Tagged Android release APK | `release.yml` on `v*` tags | Attached to the immutable GitHub Release; signed when `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD` are configured |
 | iOS archive | `build-ios.yml` or `release.yml` | Source scaffold only until an Xcode project and Apple signing assets are configured; unsigned archives are expected without Apple Developer Program setup |
 
-Current quality gates are TypeScript type-checking, production bundle builds, CodeQL, and Pages deployment. Unit tests, browser smoke tests, and lint/format checks are not configured yet.
+Quality gates include dependency audits, TypeScript checks, bundle/docs builds, unsigned Android compilation, and CodeQL. Unit tests, browser smoke tests, and lint/format checks are not configured yet.
 
 ## License
 
