@@ -5,6 +5,7 @@
     "": {
       "name": "speedy-bird-lynx",
       "dependencies": {
+        "@lynx-js/lynx-core": "0.1.4",
         "@lynx-js/react": "^0.126.1",
         "@lynx-js/web-core": "^0.26.1",
         "@lynx-js/web-elements": "^0.12.11",
@@ -121,6 +122,8 @@
     "@lynx-js/debug-metadata": ["@lynx-js/debug-metadata@0.1.0", "", { "bin": { "debug-metadata": "./dist/cli.js" } }, "sha512-3N+Wgc/kIc4/aG5KpdPWKsC9MsNngygeyg9JS6IOayS8AQJ37xjVEzlz1U3aYzT9al0RJKL7w4poa0tGaXBv1g=="],
 
     "@lynx-js/debug-metadata-rsbuild-plugin": ["@lynx-js/debug-metadata-rsbuild-plugin@0.2.3", "", { "dependencies": { "@lynx-js/debug-metadata": "^0.1.0" }, "peerDependencies": { "@rsbuild/core": "^2.0.0" }, "optionalPeers": ["@rsbuild/core"] }, "sha512-fsSN9lGYHjmnL94rI9T8/HnOAM1VHAIGBgH6Stv+uUrAa7GiKuaytIu2dO6wZ0oGGzHFHPXmCmMNVbw5yQRWlQ=="],
+
+    "@lynx-js/lynx-core": ["@lynx-js/lynx-core@0.1.4", "", {}, "sha512-JxpAoDhpR8dJ6PFR2KOsFQyWt6SKiU+Bp701/miy5exqZHd+SlCd3UCfMtJy3nRlz3gy1O1xsObK7+x+jArdAQ=="],
 
     "@lynx-js/react": ["@lynx-js/react@0.126.1", "", { "dependencies": { "preact": "npm:@lynx-js/internal-preact@11.0.0-rc.1-20260903085447-f95471a" }, "peerDependencies": { "@lynx-js/types": "*", "@types/react": "^18 || ^19.0.0" }, "optionalPeers": ["@lynx-js/types"] }, "sha512-vb4FAznktLlL5Gqrw0RvGVONdm9sW4AmiqEhY695XD/Apv7j6Pc27oO4m3qxspjEg/PWpWNiwDpvKAgWTzm0Gw=="],
 
