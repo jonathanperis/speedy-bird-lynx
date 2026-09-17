@@ -1,5 +1,7 @@
 # Tasks: Lynx Port
 
+> Historical migration task list (March 2026), not an active implementation checklist. The port already exists and its constants/architecture differ from these early plans. See the [current manual](../../../docs/wiki/index.md).
+
 ## Task Dependency Graph
 
 ```

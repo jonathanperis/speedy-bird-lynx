@@ -3,4 +3,4 @@
 - [Architecture](architecture.md) — useGameEngine hook, dual-threaded Lynx model, CSS-based rendering
 - [Game Constants](game_constants.md) — Source-backed physics constants, build targets, Android signing behavior
 - [GitHub Config](project_github.md) — Branch protection, rulesets, CI/CD workflows, release strategy
-- [Code Health](project_codehealth.md) — No tests, no linting, minor code issues identified in the repo
+- [Code Health](project_codehealth.md) — Current build/site/APK gates, missing gameplay tests, and remaining implementation gaps

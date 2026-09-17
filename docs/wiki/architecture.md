@@ -48,13 +48,13 @@ App
 
 ## Rendering Approach
 
-Lynx has no canvas element. All visuals are composed from built-in elements:
+The ReactLynx renderer in this project composes its visuals from built-in elements:
 
 - `<view>` — containers and positioning via CSS transforms
 - `<image>` — sprites loaded as individual PNGs
 - `<text>` — score display on the game over panel
 
-Every game entity is absolutely positioned at `top: 0, left: 0` and moved using CSS `transform: translate(Xpx, Ypx)`. This avoids layout recalculations — the engine only updates transform strings.
+Game entities use absolute positioning and CSS transforms for movement. The background and ground have fixed nonzero `top` offsets, while pipes and the bird combine layout offsets with transforms. Transform-based movement limits layout work; animation also updates image opacity and render state.
 
 ## Dual-Threaded Model
 
@@ -72,9 +72,9 @@ The game loop (`setInterval` at 17ms) runs on the background thread. It updates 
 The `useGameEngine` hook manages all game state:
 
 - **`engine.current`** — mutable ref holding physics state (position, velocity, pipe list). Updated every tick without triggering renders.
-- **`renderState`** — React state snapshot pushed to components via `setRenderState()`. Only updated at the end of each tick.
+- **`renderState`** — React state snapshot pushed to components via `setRenderState()` at the end of each tick and immediately after input handling.
 
-This separation means physics calculations do not allocate React objects — only the final render snapshot does.
+This separation keeps mutable simulation data out of React state. Each tick still allocates a render snapshot and a shallow pipe-array copy; it is not an allocation-free game loop.
 
 ## Web Rendering Surfaces
 
@@ -82,6 +82,6 @@ This separation means physics calculations do not allocate React objects — onl
 |---------|--------|---------|
 | ReactLynx web preview | `bun run dev` and `http://localhost:3000/__web_preview?casename=main.web.bundle` | Development preview of the compiled `main.web.bundle` |
 | GitHub Pages canvas demo | `docs/src/pages/index.astro` | Public playable browser demo; it ports the game state machine and physics to an inline `<canvas>` script for zero-dependency Pages playback |
-| Standalone web host | `web-host/` with `rsbuild.web-host.config.ts` | Advanced/dev-only host that renders `main.web.bundle` inside `<lynx-view>`; `web-host/index.html` currently points at the configured bundle URL |
+| Standalone web host | `bun run dev:web-host`, with `bun run dev` in a second terminal | Development-only `<lynx-view>` host on port 4000, loading the bundle from port 3000 |
 
 The canvas demo intentionally uses a 400x600 viewport to fit the landing-page phone frame. Core physics values such as flap force, gravity, pipe gap, speed ramp, and medal thresholds mirror `src/constants.ts`; the viewport height is adapted from the ReactLynx game's 400x750 canvas height.

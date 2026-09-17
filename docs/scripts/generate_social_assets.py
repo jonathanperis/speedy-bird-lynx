@@ -6,7 +6,7 @@ Open Graph image and PNG/apple-touch favicon fallbacks for GitHub Pages.
 """
 from __future__ import annotations
 
-import math
+import argparse
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
@@ -44,7 +44,7 @@ def paste_pixel(base: Image.Image, sprite: Image.Image, xy: tuple[int, int], sca
     base.alpha_composite(sprite, xy)
 
 
-def make_og() -> Image.Image:
+def make_og(font_bold: str, font_mono_bold: str) -> Image.Image:
     img = Image.new("RGBA", (W, H), "#04111e")
     px = img.load()
 
@@ -115,18 +115,19 @@ def make_og() -> Image.Image:
 
     # Tiny score glyph panel.
     draw.rounded_rectangle((735, 108, 870, 153), radius=10, fill=(8, 31, 54, 230), outline=(255, 209, 102, 255), width=4)
-    draw_pixel_text(draw, (756, 113), "SCORE 42", font(FONT_MONO_BOLD, 22), (255, 209, 102, 255), shadow=(2, 2))
+    draw_pixel_text(draw, (756, 113), "SCORE 42", font(font_mono_bold, 22), (255, 209, 102, 255), shadow=(2, 2))
 
     # Text lockup.
-    draw_pixel_text(draw, (112, 110), "SPEEDY", font(FONT_BOLD, 82), (255, 209, 102, 255), shadow=(6, 6))
-    draw_pixel_text(draw, (112, 188), "BIRD", font(FONT_BOLD, 104), (232, 248, 255, 255), shadow=(6, 6))
-    draw_pixel_text(draw, (118, 306), "ReactLynx pixel arcade", font(FONT_MONO_BOLD, 30), (74, 168, 220, 255), shadow=(3, 3))
-    draw_pixel_text(draw, (118, 350), "iOS • Android • Web", font(FONT_MONO_BOLD, 28), (255, 107, 53, 255), shadow=(3, 3))
+    draw_pixel_text(draw, (112, 110), "SPEEDY", font(font_bold, 82), (255, 209, 102, 255), shadow=(6, 6))
+    draw_pixel_text(draw, (112, 188), "BIRD", font(font_bold, 104), (232, 248, 255, 255), shadow=(6, 6))
+    draw_pixel_text(draw, (118, 306), "ReactLynx pixel arcade", font(font_mono_bold, 30), (74, 168, 220, 255), shadow=(3, 3))
+    draw_pixel_text(draw, (118, 350), "Android • Web", font(font_mono_bold, 28), (255, 107, 53, 255), shadow=(3, 3))
+    draw_pixel_text(draw, (118, 388), "iOS source scaffold", font(font_mono_bold, 20), (232, 248, 255, 255), shadow=(2, 2))
 
     # Repo / URL chip.
     chip = (112, 426, 492, 480)
     draw.rounded_rectangle(chip, radius=14, fill=(255, 209, 102, 230), outline=(255, 236, 170, 255), width=2)
-    draw.text((134, 439), "Play on GitHub Pages", font=font(FONT_MONO_BOLD, 22), fill=(4, 17, 30, 255))
+    draw.text((134, 439), "Play on GitHub Pages", font=font(font_mono_bold, 22), fill=(4, 17, 30, 255))
 
     # Pixel scanlines / vignette.
     overlay = Image.new("RGBA", img.size, (0, 0, 0, 0))
@@ -148,8 +149,12 @@ def make_icon_fallbacks() -> None:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--font-bold', default=FONT_BOLD, help='Path to the bold display TTF font')
+    parser.add_argument('--font-mono-bold', default=FONT_MONO_BOLD, help='Path to the bold monospace TTF font')
+    args = parser.parse_args()
     OUT_OG.parent.mkdir(parents=True, exist_ok=True)
-    make_og().save(OUT_OG, optimize=True)
+    make_og(args.font_bold, args.font_mono_bold).save(OUT_OG, optimize=True)
     make_icon_fallbacks()
     print(f"wrote {OUT_OG}")
     print(f"wrote {OUT_FAVICON}, {OUT_FAVICON_32}, {OUT_APPLE}")
