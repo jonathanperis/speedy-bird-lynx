@@ -194,7 +194,9 @@ jobs:
 
       - name: Set tag from ref
         if: startsWith(github.ref, 'refs/tags/')
-        run: echo "RELEASE_TAG=${{ github.ref_name }}" >> "$GITHUB_ENV"
+        env:
+          RELEASE_REF_NAME: ${{ github.ref_name }}
+        run: echo "RELEASE_TAG=$RELEASE_REF_NAME" >> "$GITHUB_ENV"
 
       - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
         with:
