@@ -11,6 +11,10 @@ export default defineConfig({
   },
   server: {
     port: 4000,
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'credentialless',
+    },
   },
   output: {
     distPath: {

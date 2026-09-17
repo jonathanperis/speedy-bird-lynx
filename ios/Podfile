@@ -1,21 +1,54 @@
 source 'https://cdn.cocoapods.org/'
+source 'https://github.com/lynx-family/Specs.git'
 
-platform :ios, '13.0'
+platform :ios, '15.0'
 
 target 'SpeedyBird' do
   # Core Lynx engine
-  pod 'Lynx', '3.7.0', :subspecs => ['Framework']
+  pod 'Lynx', '4.1.0', :subspecs => ['Framework']
 
   # JavaScript engine (QuickJS via PrimJS)
-  pod 'PrimJS', '3.7.0', :subspecs => ['quickjs', 'napi']
+  pod 'PrimJS', '4.1.1', :subspecs => ['quickjs', 'napi']
 
   # Lynx services
-  pod 'LynxService', '3.7.0', :subspecs => ['Image', 'Log', 'Http']
+  pod 'LynxService', '4.1.0', :subspecs => ['Image', 'Log', 'Http']
 
-  # Image loading (required by LynxService/Image)
+  # Exact versions required by the LynxService/Image 4.1.0 podspec.
   pod 'SDWebImage', '5.15.5'
   pod 'SDWebImageWebPCoder', '0.11.0'
 
-  # Extended elements
-  pod 'XElement', '3.7.0'
+end
+
+# This pinned pod graph has one runtime resource bundle. Xcode's native copy
+# phase packages it without CocoaPods' undeclared scratch-file writes, so user
+# script sandboxing can remain enabled.
+post_integrate do |installer|
+  project = installer.aggregate_targets.first.user_project
+  target = project.targets.find { |item| item.name == 'SpeedyBird' }
+  phase = target.shell_script_build_phases.find { |item| item.name == '[CP] Copy Pods Resources' }
+  phase.remove_from_project
+  resource = project.files.find { |file| file.path == 'Lynx/LynxResources.bundle' }
+  resource ||= project.main_group.new_file('Lynx/LynxResources.bundle', 'BUILT_PRODUCTS_DIR')
+  target.resources_build_phase.add_file_reference(resource, true)
+  project.save
+end
+
+# Xcode 27 supports deployment targets from iOS 15; several upstream pods
+# still declare older minimums even when the application targets iOS 15.
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      current = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] || '15.0'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = [Gem::Version.new(current), Gem::Version.new('15.0')].max.to_s
+      if target.name == 'Lynx'
+        # Lynx 4.1 waits on futures while discarding their values during teardown.
+        # Xcode 27 diagnoses these as nodiscard; retain the warning without -Werror.
+        flags = Array(config.build_settings['OTHER_CPLUSPLUSFLAGS'] || '$(inherited)')
+        config.build_settings['OTHER_CPLUSPLUSFLAGS'] = flags + ['-Wno-error=unused-result', '-Wno-error=deprecated-declarations']
+        # The SDK also retains deprecated UIKit compatibility paths (keyWindow).
+        cflags = Array(config.build_settings['OTHER_CFLAGS'] || '$(inherited)')
+        config.build_settings['OTHER_CFLAGS'] = cflags + ['-Wno-error=deprecated-declarations', '-Wno-error=deprecated-implementations']
+      end
+    end
+  end
 end

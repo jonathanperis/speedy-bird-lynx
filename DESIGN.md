@@ -57,12 +57,12 @@ components:
     backgroundColor: "{colors.arcade-gold}"
     textColor: "{colors.stroke-dark}"
     typography: "{typography.label}"
-    rounded: "{rounded.pill}"
+    rounded: "{rounded.pixel}"
     padding: "1rem 2.5rem"
   card-panel:
     backgroundColor: "{colors.panel-blue}"
     textColor: "{colors.text-bright}"
-    rounded: "{rounded.panel}"
+    rounded: "{rounded.pixel}"
     padding: "1.5rem"
   hud-chip:
     backgroundColor: "{colors.sky-surface}"
@@ -74,6 +74,8 @@ components:
 # Design System: Speedy Bird
 
 ## 1. Overview
+
+Implementation notes reviewed 2026-09-17. The active landing page is `docs/src/pages/index.astro`; the former unused `components/home/` implementation has been removed. Product intent lives in `PRODUCT.md`, while the manual documents actual platform support and build status.
 
 **Creative North Star: "The Night Arcade Cabinet"**
 
@@ -128,7 +130,7 @@ The palette is a committed night arcade palette: saturated enough to feel like a
 **Body Font:** Space Grotesk with system sans fallback.  
 **Label/Mono Font:** Use Nunito labels or a deliberately chosen arcade/scoreboard face in a future pass; do not add casual monospace by reflex.
 
-**Character:** The current pairing is rounded, approachable, and readable. It works for a playful game, but the overhaul should strengthen the title, numbers, and medals with a more arcade-specific display treatment rather than leaning on generic modern sans styling.
+**Character:** The pairing is rounded, approachable, and readable. Pixel outlines, hard shadows, and prominent numbers give the active title, HUD, and medals their arcade treatment.
 
 ### Hierarchy
 
@@ -164,7 +166,7 @@ Speedy Bird should use a hybrid of flat pixel layering and rare responsive shado
 
 ### Buttons
 
-- **Shape:** tactile arcade controls, currently pill-shaped (`999px`), but overhaul variants should test chunkier pixel buttons (`4px`) with hard outlines.
+- **Shape:** tactile pixel buttons (`4px`) with hard outlines and press shadows.
 - **Primary:** Arcade Gold background with Stroke Dark text, uppercase label, heavy weight, generous horizontal padding.
 - **Hover / Focus:** move by transform only; focus uses an explicit HUD Glow ring. Do not animate padding, width, or layout properties.
 - **Pressed:** shift down into its hard shadow like an arcade cabinet button.
@@ -177,7 +179,7 @@ Speedy Bird should use a hybrid of flat pixel layering and rare responsive shado
 
 ### Cards / Containers
 
-- **Corner Style:** panel radius (`16px`) for current surfaces; pixel-panel variants may use small radius (`4px`) with a visible stroke.
+- **Corner Style:** pixel panels (`4px`) with visible strokes; the playable phone frame retains rounded corners.
 - **Background:** Panel Blue or Sky Surface. Avoid translucent glass as the default.
 - **Shadow Strategy:** flat at rest, hard offset or cabinet depth only for signature modules.
 - **Border:** pipe-green, arcade-gold, or dark pixel stroke, chosen for meaning rather than decoration.
@@ -189,7 +191,7 @@ The landing page has no form fields. If fields are added later, they should look
 
 ### Navigation
 
-Navigation should feel like a HUD or cabinet tab bar. The current glass pill should be treated as transitional. Preferred variants use a dark navy panel, gold active indicator, pipe/coin separators, and visible focus states. Keep labels short: Play, Rules, Build, Docs, GitHub.
+Navigation feels like a HUD or cabinet tab bar: a dark navy panel with a pipe-green border and visible focus states. Keep labels short: Play, Rules, Build, Docs, GitHub. The landing navigation is separate from the manual's sidebar and mobile menu.
 
 ### Play Surface
 
@@ -209,6 +211,7 @@ Technical docs should appear as a builder's manual or arcade service panel: grou
 
 - **Do** keep the night-sky, bird, pipe, medal, and arcade-gold identity intact.
 - **Do** make the speed multiplier visually central through HUD chips, timelines, and threshold markers.
+- **Do** label static rule examples honestly. The starting-speed chip is not live gameplay telemetry.
 - **Do** use pipes, scoreboards, medals, and cabinet panels as structure, not decoration.
 - **Do** cap body copy at 65-75ch and let numbers carry the game mechanic.
 - **Do** add `prefers-reduced-motion` behavior for clouds, particles, CTA pulse, pipe sway, and reveal animations.

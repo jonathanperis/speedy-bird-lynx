@@ -1,34 +1,10 @@
 name: Build iOS
 
-# ┌──────────────────────────────────────────────────────────────────────┐
-# │ REQUIRES: Apple Developer Program ($99/year)                        │
-# │                                                                     │
-# │ To enable this workflow you need to:                                │
-# │                                                                     │
-# │ 1. Create an Xcode project (.xcodeproj) via Xcode:                 │
-# │    - Open Xcode > Create New Project > App                         │
-# │    - Product Name: SpeedyBird                                      │
-# │    - Bundle ID: com.jonathanperis.speedybird                       │
-# │    - Language: Swift                                                │
-# │    - Add existing Swift files from ios/SpeedyBird/                 │
-# │    - Set Bridging Header in Build Settings                         │
-# │    - Add main.lynx.bundle to Copy Bundle Resources                 │
-# │    - Set User Script Sandboxing = NO in Build Settings             │
-# │                                                                     │
-# │ 2. Enroll in the Apple Developer Program:                          │
-# │    https://developer.apple.com/programs/                           │
-# │                                                                     │
-# │ 3. Create a signing certificate + provisioning profile             │
-# │    (Fastlane Match recommended for CI)                             │
-# │                                                                     │
-# │ 4. Add these GitHub secrets:                                       │
-# │    - APPLE_CERTIFICATE_BASE64                                      │
-# │    - APPLE_CERTIFICATE_PASSWORD                                    │
-# │    - APPLE_PROVISIONING_PROFILE_BASE64                             │
-# │    - APPLE_TEAM_ID                                                 │
-# │                                                                     │
-# │ Without these, the workflow builds unsigned (no device install).    │
-# └──────────────────────────────────────────────────────────────────────┘
+# Requires a tracked ios/SpeedyBird.xcodeproj with a shared SpeedyBird scheme,
+# the Swift sources/bridging header, and main.lynx.bundle in Copy Bundle Resources.
+# This workflow always builds unsigned and does not read Apple signing secrets.
+# Paid membership is not needed for an unsigned archive; signed distribution
+# requires separate signing implementation and Apple provisioning configuration.
 
 on:
   push:
@@ -42,7 +18,7 @@ jobs:
   build:
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -57,6 +33,10 @@ jobs:
           fi
 
       # Build Lynx JS bundle (Bun is the standardized AGENTS.md convention for this repo)
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        if: steps.check.outputs.exists == 'true'
+        with:
+          node-version: '24'
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         if: steps.check.outputs.exists == 'true'
         with:
@@ -74,11 +54,19 @@ jobs:
       - run: cp dist/main.lynx.bundle ios/SpeedyBird/Resources/
         if: steps.check.outputs.exists == 'true'
 
-      # Install CocoaPods dependencies
-      - run: cd ios && pod install
+      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+        if: steps.check.outputs.exists == 'true'
+        with:
+          ruby-version: '3.3'
+          working-directory: ios
+          bundler-cache: true
+
+      # Install the CocoaPods dependencies using the locked Ruby tooling.
+      - run: bundle exec pod install
+        working-directory: ios
         if: steps.check.outputs.exists == 'true'
 
-      # Build unsigned archive (signing requires Apple Developer Program)
+      # Build unsigned archive; signing is not implemented in this workflow.
       - name: Build iOS archive
         if: steps.check.outputs.exists == 'true'
         run: |

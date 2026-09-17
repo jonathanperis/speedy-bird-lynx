@@ -4,7 +4,6 @@ import android.app.Activity
 import android.os.Bundle
 import com.lynx.tasm.LynxView
 import com.lynx.tasm.LynxViewBuilder
-import com.lynx.xelement.XElementBehaviors
 
 class MainActivity : Activity() {
 
@@ -17,7 +16,6 @@ class MainActivity : Activity() {
 
     private fun buildLynxView(): LynxView {
         val viewBuilder = LynxViewBuilder()
-        viewBuilder.addBehaviors(XElementBehaviors().create())
         viewBuilder.setTemplateProvider(AssetTemplateProvider(this))
         return viewBuilder.build(this)
     }

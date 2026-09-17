@@ -14,12 +14,14 @@ Cross-platform Flappy Bird clone built with ReactLynx + TypeScript. The checked-
 
 | Technology | Version | Purpose |
 |-----------|---------|---------|
-| ReactLynx | 0.119.0 | Cross-platform native UI framework |
-| React | 18.3.1 | Component model and hooks |
-| TypeScript | 6.0.3 | Type-safe source code |
-| RSpeedy / Rspack | 0.14.5 | Lynx bundler with HMR |
+| ReactLynx | 0.126.1 | Game component model and hooks |
+| React | 19.3.0 | Compatibility dependencies and typings |
+| TypeScript | 6.0.3 app / 7.0.2 docs | Root limited by Rspeedy's supported peer range |
+| Rspeedy / ReactLynx plugin | 0.17.2 / 0.20.2 | Coordinated Lynx bundler/compiler |
 | Rsbuild | 2.2.7 | Web build target |
-| Lynx SDK | 3.7.0 | Android/iOS hosts; TypeScript bindings use `@lynx-js/types` 3.9.0 |
+| Lynx SDK / PrimJS | 4.1.0 / 4.1.1 | Native hosts; TypeScript bindings use `@lynx-js/types` 4.2.1 |
+| Astro / Tailwind | 7.3.3 / 4.3.3 | Documentation website |
+| AGP / Gradle / Kotlin | 9.4.0 / 9.7.1 / 2.4.20 | Android; Java 21, compile SDK 37.2, target 37, min 21 |
 
 ---
 
@@ -30,8 +32,9 @@ Use Bun for root ReactLynx/Rspeedy installs and command examples because the roo
 ```sh
 bun install --frozen-lockfile       # Install exact dependencies
 bun run dev                         # Dev server with HMR on :3000
-bunx tsc --noEmit                   # Type check only
+bun run check                      # Type check only
 bun run build                       # Production build
+bun run build:web-host              # Compile standalone development web host
 ```
 
 `bun run build` emits `dist/main.lynx.bundle` for native hosts and `dist/main.web.bundle` for web-preview tooling.
@@ -40,23 +43,27 @@ bun run build                       # Production build
 
 ```sh
 bun run build
-cp dist/main.lynx.bundle android/app/src/main/assets/
 cd android && ./gradlew assembleDebug
 cd android && ./gradlew assembleRelease
+cd android && ./gradlew lintDebug
 ```
 
-The Android workflow signs release builds only when signing secrets are configured.
+Gradle stages the current root bundle into generated APK assets. Use `scripts/verify_android_bundle.py` to compare each APK's bundle with `dist/main.lynx.bundle`. Sprites are embedded in the bundle. The Android workflow signs release builds only when signing secrets are configured.
 
 ### iOS
 
 ```sh
 bun run build
 cp dist/main.lynx.bundle ios/SpeedyBird/Resources/
-cd ios && pod install
+cd ios && bundle install && bundle exec pod install
 # Open SpeedyBird.xcworkspace in Xcode when a local Xcode project is present.
 ```
 
-The iOS workflow currently guards on the presence of an Xcode project and builds unsigned unless signing is configured.
+The iOS workflow guards on a tracked Xcode project and always builds unsigned; it does not consume Apple signing secrets. Ruby tooling is locked in `ios/Gemfile.lock`.
+
+### Documentation checks
+
+Run `npm run build` and `npm run check:site` in `docs/`. The latter verifies all wiki routes, internal links/fragments, unique IDs, and per-route canonical/OG URLs. The active homepage is `docs/src/pages/index.astro`; guide titles/navigation live in `docs/src/lib/docs-sidebar.config.ts`. See `docs/README.md` for authoring and asset maintenance.
 
 ---
 
@@ -85,7 +92,7 @@ ReactLynx runs React work off the main rendering thread. Keep per-frame physics 
 - **CSS transforms**: Movement uses `transform: translate(...)` rather than layout recalculation.
 - **State machine**: `STATE_READY` → `STATE_PLAY` → `STATE_OVER`.
 - **AABB collision**: Uses a circular bird hitbox approximation.
-- **Audio abstraction**: Web `HTMLAudioElement` implementation plus native module stubs.
+- **Audio abstraction**: `HTMLAudioElement` where available; native and web-worker contexts use an unimplemented placeholder. Canvas has separate browser audio.
 - **Controls**: ReactLynx app uses tap/click to flap. The GitHub Pages canvas demo also supports Space.
 
 ---
@@ -97,11 +104,11 @@ speedy-bird-lynx/
 ├── src/
 │   ├── index.tsx                    # Entry point
 │   ├── App.tsx                      # Root component + tap/click handler
-│   ├── types.ts                     # GameState enum, PipeData, SoundName
+│   ├── types.ts                     # State constants/types, PipeData, SoundName
 │   ├── constants.ts                 # Physics, dimensions, colors
 │   ├── hooks/useGameEngine.ts       # Core game loop + physics
 │   ├── components/                  # Bird, Pipe, Background, Ground, etc.
-│   └── audio/audio.ts               # Audio abstraction layer
+│   └── audio/audio.ts               # Audio adapter and native placeholder
 ├── android/                         # Native Android host (Kotlin)
 ├── ios/                             # Native iOS host (Swift/CocoaPods scaffold)
 ├── assets/sprites/                  # PNG sprites (bird, pipes, medals, digits)
@@ -136,7 +143,7 @@ speedy-bird-lynx/
 
 | Workflow | File | Trigger | Actions |
 |----------|------|---------|---------|
-| Build Check | `ci.yml` | Manual, push to `main`/`lynx-migration`, PR to `main` | Root/docs audits, type-check/build, docs build, unsigned Android compilation |
+| Build Check | `ci.yml` | Manual, push to `main`/`lynx-migration`, PR to `main` | Audits, type-check, bundles/web-host/docs builds, site validation, Android compilation/lint and APK bundle verification |
 | CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript and Actions analysis |
 | Deploy Web | `deploy.yml` | Push to `main`, manual | Reusable GitHub Pages docs deploy for `docs/` |
 | Build Android | `build-android.yml` | Push to `main`, manual from `main` | Build/sign APK with a read-only job; separate job publishes the immutable build release |
@@ -159,8 +166,10 @@ speedy-bird-lynx/
 
 ## Code Quality Notes
 
-- **TypeScript strict mode**: Enabled; all code must pass `bunx tsc --noEmit`.
-- **No test framework yet**: Vitest is a natural fit if tests are added.
+- **TypeScript strict mode**: Enabled; app code must pass `bun run check`. Set `jsxImportSource` to `@lynx-js/react` for Lynx element types.
+- **Focused verification**: Generated-site and APK bundle checks exist. Gameplay unit tests and browser UI tests are not configured.
 - **No linter/formatter yet**: Biome is a good fit if formatting/linting is added.
 - **CodeQL**: Runs on every push/PR and weekly for security analysis.
 - **Dependabot**: Weekly updates for npm packages and GitHub Actions.
+
+Dependency upgrades must preserve the coordinated ReactLynx/compiler versions and native pod constraints. See `docs/wiki/dependency-updates.md` for reviewed versions and holds; a newer registry version is not automatically a supported upgrade.

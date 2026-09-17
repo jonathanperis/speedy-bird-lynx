@@ -15,7 +15,7 @@ Always rebase before merge. Never force-push to `main`.
 
 ## Repository Topics
 
-android, bytedance, cross-platform, flappy-bird, game, ios, lynx, native-ui, reactlynx, rspeedy, typescript
+Read current topics and About metadata with `gh repo view --json description,homepageUrl,repositoryTopics`. Avoid maintaining a second mutable topic list here.
 
 ## Release Strategy
 
@@ -27,7 +27,7 @@ android, bytedance, cross-platform, flappy-bird, game, ios, lynx, native-ui, rea
 
 | File | Purpose |
 |------|---------|
-| `ci.yml` | Type check + build (manual, push/PR paths) |
+| `ci.yml` | Audits, type check, bundles/web host/docs, site validation, Android build/lint, and APK bundle verification |
 | `codeql.yml` | Security analysis (push/PR to main + weekly) |
 | `deploy.yml` | GitHub Pages deployment through shared reusable workflow |
 | `build-android.yml` | Release APK build + GitHub Release |

@@ -1,5 +1,7 @@
 # State
 
+> Historical decision snapshot (March 2026). These lessons do not describe the current rendering implementation or verification state. See [Architecture](../../docs/wiki/architecture.md) and [Dependencies and Upgrades](../../docs/wiki/dependency-updates.md).
+
 ## Decisions
 - 2026-03-31: Chose Lynx as target framework for cross-platform port
 - 2026-03-31: Will use element-based rendering (no canvas) with CSS transforms

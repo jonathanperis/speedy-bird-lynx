@@ -26,8 +26,8 @@ All ReactLynx game entities render as positioned `<view>` and `<image>` elements
 ## Cross-Platform Build Strategy
 
 - **Lynx bundle** (`main.lynx.bundle`): Shared TypeScript compiled by RSpeedy and loaded by native hosts.
-- **Android host**: Kotlin + Lynx SDK 3.7.0, loading the bundle from `assets/`.
-- **iOS host**: Swift/CocoaPods scaffold + Lynx SDK 3.7.0, loading the bundle from app resources when an Xcode project is present.
+- **Android host**: Kotlin + Lynx SDK 4.1.0; Gradle stages the current bundle into generated APK assets.
+- **iOS host**: Swift/CocoaPods scaffold + Lynx SDK 4.1.0, loading the bundle from app resources when an Xcode project is present. Current CI always disables signing.
 - **GitHub Pages site**: Astro site under `docs/`, including a playable canvas demo and generated wiki pages.
 - **Web preview tooling**: RSpeedy dev server with `@lynx-js/web-core` for development.
 
@@ -35,5 +35,5 @@ All ReactLynx game entities render as positioned `<view>` and `<image>` elements
 
 Runtime-detected dual implementation:
 
-- **WebAudioModule**: Uses `HTMLAudioElement` for web.
+- **WebAudioModule**: Uses `HTMLAudioElement` only where the JavaScript runtime exposes `Audio`; the Lynx web worker does not imply browser-document APIs.
 - **NativeAudioModule**: Stubs for native platforms until native audio APIs are wired.

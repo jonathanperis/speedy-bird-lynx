@@ -11,20 +11,20 @@ const jsonLd = `{
   "@context": "https://schema.org",
   "@type": "VideoGame",
   "name": "Speedy Bird",
-  "description": "A pixel art Speedy Bird clone built with Lynx cross-platform framework. Play in your browser or on mobile.",
+  "description": "A Flappy Bird-inspired arcade game with an Android ReactLynx host and a playable browser Canvas demo.",
   "url": "https://jonathanperis.github.io/speedy-bird-lynx/",
   "image": "${socialImageUrl}",
   "genre": ["Arcade", "Pixel Art", "Side-Scroller"],
-  "gamePlatform": ["Web Browser", "iOS", "Android"],
+  "gamePlatform": ["Web Browser", "Android"],
   "applicationCategory": "Game",
-  "operatingSystem": ["iOS", "Android", "Web"],
+  "operatingSystem": ["Android", "Web"],
   "author": {
     "@type": "Person",
     "name": "Jonathan Peris",
     "url": "https://github.com/jonathanperis"
   },
   "isAccessibleForFree": true,
-  "license": "https://github.com/jonathanperis/speedy-bird-lynx/blob/master/LICENSE",
+  "license": "https://github.com/jonathanperis/speedy-bird-lynx/blob/main/LICENSE",
   "codeRepository": "https://github.com/jonathanperis/speedy-bird-lynx"
 }`;
 ---
@@ -46,7 +46,7 @@ const jsonLd = `{
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Speedy Bird - Pixel Art Side-Scroller</title>
-  <meta name="description" content="A pixel art Speedy Bird clone built with Lynx cross-platform framework. Play in your browser or on mobile via Lynx native.">
+  <meta name="description" content="Play Speedy Bird in your browser. Explore the ReactLynx Android host, web preview, iOS source scaffold, and implementation guides.">
   <meta name="keywords" content="Speedy Bird, pixel art, Lynx, ReactLynx, cross-platform, mobile game, side-scroller, open source">
   <link rel="icon" href={faviconHref} sizes="any">
   <link rel="icon" type="image/png" href={faviconPngHref}>
@@ -57,7 +57,7 @@ const jsonLd = `{
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Speedy Bird - Pixel Art Side-Scroller">
-  <meta property="og:description" content="A pixel art Speedy Bird clone built with Lynx cross-platform framework. Play in your browser.">
+  <meta property="og:description" content="Every pipe makes it faster. Play the Canvas demo and explore the ReactLynx game, Android host, and builder's manual.">
   <meta property="og:url" content="https://jonathanperis.github.io/speedy-bird-lynx/">
   <meta property="og:image" content={socialImageUrl}>
   <meta property="og:image:secure_url" content={socialImageUrl}>
@@ -71,7 +71,7 @@ const jsonLd = `{
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Speedy Bird - Pixel Art Side-Scroller">
-  <meta name="twitter:description" content="A pixel art Speedy Bird clone built with Lynx. Play in your browser.">
+  <meta name="twitter:description" content="Every pipe makes it faster. Play the Canvas demo and explore the ReactLynx builder's manual.">
   <meta name="twitter:image" content={socialImageUrl}>
   <meta name="twitter:image:alt" content="Speedy Bird Lynx pixel arcade preview with the bird flying between pipes">
   <meta name="twitter:creator" content="@jperis_silva">
@@ -1480,8 +1480,8 @@ const jsonLd = `{
 
       <div class="hero-hud" aria-label="Speedy Bird rules summary">
         <div class="speed-badge hero-hud-card">
-          <div class="speed-readout"><span class="speed-num" id="speedNum">1.00</span><span class="speed-x">×</span></div>
-          <span class="speed-label">Live Multiplier</span>
+          <div class="speed-readout"><span class="speed-num">1.00</span><span class="speed-x">×</span></div>
+          <span class="speed-label">Starting Speed</span>
         </div>
         <div class="hero-hud-card">
           <strong>+1%</strong>
@@ -1602,14 +1602,15 @@ const jsonLd = `{
       <p class="section-kicker">Builder's manual</p>
       <h2>BUILT AS A REAL CROSS-PLATFORM GAME</h2>
       <p class="section-lede">
-        The web canvas above mirrors the ReactLynx implementation: the same core physics constants,
-        tile-based pipes, sprite digits, sound cues, and state machine used by the native build, with
-        the viewport adapted to the landing-page phone frame.
+        The Canvas demo above is a separate browser implementation of the ReactLynx game's core physics,
+        tile-based pipes, sprite digits, and state machine. Its 400×600 viewport fits the phone frame;
+        the ReactLynx game uses 400×750 logical dimensions. Canvas audio works in the browser, while
+        ReactLynx native and worker-based audio still need a bridge implementation.
       </p>
 
       <div class="manual-grid">
         <article class="manual-panel panel-wide">
-          <span class="panel-code">ENGINE / 60FPS</span>
+          <span class="panel-code">ENGINE / 17MS TICKS</span>
           <h3>Physics that stay readable as speed climbs</h3>
           <p>Gravity, velocity-based flaps, rotation, AABB collision, and constant-gap pipe spawning keep runs fair while the world accelerates.</p>
         </article>
@@ -1626,12 +1627,12 @@ const jsonLd = `{
         <article class="manual-panel">
           <span class="panel-code">LYNX</span>
           <h3>ReactLynx Port</h3>
-          <p>A single TypeScript codebase targets native Lynx rendering on iOS and Android, plus the browser demo.</p>
+          <p>Shared TypeScript powers the Android host and Lynx web preview. iOS source is included for local Xcode project setup; this page runs the separate Canvas demo.</p>
         </article>
         <article class="manual-panel">
           <span class="panel-code">SHIP</span>
           <h3>CI/CD Ready</h3>
-          <p>GitHub Actions build web docs, Lynx bundles, Android APKs, iOS archives, and releases.</p>
+          <p>GitHub Actions check bundles, Android builds, and docs, then publish Pages and release artifacts. iOS archives require a tracked Xcode project and are always unsigned.</p>
         </article>
       </div>
     </div>
@@ -1650,7 +1651,8 @@ const jsonLd = `{
         <span>Native rendering</span>
         <span>CSS transforms</span>
         <span>Rspack toolchain</span>
-        <span>iOS · Android · Web</span>
+        <span>Android · Web</span>
+        <span>iOS source scaffold</span>
       </div>
     </div>
   </section>
@@ -1670,25 +1672,30 @@ const jsonLd = `{
         <h3>Start Here</h3>
         <p>Project overview, Lynx setup, architecture, and getting started.</p>
       </a>
-      <a class="doc-card" href="docs/game-engine">
+      <a class="doc-card" href="docs/game-engine/">
         <span class="doc-index">02</span>
         <h3>Game Engine</h3>
         <p>Physics, collision detection, scoring, and game state machine.</p>
       </a>
-      <a class="doc-card" href="docs/architecture">
+      <a class="doc-card" href="docs/architecture/">
         <span class="doc-index">03</span>
         <h3>Architecture</h3>
         <p>File structure, game loop, component hierarchy, and module breakdown.</p>
       </a>
-      <a class="doc-card" href="docs/assets-and-sprites">
+      <a class="doc-card" href="docs/assets-and-sprites/">
         <span class="doc-index">04</span>
         <h3>Assets &amp; Sprites</h3>
         <p>Sprites, audio files, tile-based rendering, and asset attribution.</p>
       </a>
-      <a class="doc-card" href="docs/getting-started">
+      <a class="doc-card" href="docs/getting-started/">
         <span class="doc-index">05</span>
         <h3>Run It Locally</h3>
         <p>Controls, local setup, and Lynx Explorer testing for mobile devices.</p>
+      </a>
+      <a class="doc-card" href="docs/dependency-updates/">
+        <span class="doc-index">06</span>
+        <h3>Dependencies &amp; Upgrades</h3>
+        <p>Current versions, compatibility holds, native toolchains, and verification.</p>
       </a>
     </div>
   </section>
@@ -1702,31 +1709,21 @@ const jsonLd = `{
     </p>
     <p style="margin-top: 0.5rem;">
       Created by <a href="https://github.com/jonathanperis" target="_blank" rel="noreferrer noopener">jonathanperis</a>.
-      Original game by <a href="https://github.com/noanonoa" target="_blank" rel="noreferrer noopener">noanonoa</a>.
+      Original Flappy Bird by <a href="https://en.wikipedia.org/wiki/Flappy_Bird" target="_blank" rel="noreferrer noopener">Dong Nguyen</a>.
+      Earlier Canvas recreation by <a href="https://github.com/noanonoa/flappy-bird" target="_blank" rel="noreferrer noopener">noanonoa</a>.
     </p>
     <p style="margin-top: 0.25rem;">
       Sprites from <a href="https://www.spriters-resource.com/fullview/59894/" target="_blank" rel="noreferrer noopener">The Spriters Resource</a>.
     </p>
   </footer>
 
-  <!-- Nav + speed counter + reveals JS -->
+  <!-- Navigation and section reveals -->
   <script is:inline>
     // Pill nav appear
     const heroEl = document.querySelector('.hero');
     const navEl = document.getElementById('pill-nav');
     if (window.IntersectionObserver) {
       new IntersectionObserver(([e]) => navEl.classList.toggle('visible', !e.isIntersecting)).observe(heroEl);
-    }
-    
-    // Speed counter loop
-    let spd = 1.0;
-    const spdEl = document.getElementById('speedNum');
-    if (spdEl) {
-      setInterval(() => {
-        spd += 0.01;
-        if (spd > 1.73) spd = 1.0;
-        spdEl.textContent = spd.toFixed(2);
-      }, 50);
     }
     
     // Section reveals

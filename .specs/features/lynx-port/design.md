@@ -1,5 +1,7 @@
 # Design: Lynx Port
 
+> Historical migration design (March 2026), preserved for provenance. The implemented game uses a 17ms timer, ref-based physics, and React render snapshots rather than the RAF/setNativeProps design below. See [Architecture](../../../docs/wiki/architecture.md).
+
 ## Architecture Overview
 
 ```

@@ -1,5 +1,7 @@
 # Speedy Bird — Lynx Port
 
+> Historical project vision (March 2026). Six-platform support and RAF/setNativeProps below are original aspirations, not the current project contract. See the [platform status](../../docs/wiki/index.md) and [architecture](../../docs/wiki/architecture.md).
+
 ## Vision
 Port the existing HTML5 Canvas Speedy Bird clone to ByteDance's Lynx framework, creating a cross-platform native app that runs on Android, iOS, Web, macOS, Windows, and HarmonyOS from a single TypeScript/TSX codebase.
 

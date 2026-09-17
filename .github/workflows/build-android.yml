@@ -16,7 +16,7 @@ jobs:
       version-name: ${{ steps.version.outputs.VERSION_NAME }}
       version-code: ${{ steps.version.outputs.VERSION_CODE }}
     steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -39,6 +39,9 @@ jobs:
           echo "Version: $VERSION (code: $VERSION_CODE)"
 
       # Build Lynx JS bundle (Bun is the standardized AGENTS.md convention for this repo)
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         with:
           bun-version: latest
@@ -49,9 +52,6 @@ jobs:
       - name: Build Lynx bundle
         run: bun run build
 
-      # Copy bundle into Android assets
-      - run: cp dist/main.lynx.bundle android/app/src/main/assets/
-
       # Decode signing keystore (if secrets are configured)
       - name: Decode keystore
         if: env.KEYSTORE_BASE64 != ''
@@ -60,10 +60,15 @@ jobs:
         run: echo "$KEYSTORE_BASE64" | base64 -d > android/app/release.keystore
 
       # Build Android APK
-      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
+
+      - name: Install Android SDK
+        run: |
+          sdkmanager "cmdline-tools;latest"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.2" "build-tools;37.0.0"
 
       - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
 
@@ -75,7 +80,11 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           VERSION_NAME: ${{ steps.version.outputs.VERSION_NAME }}
           VERSION_CODE: ${{ steps.version.outputs.VERSION_CODE }}
-        run: cd android && chmod +x gradlew && ./gradlew assembleRelease
+        working-directory: android
+        run: ./gradlew assembleRelease
+
+      - name: Verify packaged bundle
+        run: python3 scripts/verify_android_bundle.py android/app/build/outputs/apk/release/*.apk
 
       # Rename APK with version
       - name: Rename APK
@@ -145,7 +154,7 @@ jobs:
           | Version | \`${VERSION_NAME}\` |
           | Version Code | \`${VERSION_CODE}\` |
           | Commit | [\`${SHORT_SHA}\`](https://github.com/${GH_REPO}/commit/${COMMIT_SHA}) |
-          | Lynx SDK | 3.7.0 |
+          | Lynx SDK | 4.1.0 |
           | Min Android | API 21 (5.0 Lollipop) |
 
           > **[Play the web version](https://jonathanperis.github.io/speedy-bird-lynx/)** if you don't have an Android device."

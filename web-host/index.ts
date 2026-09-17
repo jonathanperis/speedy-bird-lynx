@@ -1,5 +1,6 @@
-import '@lynx-js/web-core';
-import '@lynx-js/web-core/index.css';
+/// <reference types="@rsbuild/core/types" />
+
+import '@lynx-js/web-core/client';
 import '@lynx-js/web-elements/all';
 import '@lynx-js/web-elements/index.css';
 

@@ -1,5 +1,7 @@
 # Feature: Lynx Port — Speedy Bird
 
+> Historical migration specification (March 2026), preserved for provenance. These constants, platform goals, and rendering plans are not current requirements. See the [current manual](../../../docs/wiki/index.md) and source code for the implemented behavior.
+
 ## Overview
 Port the canvas-based Speedy Bird to a ReactLynx app using element-based rendering, preserving all gameplay mechanics and visual fidelity.
 

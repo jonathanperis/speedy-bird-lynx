@@ -29,7 +29,7 @@ The loop runs via `setInterval(tick, 17)` targeting ~60 FPS. Each tick:
 
 ## Physics
 
-All values are in pixels per frame (at 60 FPS):
+Values below are per simulation tick. The 17ms timer targets about 58.8 ticks per second; browser/device scheduling can delay it, and the engine does not compensate using elapsed time.
 
 | Parameter | Value | Effect |
 |-----------|-------|--------|
@@ -37,8 +37,8 @@ All values are in pixels per frame (at 60 FPS):
 | Flap velocity | -7.25 px/frame | Upward impulse on tap |
 | Pipe base speed | 2.7 px/frame | Horizontal scroll speed |
 | Speed scaling | +1% per pipe | `speed = 2.7 * (1 + score * 0.01)` |
-| Background scroll | 0.2 px/frame | Slower parallax layer |
-| Ground scroll | 2.7 px/frame | Matches pipe speed |
+| Background scroll | 0.2 px/tick base | Multiplied by `1 + score * 0.01` during play |
+| Ground scroll | 2.7 px/tick base | Uses the same multiplier as pipe speed |
 
 ## Bird Rotation
 
@@ -108,4 +108,4 @@ Five sound effects, managed by `src/audio/audio.ts`:
 | Ground collision | Fall | `sfx_die.wav` |
 | Reset game | Swoosh | `sfx_swooshing.wav` |
 
-On web, audio uses `HTMLAudioElement`. On native platforms, it falls back to a native module stub (`AudioModule`).
+The adapter uses `HTMLAudioElement` only when `Audio` is available. Native and web-worker runtimes use an unimplemented module placeholder and remain silent. The Pages Canvas implementation has a separate browser audio path; playback follows browser user-interaction policies.
