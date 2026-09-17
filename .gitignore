@@ -1,6 +1,8 @@
 node_modules/
 dist/
 .rsbuild/
+.lynx/
+dist-web-host/
 *.local
 .DS_Store
 
@@ -15,9 +17,14 @@ android/app/release.keystore
 
 # iOS
 ios/Pods/
+ios/.bundle/
+ios/vendor/
 ios/SpeedyBird.xcworkspace/
 ios/SpeedyBird/Resources/main.lynx.bundle
 ios/Podfile.lock
 *.xcarchive
 
 # Docs generation
+
+# Local specifications and audit evidence
+.specs/

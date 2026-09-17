@@ -1,23 +1,13 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import '../../styles/docs.css';
-import { SECTION_CATEGORIES, SECTION_ORDER } from '../../lib/docs-sidebar.config';
+import { PAGE_META, SECTION_CATEGORIES, SECTION_ORDER } from '../../lib/docs-sidebar.config';
+import { renderDoc } from '../../lib/render-doc';
+import type { MarkdownInstance } from 'astro';
 
-const SLUG_LABEL: Record<string, string> = {
-  home: 'Home',
-  index: 'Home',
-  'about-lynx': 'About Lynx',
-  architecture: 'Architecture',
-  'assets-and-sprites': 'Assets And Sprites',
-  'ci-cd-pipeline': 'CI CD Pipeline',
-  'game-engine': 'Game Engine',
-  'getting-started': 'Getting Started',
-  'native-host-apps': 'Native Host Apps',
-};
+const globResult = import.meta.glob<MarkdownInstance<Record<string, unknown>>>('../../../wiki/*.md', { eager: true });
 
-const globResult = import.meta.glob('../../../wiki/*.md', { eager: true });
-
-const pagesBySlug: Record<string, any> = {};
+const pagesBySlug: Record<string, MarkdownInstance<Record<string, unknown>>> = {};
 for (const [path, module] of Object.entries(globResult)) {
   const fileName = path.split('/').pop()!.replace('.md', '');
   const slug = fileName === 'index' ? 'home' : fileName;
@@ -40,14 +30,11 @@ for (const cat of SECTION_CATEGORIES) {
 
 const requestedSlug = Astro.params.slug;
 const isRoot = requestedSlug === undefined;
-const requestedKey = requestedSlug === 'index' ? 'home' : (requestedSlug ?? 'home');
+const requestedKey = requestedSlug ?? 'home';
 
 const sectionsToRender = isRoot
   ? SECTION_CATEGORIES.flatMap(cat => cat.ids)
-      .map(slug => {
-        const key = slug === 'index' ? 'home' : slug;
-        return { slug, page: pagesBySlug[key] };
-      })
+      .map(slug => ({ slug, page: pagesBySlug[slug] }))
       .filter(s => s.page)
   : (() => {
       const page = pagesBySlug[requestedKey];
@@ -56,20 +43,26 @@ const sectionsToRender = isRoot
     })();
 
 export function getStaticPaths() {
-  const routeOrder = SECTION_ORDER.map(id => (id === 'home' ? 'index' : id));
   return [
     { params: { slug: undefined } },
-    ...routeOrder.filter(s => s !== 'index').map(slug => ({ params: { slug } })),
+    ...SECTION_ORDER.filter(id => id !== 'home').map(slug => ({ params: { slug } })),
   ];
 }
 
-const pageTitle = isRoot ? 'Speedy Bird Lynx - Documentation' : `${SLUG_LABEL[requestedSlug] ?? requestedSlug} - Speedy Bird Lynx`;
+const pageTitle = isRoot ? 'Speedy Bird Lynx - Documentation' : `${PAGE_META[requestedKey].title} - Speedy Bird Lynx`;
+const description = isRoot
+  ? 'Speedy Bird builder manual: ReactLynx architecture, game engine, assets, native builds, and CI/CD.'
+  : PAGE_META[requestedKey].description;
 const base = import.meta.env.BASE_URL;
 const docsBase = base.replace(/\/$/, '') + '/docs';
 const backHomeUrl = base.replace(/\/$/, '') + '/';
+const renderedSections = await Promise.all(sectionsToRender.map(async ({ slug, page }) => ({
+  slug,
+  html: await renderDoc(await page.compiledContent(), slug, docsBase, isRoot),
+})));
 ---
 
-<BaseLayout title={pageTitle} description="Speedy Bird builder manual: ReactLynx architecture, game engine, assets, native builds, and CI/CD.">
+<BaseLayout title={pageTitle} description={description}>
   <div class="mobile-header">
     <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu" aria-controls="sidebar" aria-expanded="false">
       <span></span>
@@ -83,7 +76,7 @@ const backHomeUrl = base.replace(/\/$/, '') + '/';
 
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <h1 class="repo-title">Speedy Bird Manual</h1>
+      <p class="repo-title">Speedy Bird Manual</p>
       <p class="repo-description">Arcade service notes for the ReactLynx game: speed curve, engine, sprites, native shells, and deploy pipeline.</p>
       <input type="text" id="searchInput" class="search-box" placeholder="Search documentation..." aria-label="Search documentation" hidden={!isRoot}>
     </div>
@@ -95,11 +88,11 @@ const backHomeUrl = base.replace(/\/$/, '') + '/';
             {cat.label && <div class="sidebar-category">{cat.label}</div>}
             <ul>
               {catIds.map((id) => {
-                const anchor = id === 'index' ? 'home' : id;
+                 const anchor = id;
                 return (
                   <li>
                     <a class="nav-item" href={`${docsBase}/#${anchor}`} data-nav-id={anchor}>
-                      {SLUG_LABEL[id]}
+                      {PAGE_META[id].title}
                     </a>
                   </li>
                 );
@@ -123,14 +116,14 @@ const backHomeUrl = base.replace(/\/$/, '') + '/';
           <p class="manual-kicker">Builder's Manual · Night Arcade Cabinet</p>
           <h1>{isRoot ? 'Speedy Bird Service Manual' : pageTitle.replace(' - Speedy Bird Lynx', '')}</h1>
           <p class="manual-lede">
-            The technical docs now sit inside the same arcade world as the game: a service panel for the speed curve,
-            ReactLynx architecture, sprite engine, native hosts, and release pipeline.
+            Source-backed guides to the speed curve, ReactLynx architecture, sprites, native hosts,
+            documentation site, and release pipeline.
           </p>
         </div>
         <div class="manual-scoreboard" aria-label="Documentation quick stats">
           <div><strong>{SECTION_ORDER.length}</strong><span>Manual pages</span></div>
           <div><strong>+1%</strong><span>Speed / pipe</span></div>
-          <div><strong>3</strong><span>Build targets</span></div>
+          <div><strong>iOS</strong><span>Source scaffold</span></div>
         </div>
       </header>
 
@@ -142,19 +135,13 @@ const backHomeUrl = base.replace(/\/$/, '') + '/';
         <a href="https://github.com/jonathanperis/speedy-bird-lynx" target="_blank" rel="noopener noreferrer">GitHub</a>
       </nav>
 
-      {sectionsToRender.map(({ slug, page: wikiPage }) => {
-        const sectionId = slug === 'index' ? 'home' : slug;
-        const Content = wikiPage.default ?? wikiPage;
-        return (
-          <section id={sectionId} class="doc-section">
-            <Content />
-          </section>
-        );
-      })}
+      {renderedSections.map(({ slug, html }) => (
+        <section id={slug} class="doc-section" set:html={html} />
+      ))}
     </main>
   </div>
 
-  {requestedSlug && <script is:inline define:vars={{ slug: requestedSlug === 'index' ? 'home' : requestedSlug, isRoot: isRoot }}>window.__docsSlug = slug; window.__isRoot = isRoot;</script>}
+  {requestedSlug && <script is:inline define:vars={{ slug: requestedSlug, isRoot }}>window.__docsSlug = slug; window.__isRoot = isRoot;</script>}
 
   <script is:inline>
     document.addEventListener('DOMContentLoaded', () => {

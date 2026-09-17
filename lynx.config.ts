@@ -13,6 +13,10 @@ export default defineConfig({
     },
     assetsInclude: [/\.wav$/],
   },
+  output: {
+    // Native hosts copy one bundle, so its sprite images must work offline.
+    dataUriLimit: { image: 64 * 1024 },
+  },
   server: {
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',

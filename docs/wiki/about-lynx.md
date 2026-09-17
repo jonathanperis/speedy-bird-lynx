@@ -7,43 +7,45 @@
 This project exists to learn Lynx by building something real. A Flappy Bird clone is a good fit because it exercises:
 
 - Element-based rendering — no canvas, all positioning via `<view>` + CSS transforms
-- Frequent state updates — 60 FPS game loop pushing React state
+- Frequent state updates — a 17ms timer targeting approximately 60 updates per second
 - Touch input — tap events for gameplay
 - Asset loading — images, sprites, audio
-- Cross-platform builds — same code on web, Android, iOS
+- Cross-platform code — Android host and web preview, with an iOS source scaffold requiring Xcode setup
 - CI/CD — automated build and release pipeline
 
 ## How Lynx Differs from Other Frameworks
 
 | Feature | Lynx | React Native | WebView (Cordova) |
 |---------|------|-------------|-------------------|
-| Rendering | Native C++ engine | Native bridge | Browser engine |
+| Rendering | Native engine on mobile | Native renderer (Fabric in the New Architecture) | Browser engine |
 | UI elements | `<view>`, `<image>`, `<text>` etc. | `<View>`, `<Image>`, `<Text>` | HTML elements |
-| Styling | CSS (200+ properties) | StyleSheet (CSS subset) | Full CSS |
-| Threading | Dual (background + main) | Bridge-based | Single |
-| JS engine | QuickJS (PrimJS) | Hermes/JSC | V8/JSC |
-| React compat | React 17+ (ReactLynx) | React Native | React DOM |
+| Styling | CSS with platform/version-specific support | JavaScript style objects and supported layout/style properties | Web CSS |
+| Execution | Main-thread rendering + background JavaScript | New Architecture uses JSI; not the legacy serialized bridge | Browser main thread, with workers available |
+| JS engine | PrimJS on these native hosts; platform-dependent runtimes elsewhere | Hermes by default | Browser-dependent (for example V8 or JavaScriptCore) |
+| Component APIs | ReactLynx, with its own runtime and compatibility APIs | React Native | React DOM |
 | Build tool | Rspack (`@lynx-js/rspeedy`) | Metro | Webpack/Vite |
 
 ## Key Lynx Concepts Used in Speedy Bird
 
-### Built-in Elements
+React Native 0.82 and newer run only on the New Architecture. Framework behavior evolves; consult the linked official references instead of treating this table as a benchmark or exhaustive feature list.
 
-Lynx only has ~10 built-in elements. This game uses:
+### Elements Used Here
+
+The ReactLynx game uses three built-in elements:
 
 - `<view>` — every container, positioned absolutely with transforms
 - `<image>` — bird sprites, pipe tiles, background, ground, medals, digits
 - `<text>` — score numbers on the game-over panel
 
-There is no `<canvas>`, `<svg>`, `<audio>`, or `<video>`.
+This application does not use canvas or extended elements for its Lynx renderer. Lynx and its platform extensions offer additional elements such as video, SVG, and canvas integrations; availability depends on the platform and registered components. The Pages demo uses the browser's standard Canvas and Audio APIs.
 
 ### CSS Differences
 
-- Default `box-sizing: border-box` and `position: relative`
-- No margin collapsing, no inline elements
-- `display` values: `linear` (default), `flex`, `grid`, `none`
-- `overflow` only supports `visible` and `hidden`
-- Units: `px`, `%`, `vh` — no `em`, `rem`, `vw`
+- Layout and styling are interpreted by Lynx on native targets, not by a browser stylesheet engine
+- The game uses explicit absolute positioning, flex rows, overflow clipping, and transforms
+- Length units include `px`, `ppx`, `rpx`, `em`, `rem`, `vh`, and `vw`; percentages are supported where the property permits them
+
+The project primarily uses pixels and percentages. See the [Lynx length reference](https://lynxjs.org/api/css/data-type/length) for definitions and platform compatibility.
 
 ### Dual-Threaded Architecture
 
@@ -55,14 +57,18 @@ React reconciliation (diffing, state updates) runs on a background thread. The m
 
 ### Native Modules
 
-Lynx does not have built-in audio. The `audio.ts` module detects the environment:
+The current `audio.ts` adapter detects whether the JavaScript environment exposes `Audio`:
 
-- **Web**: uses `HTMLAudioElement` (works immediately)
-- **Native**: calls a native module via `requireModule('AudioModule')` (requires per-platform implementation)
+- **Browser contexts with `Audio`**: uses `HTMLAudioElement`; playback can be blocked until user interaction
+- **Native and worker contexts without `Audio`**: uses a placeholder adapter and continues without sound; a supported native-module bridge is not implemented
+
+The placeholder's optional `__lynx_requireModule` lookup is not a documented integration contract. Future audio work should use Lynx's supported background-thread `NativeModules` API and register the corresponding Android/iOS modules. The only current adapter method is `play(sound)`; there is no native preload method. The standalone Canvas demo runs in the browser document and has its own working audio implementation.
 
 ## Resources
 
 - [Lynx Documentation](https://lynxjs.org/)
+- [React Native 0.82 and the New Architecture](https://reactnative.dev/blog/2025/10/08/react-native-0.82)
+- [Lynx Native Modules](https://lynxjs.org/guide/use-native-modules)
 - [Lynx GitHub](https://github.com/lynx-family/lynx)
 - [ReactLynx API Reference](https://lynxjs.org/api/index.html)
 - [Lynx Integration Guide (Android)](https://lynxjs.org/guide/start/integrate-with-existing-apps?platform=android)

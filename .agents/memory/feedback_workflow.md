@@ -8,7 +8,7 @@ All changes to this repo must use a branch + PR strategy. Never commit directly 
 
 **Why:** User enforces clean git history and code review on all changes.
 
-**How to apply:** Always create a feature/fix/docs branch, push it, and open a PR via `gh pr create`. Never push directly to main.
+**How to apply:** Use a descriptive `feature/<slug>` branch. Commit, push, and open a PR through `gh` only when the user explicitly requests those operations. Never push directly to main.
 
 ---
 
