@@ -23,13 +23,7 @@ export default function GetReadyScreen({ visible }: GetReadyScreenProps) {
         justifyContent: 'center',
       }}
     >
-      <image
-        src={getReadySrc}
-        style={{
-          width: `${IMG_W}px`,
-          height: `${IMG_H}px`,
-        }}
-      />
+      <image src={getReadySrc} style={{ width: `${IMG_W}px`, height: `${IMG_H}px` }} />
     </view>
   );
 }
