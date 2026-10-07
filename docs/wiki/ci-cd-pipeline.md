@@ -22,11 +22,13 @@ Runs on manual dispatch, pushes to `main`, pull requests targeting `main`, and w
 1. `bun install --frozen-lockfile` — install dependencies
 2. `bun audit --audit-level=high` — fail on high or critical advisories; the weekly run reports every severity
 3. `bun run lint` — Biome lint and formatting check
-4. `bun run check` — TypeScript type-checking
-5. `bun run build` and `bun run build:web-host` — build Lynx/web bundles and the development host
-6. Upload bundles as artifact (14-day retention)
-7. Compile and lint the Android debug host in a read-only job without signing secrets, then verify the APK contains the current bundle
-8. Install the frozen docs lockfile, audit it, build the site, and check every generated page's local links, fragments, unique IDs, and canonical/OG URL
+4. `bun run check` — TypeScript type-checking (app, tests, web host, configs)
+5. `bun run test` — Rstest unit and component tests
+6. `bun run assets:check` — docs asset copies match `assets/`
+7. `bun run build` and `bun run build:web-host` — build Lynx/web bundles and the development host
+8. Upload bundles as artifact (14-day retention)
+9. Compile and lint the Android debug host in a read-only job without signing secrets, then verify the APK contains the current bundle
+10. Install the frozen docs lockfile, audit it, build the site, and check every generated page's local links, fragments, unique IDs, and canonical/OG URL
 
 Successful builds and static checks do not establish device behavior or accessibility conformance.
 
@@ -86,4 +88,4 @@ The checked-in `ios/` directory contains a Swift/CocoaPods scaffold, not a gener
 
 ## Release
 
-Triggered by version tags (`v*`) or manual dispatch from `main`. The tagged commit must be on `main`; the pipeline audits, lints, and type-checks before building. This is the sole publisher for versioned releases, avoiding concurrent publishers racing an immutable release. Builds Lynx bundles and conditionally builds Android/iOS when their native projects exist; a failed build blocks publication. The publishing job uploads all available assets to a draft, then publishes the immutable release. Subsequent corrections require a new release instead of replacing published assets.
+Triggered by version tags (`v*`) or manual dispatch from `main`. The tagged commit must be on `main`; the pipeline audits, lints, type-checks, and tests before building. This is the sole publisher for versioned releases, avoiding concurrent publishers racing an immutable release. Builds Lynx bundles and conditionally builds Android/iOS when their native projects exist; a failed build blocks publication. The publishing job uploads all available assets to a draft, then publishes the immutable release. Subsequent corrections require a new release instead of replacing published assets.

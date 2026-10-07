@@ -47,7 +47,7 @@ import bird2 from '../../assets/sprites/bird-2.png';
 const BIRD_SPRITES = [bird0, bird1, bird2, bird1]; // ping-pong cycle
 ```
 
-`lynx.config.ts` sets an image inline limit of 64 KiB, large enough for every current game sprite. Rspeedy embeds those images as data URLs so native hosts can load the single bundle offline. Audio imports are emitted as separate WAV assets; native audio remains a placeholder rather than a packaged playback implementation.
+`lynx.config.ts` sets an image inline limit of 64 KiB, large enough for every current game sprite. Rspeedy embeds those images as data URLs so native hosts can load the single bundle offline. Audio is not part of the bundle: each host packages `assets/audio/*.wav` and plays it through `SpeedyBirdModule`.
 
 ## Pipe Rendering
 
@@ -58,9 +58,15 @@ Pipes use a tile-based approach instead of stretching a single image. Each pipe 
 
 This avoids visual stretching artifacts and matches the original game's pixel-art style. Each tile is 55px wide and ~53px tall.
 
+## Audio Files
+
+The five sound effects are 16-bit mono PCM WAV at 22.05 kHz, with leading and trailing silence trimmed so each sound starts on the triggering frame (the score sound previously began with 123 ms of silence). PCM avoids the decoder delay that compressed formats add to short effects, decodes on every platform, and the full set is about 136 KB.
+
+`assets/` is canonical. `docs/public/assets/` is a copy for the Pages site: run `bun run assets:sync` after changing assets; CI runs `bun run assets:check`.
+
 ## Background and Ground Tiling
 
-Both the background and ground use 5 copies laid out horizontally in a flex row. The container is translated left via CSS transform. Background offset wraps at one tile width (276px); ground offset wraps at half its tile width (112px), matching the repeated ground pattern.
+Both the background and ground use 5 copies laid out horizontally in a flex row; adjacent tiles overlap by one pixel so fractional scaling never shows a seam. The main-thread loop translates the container left. Background offset wraps at one tile width (276px); ground offset wraps at half its tile width (112px), matching the repeated ground pattern.
 
 - **Background**: 5 tiles at 276px each = 1380px total, scrolls at `0.2 * speedMultiplier` px/frame
 - **Ground**: 5 tiles at 224px each = 1120px total, scrolls at `2.7 * speedMultiplier` px/frame

@@ -88,9 +88,9 @@ The static output is written to `docs/out/`. Development serves `/` and `/docs/`
 |---------|---------------|-------|
 | ReactLynx web preview | `bun run dev`, then open `http://localhost:3000/__web_preview?casename=main.web.bundle` | Uses the compiled `main.web.bundle` from Rspeedy for development |
 | GitHub Pages canvas demo | `cd docs && npm run dev`, then open the local Astro URL | Browser-only playable demo in `docs/src/pages/index.astro`; physics mirror the ReactLynx game, while the 400x600 viewport is adapted to the landing-page phone frame |
-| Standalone web host | `bun run dev:web-host` at `http://localhost:4000` | Also run `bun run dev` at port 3000; the host loads `http://localhost:3000/main.web.bundle` |
+| Standalone web host | `bun run dev:web-host` at `http://localhost:4000` | Also run `bun run dev` at port 3000; the host loads `http://localhost:3000/main.web.bundle`. Implements sound, the saved best score, Space/Enter, and pause on tab switch |
 
-The standalone host is development-only and needs two terminals. Both servers configure cross-origin isolation headers. Use the listed `localhost` URLs consistently; if you change the bundle server's port, update `web-host/index.html` too. `bun run build:web-host` compiles the host but does not turn it into a self-contained Pages deployment.
+In development the host needs two terminals; both servers configure cross-origin isolation headers. Pass `?bundle=<url>` to load a bundle from elsewhere. For a self-contained build, run `bun run build` and then `bun run build:web-host`: `dist-web-host/` then contains the host, `main.web.bundle`, the audio, and the bridge module, and `bunx rsbuild preview --config rsbuild.web-host.config.ts` serves it with the required headers.
 
 ## Project Commands
 
@@ -98,9 +98,12 @@ The standalone host is development-only and needs two terminals. Both servers co
 |---------|-------------|
 | `bun run dev` | Start Rspeedy dev server with HMR |
 | `bun run build` | Production build (Lynx + Web bundles) |
-| `bun run check` | Type-check the ReactLynx app |
-| `bun run dev:web-host` | Serve the development-only Lynx web host on port 4000 |
-| `bun run build:web-host` | Compile the standalone host |
+| `bun run check` | Type-check the app, tests, web host, and configs |
+| `bun run test` | Rstest unit and component tests (needs Node.js on `PATH`) |
+| `bun run lint` / `bun run format` | Biome check / apply fixes |
+| `bun run assets:sync` / `assets:check` | Copy `assets/` to `docs/public/assets/` / verify the copies |
+| `bun run dev:web-host` | Serve the Lynx web host on port 4000 (with `bun run dev`) |
+| `bun run build:web-host` | Build the self-contained standalone host (after `bun run build`) |
 | `cd docs && npm run dev` | Start Astro docs/dev site with Node >=22.12 |
 | `cd docs && npm run build` | Build Astro GitHub Pages output to `docs/out/` with Node >=22.12 |
 | `cd docs && npm run preview` | Preview the production docs build with Node >=22.12 |

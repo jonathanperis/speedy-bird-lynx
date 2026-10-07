@@ -6,29 +6,35 @@
 speedy-bird-lynx/
 ├── src/                          # Lynx/ReactLynx application
 │   ├── index.tsx                 # Entry point
-│   ├── App.tsx                   # Root component
-│   ├── types.ts                  # TypeScript types (GameState, PipeData)
-│   ├── constants.ts              # All game constants
+│   ├── App.tsx                   # Root view, viewport fit, tap handling
+│   ├── types.ts                  # GameState, PipeData, SoundName, Medal
+│   ├── constants.ts              # Game constants
+│   ├── game/
+│   │   ├── engine.ts             # Pure rules: step, tap, collisions, scoring, viewport
+│   │   ├── announcements.ts      # Screen-reader labels and announcements
+│   │   └── preferences.ts        # Saved best-score format
 │   ├── hooks/
-│   │   └── useGameEngine.ts      # Core game loop and physics
-│   ├── components/
-│   │   ├── Bird.tsx              # Animated bird sprite
-│   │   ├── Pipe.tsx              # Tile-based pipe rendering
-│   │   ├── Background.tsx        # Parallax scrolling background
-│   │   ├── Ground.tsx            # Scrolling ground layer
-│   │   ├── ScoreDisplay.tsx      # Sprite-based digit rendering
-│   │   ├── GetReadyScreen.tsx    # Start screen overlay
-│   │   └── GameOverScreen.tsx    # Game over panel with medals
-│   └── audio/
-│       └── audio.ts              # Audio abstraction (web + native)
-│
+│   │   └── useGame.ts            # Main-thread frame loop and renderer; HUD state
+│   ├── platform/
+│   │   └── host.ts               # SpeedyBirdModule bridge and host event names
+│   └── components/
+│       ├── Bird.tsx              # Bird with four mounted animation frames
+│       ├── PipeSlot.tsx          # Reusable tile-based pipe pair
+│       ├── Background.tsx        # Parallax skyline tiles
+│       ├── Ground.tsx            # Scrolling ground tiles
+│       ├── ScoreDisplay.tsx      # Sprite digits
+│       ├── GetReadyScreen.tsx    # Start overlay
+│       ├── GameOverScreen.tsx    # Results panel with medal and "NEW" best
+│       └── PausedOverlay.tsx     # Shown when the app is backgrounded mid-run
+├── tests/                        # Rstest unit and component tests
 ├── android/                      # Native Android host app
 ├── ios/                          # Native iOS host app (source files)
-├── assets/                       # Sprites, audio, medals, digits
+├── assets/                       # Canonical sprites and audio
 ├── docs/                         # Astro GitHub Pages site + playable canvas demo
-├── web-host/                     # Advanced/dev-only standalone <lynx-view> host
-├── .github/workflows/            # CI/CD pipelines
+├── web-host/                     # Standalone <lynx-view> host with the bridge module
+├── scripts/                      # Asset sync and APK verification
 ├── lynx.config.ts                # Lynx build configuration
+├── rstest.config.ts              # Test runner configuration
 ├── rsbuild.web-host.config.ts    # Web host build configuration
 └── tsconfig.json                 # TypeScript configuration
 ```
@@ -36,52 +42,55 @@ speedy-bird-lynx/
 ## Component Hierarchy
 
 ```
-App
-├── Background          (z-index: 0, parallax scroll)
-├── Pipe[]              (z-index: 1, tile-based, scroll left)
-├── Bird                (z-index: 2, animated sprite + rotation)
-├── Ground              (z-index: 3, scroll matches pipe speed)
-├── ScoreDisplay        (z-index: 4, visible during play)
-├── GetReadyScreen      (z-index: 5, visible on ready)
-└── GameOverScreen      (z-index: 5, visible on game over)
+App (root view: main-thread tap handler, layout listener, accessibility label)
+└── Playfield (400x750, scaled to fit and anchored to the bottom edge)
+    ├── Background      (z-index: 0, parallax scroll)
+    ├── PipeSlot x5     (z-index: 1, reusable pipe pairs)
+    ├── Bird            (z-index: 2, animated sprite + rotation)
+    ├── Ground          (z-index: 3, scroll matches pipe speed)
+    ├── ScoreDisplay    (z-index: 4, visible during play)
+    ├── GetReadyScreen  (z-index: 5, visible on ready)
+    ├── GameOverScreen  (z-index: 5, visible on game over)
+    └── PausedOverlay   (z-index: 6, visible while paused)
 ```
 
-## Rendering Approach
-
-The ReactLynx renderer in this project composes its visuals from built-in elements:
-
-- `<view>` — containers and positioning via CSS transforms
-- `<image>` — sprites loaded as individual PNGs
-- `<text>` — score display on the game over panel
-
-Game entities use absolute positioning and CSS transforms for movement. The background and ground have fixed nonzero `top` offsets, while pipes and the bird combine layout offsets with transforms. Transform-based movement limits layout work; animation also updates image opacity and render state.
+The playfield keeps its 400x750 aspect ratio. On tall phones it fills the width and the extra height above it shows more sky; pipes extend into it. On wide screens it fills the height and dark side panels cover the area outside it, so pipes never pop in at the edge.
 
 ## Dual-Threaded Model
 
-Lynx runs on two threads:
+Lynx runs app code on two threads. This game uses each for what it is good at:
 
 | Thread | Responsibility |
 |--------|---------------|
-| **Background** | React reconciliation, game logic, state management |
-| **Main** | Native rendering, layout, touch event delivery |
+| **Main** | Taps (`main-thread:bindtap`), the frame loop (`lynx.requestAnimationFrame`), simulation steps, and per-frame style updates (`setStyleProperties`) |
+| **Background** | React rendering of discrete UI (score, overlays, accessibility label), sounds, saved best score, and host events |
 
-The game loop (`setInterval` at 17ms) runs on the background thread. It updates a React state object (`RenderState`) which triggers reconciliation. Lynx's main thread then applies the resulting native element updates.
+The engine module is imported with `with { runtime: 'shared' }` so the same code runs on the main thread. Animated elements have static React props; only the main thread changes their styles, so React never overwrites a frame. Each frame costs no React render and no cross-thread message unless the state, score, or pause flag changes or a sound plays. The loop stops while the game is idle or paused.
 
-## State Management
+## Rendering Approach
 
-The `useGameEngine` hook manages all game state:
+Visuals use built-in elements only:
 
-- **`engine.current`** — mutable ref holding physics state (position, velocity, pipe list). Updated every tick without triggering renders.
-- **`renderState`** — React state snapshot pushed to components via `setRenderState()` at the end of each tick and immediately after input handling.
+- `<view>` — containers and positioning via CSS transforms
+- `<image>` — sprites, embedded in the bundle as data URIs so native hosts need only one file
+- `<text>` — score and best score on the game-over panel, and the pause message
 
-This separation keeps mutable simulation data out of React state. Each tick still allocates a render snapshot and a shallow pipe-array copy; it is not an allocation-free game loop.
+## Testing
+
+`bun run test` runs Rstest with the ReactLynx Testing Library, reusing `lynx.config.ts` so main-thread functions and shared modules compile as in the app:
+
+- `tests/engine.test.ts` — state transitions, physics, scoring, collisions, restart lock, determinism, viewport fit
+- `tests/preferences.test.ts` — saved-score parsing and screen-reader text
+- `tests/app.test.tsx` — the real App with a stubbed frame scheduler and host bridge: taps, sounds, game over with a saved best score, pause and resume
+
+Tests need Node.js (jsdom does not run on Bun).
 
 ## Web Rendering Surfaces
 
 | Surface | Source | Purpose |
 |---------|--------|---------|
 | ReactLynx web preview | `bun run dev` and `http://localhost:3000/__web_preview?casename=main.web.bundle` | Development preview of the compiled `main.web.bundle` |
-| GitHub Pages canvas demo | `docs/src/pages/index.astro` | Public playable browser demo; it ports the game state machine and physics to an inline `<canvas>` script for zero-dependency Pages playback |
-| Standalone web host | `bun run dev:web-host`, with `bun run dev` in a second terminal | Development-only `<lynx-view>` host on port 4000, loading the bundle from port 3000 |
+| Standalone web host | `bun run dev:web-host` with `bun run dev`; or `bun run build && bun run build:web-host` | `<lynx-view>` host on port 4000 that implements `SpeedyBirdModule` (Web Audio, `localStorage`, live-region announcements) and forwards Space/Enter and tab visibility. The production build is self-contained: it ships `main.web.bundle` and the audio files |
+| GitHub Pages canvas demo | `docs/src/pages/index.astro` | Public playable browser demo, a separate `<canvas>` port of the game for zero-dependency Pages playback |
 
-The canvas demo intentionally uses a 400x600 viewport to fit the landing-page phone frame. Core physics values such as flap force, gravity, pipe gap, speed ramp, and medal thresholds mirror `src/constants.ts`; the viewport height is adapted from the ReactLynx game's 400x750 canvas height.
+The canvas demo uses a 400x600 viewport to fit the landing-page phone frame. Its physics values mirror `src/constants.ts`.

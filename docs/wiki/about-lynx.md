@@ -7,8 +7,8 @@
 This project exists to learn Lynx by building something real. A Flappy Bird clone is a good fit because it exercises:
 
 - Element-based rendering — no canvas, all positioning via `<view>` + CSS transforms
-- Frequent state updates — a 17ms timer targeting approximately 60 updates per second
-- Touch input — tap events for gameplay
+- Per-frame animation — a main-thread frame loop that updates element styles without React renders
+- Touch input — main-thread tap handlers with no cross-thread round trip
 - Asset loading — images, sprites, audio
 - Cross-platform code — Android host and web preview, with an iOS source scaffold requiring Xcode setup
 - CI/CD — automated build and release pipeline
@@ -47,22 +47,21 @@ This application does not use canvas or extended elements for its Lynx renderer.
 
 The project primarily uses pixels and percentages. See the [Lynx length reference](https://lynxjs.org/api/css/data-type/length) for definitions and platform compatibility.
 
-### Dual-Threaded Architecture
+### Dual-Threaded Architecture and Main Thread Script
 
-React reconciliation (diffing, state updates) runs on a background thread. The main thread handles native rendering and touch events. This means:
+React reconciliation (diffing, state updates) runs on a background thread. The main thread handles native rendering and touch events. Normally every update crosses between the two, which is fine for UI but too slow for a game updated every frame. [Main Thread Script](https://lynxjs.org/react/main-thread-script.html) lets selected functions run on the main thread instead:
 
-- The game loop and React state live on the background thread
-- Touch events (`bindtap`) are serialized from main to background thread
-- Native element updates are applied on the main thread after reconciliation
+- `'main thread'` functions handle taps (`main-thread:bindtap`) and run the frame loop with `lynx.requestAnimationFrame`
+- `useMainThreadRef` binds elements (`main-thread:ref`) and keeps the controller between calls
+- `setStyleProperties` moves the bird, pipes, and scenery directly, without React
+- `import ... with { runtime: 'shared' }` makes the pure engine module callable from main-thread code
+- `runOnBackground` sends discrete changes (score, state, sounds) to React; `runOnMainThread` lets background code start, pause, or resume the loop
+
+See [Game Engine](game-engine.md) for the frame-by-frame flow.
 
 ### Native Modules
 
-The current `audio.ts` adapter detects whether the JavaScript environment exposes `Audio`:
-
-- **Browser contexts with `Audio`**: uses `HTMLAudioElement`; playback can be blocked until user interaction
-- **Native and worker contexts without `Audio`**: uses a placeholder adapter and continues without sound; a supported native-module bridge is not implemented
-
-The placeholder's optional `__lynx_requireModule` lookup is not a documented integration contract. Future audio work should use Lynx's supported background-thread `NativeModules` API and register the corresponding Android/iOS modules. The only current adapter method is `play(sound)`; there is no native preload method. The standalone Canvas demo runs in the browser document and has its own working audio implementation.
+Sound, saved scores, and screen-reader announcements go through one native module, `SpeedyBirdModule`, read from the background thread's `NativeModules` (`src/platform/host.ts`). Each host implements it: the standalone web host registers an ES module through `<lynx-view>`'s `nativeModulesMap` and handles calls with `onNativeModulesCall`. A host without the module still runs the game silently. The Canvas demo runs in the browser document and has its own audio implementation.
 
 ## Resources
 
