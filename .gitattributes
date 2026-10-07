@@ -1,1 +1,18 @@
-android/gradlew.bat text eol=crlf
+# Normalize text to LF in the repository; Windows scripts keep CRLF.
+* text=auto eol=lf
+*.bat text eol=crlf
+android/gradlew text eol=lf
+
+# Binary assets
+*.png binary
+*.ico binary
+*.jpg binary
+*.wav binary
+*.m4a binary
+*.jar binary
+*.keystore binary
+
+# Generated lockfiles: collapse diffs by default but keep them reviewable.
+bun.lock linguist-generated=true
+ios/Gemfile.lock linguist-generated=true
+ios/Podfile.lock linguist-generated=true

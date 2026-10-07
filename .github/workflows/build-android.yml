@@ -1,170 +1,96 @@
 name: Build Android
 
+# Publishes an immutable build/0.0.0-<sha> prerelease. Build Check calls this after all
+# of its jobs pass for a push to main; manual runs are limited to main.
+
 on:
-  push:
-    branches: [main]
+  workflow_call:
+    secrets:
+      KEYSTORE_BASE64:
+        required: false
+      KEYSTORE_PASSWORD:
+        required: false
+      KEY_ALIAS:
+        required: false
+      KEY_PASSWORD:
+        required: false
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: android-build-release
+  cancel-in-progress: false
+
 jobs:
-  build:
+  version:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
+      sha: ${{ steps.version.outputs.SHA }}
       version-name: ${{ steps.version.outputs.VERSION_NAME }}
-      version-code: ${{ steps.version.outputs.VERSION_CODE }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      # Compute version from tag or short SHA
-      - name: Set version
+      - name: Compute build version
         id: version
         env:
-          GH_REF: ${{ github.ref }}
+          RUN_SHA: ${{ github.sha }}
         run: |
-          if [[ "$GH_REF" == refs/tags/v* ]]; then
-            VERSION="${GH_REF#refs/tags/v}"
-          else
-            VERSION="0.0.0-$(git rev-parse --short HEAD)"
-          fi
-          # Version code: seconds since epoch / 10 (fits in 32-bit int for decades)
-          VERSION_CODE=$(( $(date +%s) / 10 ))
-          echo "VERSION_NAME=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_OUTPUT"
-          echo "Version: $VERSION (code: $VERSION_CODE)"
+          echo "SHA=$RUN_SHA" >> "$GITHUB_OUTPUT"
+          echo "VERSION_NAME=0.0.0-${RUN_SHA:0:7}" >> "$GITHUB_OUTPUT"
 
-      # Build Lynx JS bundle (Bun is the standardized AGENTS.md convention for this repo)
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: '24'
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Build Lynx bundle
-        run: bun run build
-
-      # Decode signing keystore (if secrets are configured)
-      - name: Decode keystore
-        if: env.KEYSTORE_BASE64 != ''
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-        run: echo "$KEYSTORE_BASE64" | base64 -d > android/app/release.keystore
-
-      # Build Android APK
-      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
-        with:
-          distribution: temurin
-          java-version: 21
-
-      - name: Install Android SDK
-        run: |
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "cmdline-tools;latest"
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.2" "build-tools;37.0.0"
-
-      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
-
-      - name: Build release APK
-        env:
-          KEYSTORE_FILE: ${{ secrets.KEYSTORE_BASE64 != '' && 'release.keystore' || '' }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          VERSION_NAME: ${{ steps.version.outputs.VERSION_NAME }}
-          VERSION_CODE: ${{ steps.version.outputs.VERSION_CODE }}
-        working-directory: android
-        run: ./gradlew assembleRelease
-
-      - name: Verify packaged bundle
-        run: python3 scripts/verify_android_bundle.py android/app/build/outputs/apk/release/*.apk
-
-      # Rename APK with version
-      - name: Rename APK
-        env:
-          VERSION_NAME: ${{ steps.version.outputs.VERSION_NAME }}
-        run: |
-          APKS=(android/app/build/outputs/apk/release/*.apk)
-          test "${#APKS[@]}" -eq 1
-          cp "${APKS[0]}" "android/app/build/outputs/apk/release/speedy-bird-${VERSION_NAME}.apk"
-
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
-        with:
-          name: speedy-bird-${{ steps.version.outputs.VERSION_NAME }}-android
-          path: android/app/build/outputs/apk/release/speedy-bird-*.apk
-          if-no-files-found: error
-          retention-days: 90
+  apk:
+    needs: version
+    uses: ./.github/workflows/reusable-android-apk.yml
+    with:
+      ref: ${{ needs.version.outputs.sha }}
+      version-name: ${{ needs.version.outputs.version-name }}
+    secrets:
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
   publish:
-    needs: build
-    if: github.ref == 'refs/heads/main'
+    needs: [version, apk]
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: write
     steps:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
-          name: speedy-bird-${{ needs.build.outputs.version-name }}-android
-          path: android/app/build/outputs/apk/release
+          name: android-apk
+          path: apk
 
-      # Create GitHub Release with APK attached
-      - name: Create GitHub Release
+      # Build releases are prereleases so they never replace a versioned release as "Latest".
+      - name: Publish build prerelease
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION_NAME: ${{ needs.build.outputs.version-name }}
-          VERSION_CODE: ${{ needs.build.outputs.version-code }}
-          GH_REF: ${{ github.ref }}
-          GH_SHA: ${{ github.sha }}
           GH_REPO: ${{ github.repository }}
+          COMMIT_SHA: ${{ needs.version.outputs.sha }}
+          VERSION_NAME: ${{ needs.version.outputs.version-name }}
         run: |
-          COMMIT_SHA="$GH_SHA"
-          SHORT_SHA="${COMMIT_SHA:0:7}"
+          TAG="build/$VERSION_NAME"
           APK_FILE="speedy-bird-${VERSION_NAME}.apk"
-          APK_SIZE=$(du -h "android/app/build/outputs/apk/release/$APK_FILE" | cut -f1)
-
-          if [[ "$GH_REF" == refs/tags/v* ]]; then
-            TAG="${GH_REF#refs/tags/}"
-            TITLE="Speedy Bird $TAG"
-            PRERELEASE=""
-          else
-            TAG="build/$VERSION_NAME"
-            TITLE="Speedy Bird v${VERSION_NAME}"
-            PRERELEASE=""
-          fi
-
-          BODY="Automated release built from commit [\`${COMMIT_SHA}\`](https://github.com/${GH_REPO}/commit/${COMMIT_SHA}).
-
-          ### Downloads
+          APK_SIZE=$(du -h "apk/$APK_FILE" | cut -f1)
+          BODY="Automated build from commit [\`${COMMIT_SHA}\`](https://github.com/${GH_REPO}/commit/${COMMIT_SHA}) after verification passed.
 
           | Platform | File | Size | Notes |
           |----------|------|------|-------|
           | Android | \`${APK_FILE}\` | ${APK_SIZE} | Release APK; signed only when signing secrets are configured |
 
-          ### Build Info
-
-          | Field | Value |
-          |-------|-------|
-          | Version | \`${VERSION_NAME}\` |
-          | Version Code | \`${VERSION_CODE}\` |
-          | Commit | [\`${SHORT_SHA}\`](https://github.com/${GH_REPO}/commit/${COMMIT_SHA}) |
-          | Lynx SDK | 4.1.0 |
-          | Min Android | API 21 (5.0 Lollipop) |
+          Lynx SDK 4.1.0 · minimum Android API 21.
 
           > **[Play the web version](https://jonathanperis.github.io/speedy-bird-lynx/)** if you don't have an Android device."
 
-          gh release create "$TAG" \
+          gh release create "$TAG" "apk/$APK_FILE" \
             --repo "$GH_REPO" \
-            --target "$GH_SHA" \
-            --draft \
-            --title "$TITLE" \
+            --target "$COMMIT_SHA" \
+            --title "Speedy Bird build ${VERSION_NAME}" \
             --notes "$BODY" \
-            $PRERELEASE \
-            "android/app/build/outputs/apk/release/$APK_FILE"
-          gh release edit "$TAG" --repo "$GH_REPO" --draft=false
+            --draft \
+            --prerelease \
+            --latest=false
+          gh release edit "$TAG" --repo "$GH_REPO" --draft=false --latest=false

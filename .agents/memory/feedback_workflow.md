@@ -34,6 +34,8 @@ Repo-wide files (SECURITY.md, CODE_OF_CONDUCT.md, CONTRIBUTING.md, FUNDING.yml, 
 
 **How to apply:** Never create SECURITY.md, CODE_OF_CONDUCT.md, CONTRIBUTING.md, FUNDING.yml, issue/PR templates, or CODEOWNERS in this repo. If the user needs these, suggest updating the `.github` repo instead.
 
+Note (2026-10-07): GitHub does not inherit `CODEOWNERS` from the `.github` repo; it only works in the repository itself. A root `CODEOWNERS` currently exists here; leave it unless the user decides otherwise.
+
 ---
 
 Always sync main before creating a branch and before opening a PR.

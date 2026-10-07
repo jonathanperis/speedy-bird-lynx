@@ -1,0 +1,18 @@
+name: Set up Android toolchain
+description: Install JDK 21, the Android SDK platform used by the host app, and Gradle caching.
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+      with:
+        distribution: temurin
+        java-version: 21
+
+    - name: Install Android SDK packages
+      shell: bash
+      run: |
+        "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "cmdline-tools;latest"
+        "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.2" "build-tools;37.0.0"
+
+    - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6

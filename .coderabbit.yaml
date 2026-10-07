@@ -24,40 +24,40 @@ reviews:
     - "!**/build/**"
     - "!**/out/**"
     - "!**/*.min.js"
-    - "!**/package-lock.json"
-    - "!**/bun.lock"
-    - "!**/bun.lockb"
-    - "!**/yarn.lock"
-    - "!**/Cargo.lock"
-    - "!**/*.snap"
 
   path_instructions:
-    - path: "**/*.cs"
+    - path: "src/**/*.{ts,tsx}"
       instructions: |
-        Follow .NET coding conventions. Flag missing async/await,
-        ConfigureAwait(false) in library code, IDisposable patterns,
-        and any nullable reference annotation gaps.
-    - path: "**/*.tsx"
+        This is ReactLynx (Lynx elements such as view, image and text), not React DOM.
+        Flag per-frame React state updates, effects without cleanup, missing list keys,
+        APIs unavailable on the Lynx background or main thread, and missing
+        accessibility-label/accessibility-element on interactive elements.
+        Gameplay rules belong in src/game/engine.ts and need unit tests.
+    - path: "**/*.kt"
       instructions: |
-        Flag missing key props in lists, useEffect dependency issues,
-        accessibility gaps (alt, aria-*), and any prop drilling that
-        could be replaced with context.
-    - path: "**/*.go"
+        Flag LynxView lifecycle gaps (destroy, onEnterBackground/onEnterForeground),
+        work on the main thread that can block, leaked contexts, and unnecessary
+        permissions or exported components.
+    - path: "**/*.swift"
       instructions: |
-        Flag missing error checks, channel leaks, goroutine leaks,
-        and any context cancellation issues.
-    - path: "**/*.rs"
+        Flag LynxView lifecycle and layout gaps (safe areas, trait or size changes),
+        retain cycles in closures, and work that blocks the main thread.
+    - path: "**/*.gradle.kts"
       instructions: |
-        Flag unwrap()/expect() in non-test code, missing Drop impls,
-        and any unnecessary allocations.
+        Keep Lynx SDK, PrimJS and Fresco versions coordinated; flag unpinned or
+        dynamic versions and configuration-cache incompatibilities.
     - path: "**/*.py"
       instructions: |
-        Flag bare except clauses, mutable default arguments, and
-        any synchronous I/O in async functions.
-    - path: ".github/workflows/**/*.yml"
+        Flag bare except clauses, unchecked file paths, and unclear error messages.
+    - path: ".github/**/*.yml"
       instructions: |
-        Flag any user-controlled input interpolated directly in
-        run: blocks (workflow injection risk). Recommend env: + quoting.
+        Flag user-controlled input interpolated directly in run: blocks (use env: and
+        quoting), actions not pinned to a full commit SHA, missing timeout-minutes,
+        and permissions broader than the job needs.
+    - path: "**/*.lock"
+      instructions: |
+        Lockfiles are supply-chain inputs: flag unexpected registries, git or tarball
+        sources, and packages that do not correspond to a manifest change.
 
 chat:
   auto_reply: true

@@ -5,6 +5,9 @@ dist/
 dist-web-host/
 *.local
 .DS_Store
+.env
+.env.*
+!.env.example
 
 # Android
 android/.gradle/
@@ -12,6 +15,8 @@ android/app/build/
 android/build/
 android/app/src/main/assets/main.lynx.bundle
 android/app/release.keystore
+*.jks
+*.keystore
 *.apk
 *.aab
 
@@ -24,7 +29,6 @@ ios/SpeedyBird/Resources/main.lynx.bundle
 ios/Podfile.lock
 *.xcarchive
 
-# Docs generation
-
 # Local specifications and audit evidence
 .specs/
+playwright-evidence/

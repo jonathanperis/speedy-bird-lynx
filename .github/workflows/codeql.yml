@@ -6,47 +6,61 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: "0 3 * * 1"
+    - cron: '0 3 * * 1'
   workflow_dispatch:
 
 permissions:
   contents: read
-  security-events: write
 
 jobs:
   analyze:
-    name: Analyze (javascript-typescript)
+    name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
-        with:
-          languages: javascript-typescript
-          queries: security-and-quality
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
-        with:
-          category: "/language:javascript-typescript"
-
-  analyze-actions:
-    name: Analyze (actions)
-    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [javascript-typescript, actions, python]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - uses: github/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
         with:
-          languages: actions
+          languages: ${{ matrix.language }}
+          build-mode: none
           queries: security-and-quality
       - uses: github/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
         with:
-          category: /language:actions
+          category: /language:${{ matrix.language }}
+
+  # Kotlin extraction needs a real Gradle compilation of the host app.
+  analyze-kotlin:
+    name: Analyze (java-kotlin)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-js
+      - name: Build Lynx bundle
+        run: bun run build
+      - uses: ./.github/actions/setup-android
+      - uses: github/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
+        with:
+          languages: java-kotlin
+          build-mode: manual
+          queries: security-and-quality
+      - name: Compile Android host
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon --no-build-cache --rerun-tasks
+      - uses: github/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
+        with:
+          category: /language:java-kotlin

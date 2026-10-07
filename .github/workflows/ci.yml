@@ -3,13 +3,16 @@ name: Build Check
 on:
   workflow_dispatch:
   push:
-    branches: [main, lynx-migration]
+    branches: [main]
   pull_request:
     branches: [main]
+  schedule:
+    # Weekly run catches upstream advisories and toolchain drift between changes.
+    - cron: '0 6 * * 1'
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -17,23 +20,22 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: '24'
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
-        with:
-          bun-version: latest
+      - uses: ./.github/actions/setup-js
 
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
+      # Gating runs fail on high/critical advisories; the weekly run reports every severity.
       - name: Audit dependencies
-        run: bun audit
+        env:
+          AUDIT_LEVEL: ${{ github.event_name == 'schedule' && 'low' || 'high' }}
+        run: bun audit --audit-level="$AUDIT_LEVEL"
+
+      - name: Lint and format
+        run: bun run lint
 
       - name: Type check
         run: bun run check
@@ -55,6 +57,7 @@ jobs:
   android:
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -63,15 +66,7 @@ jobs:
         with:
           name: lynx-bundles
           path: dist
-      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
-        with:
-          distribution: temurin
-          java-version: 21
-      - name: Install Android SDK
-        run: |
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "cmdline-tools;latest"
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.2" "build-tools;37.0.0"
-      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
+      - uses: ./.github/actions/setup-android
       - name: Compile and lint Android host
         working-directory: android
         run: ./gradlew assembleDebug lintDebug --no-daemon
@@ -80,19 +75,34 @@ jobs:
 
   docs:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      - uses: ./.github/actions/setup-js
         with:
-          node-version: '24'
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
-      - run: bun install --frozen-lockfile
+          working-directory: docs
+      - name: Audit dependencies
         working-directory: docs
-      - run: bun audit
+        env:
+          AUDIT_LEVEL: ${{ github.event_name == 'schedule' && 'low' || 'high' }}
+        run: bun audit --audit-level="$AUDIT_LEVEL"
+      - name: Build site
         working-directory: docs
-      - run: npm run build
+        run: npm run build
+      - name: Validate generated site
         working-directory: docs
-      - run: npm run check:site
-        working-directory: docs
+        run: npm run check:site
+
+  android-release:
+    needs: [build, android, docs]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/build-android.yml
+    secrets:
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}

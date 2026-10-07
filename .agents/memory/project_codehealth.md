@@ -1,6 +1,6 @@
 ---
 name: Code Health and Quality Gaps
-description: Source-backed quality gates and remaining gaps, reviewed 2026-09-17
+description: Source-backed quality gates and remaining gaps, reviewed 2026-10-07
 type: project
 ---
 
@@ -12,17 +12,12 @@ Generated-site checks validate routes, internal links/fragments, unique IDs, and
 
 **How to apply:** If adding tests, Vitest is the natural fit (Rspack ecosystem). Priority targets: useGameEngine tick logic, collision detection, state transitions.
 
-## No Linting or Formatting Config
+## Lint and Format
 
-No ESLint, Prettier, or Biome configuration. Existing gates include strict app TypeScript, builds, dependency audits, generated-site checks, Android compilation/API lint, APK verification, and CodeQL.
-
-**Why:** Not yet set up.
-
-**How to apply:** If the user asks to add linting, Biome is a good fit (fast, TypeScript-native, replaces both ESLint and Prettier).
+Biome 2 (`biome.json`) lints and format-checks app code, the web host, tests, and scripts; CI runs `bun run lint` (`biome ci .`). Use `bun run format` to apply fixes.
 
 ## Minor Code Issues (non-blocking)
 
 - `audio.ts`: optional `__lynx_requireModule` lookup is a placeholder, not a supported bridge implementation. Future audio work needs the documented background-thread `NativeModules` API.
 - `useGameEngine.ts`: `let nextPipeId = 0` is module-scoped (safe for single instance, but won't reset on remount)
 - `tsconfig.json`: `@/*` path alias defined but never used in imports (all relative)
-- `ci.yml`: still monitors `lynx-migration` branch (may be stale)
