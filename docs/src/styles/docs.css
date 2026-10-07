@@ -281,7 +281,7 @@ input:focus-visible {
   text-transform: uppercase;
 }
 
-.docs-marquee h1 {
+.docs-marquee .marquee-title {
   margin: 0;
   max-width: 12ch;
   color: var(--text-bright);
@@ -405,13 +405,15 @@ section.doc-section::before {
 
 section.doc-section > :first-child { margin-top: 0; }
 
-h1, h2, h3, h4 {
+h1, h2, h3, h4, h5, h6 {
   font-family: 'Nunito', system-ui, sans-serif;
   color: var(--text-bright);
   text-wrap: balance;
 }
 
-.content .doc-section > h1:first-child {
+/* Guide headings are styled by their Markdown level (render-doc.ts adds doc-h<level>), because
+   the combined manual renders each one a level lower than on its own page. */
+.content .doc-section > .doc-h1:first-child {
   margin-top: 0.3rem;
   margin-bottom: 0.9rem;
   color: var(--text-bright);
@@ -422,14 +424,14 @@ h1, h2, h3, h4 {
   text-shadow: 3px 3px 0 var(--stroke-dark);
 }
 
-h1 {
+.doc-h1 {
   font-size: clamp(2rem, 4vw, 3.2rem);
   font-weight: 900;
   line-height: 1.02;
   letter-spacing: -0.04em;
 }
 
-h2 {
+.doc-h2 {
   scroll-margin-top: 110px;
   margin: 2.2rem 0 1rem;
   padding-bottom: 0.5rem;
@@ -441,7 +443,7 @@ h2 {
   letter-spacing: -0.03em;
 }
 
-h3 {
+.doc-h3 {
   scroll-margin-top: 110px;
   margin: 1.75rem 0 0.75rem;
   color: var(--text-bright);
@@ -450,7 +452,7 @@ h3 {
   letter-spacing: -0.01em;
 }
 
-h4 {
+.doc-h4 {
   margin: 1.35rem 0 0.55rem;
   color: var(--arcade-gold);
   font-size: 1rem;
@@ -621,7 +623,7 @@ tr:last-child td { border-bottom: 0; }
   .content { padding: 1.25rem 1rem 4rem; }
   .overlay.open { display: block; }
   .docs-marquee { padding: 1.2rem; }
-  .docs-marquee h1 { max-width: 10ch; }
+  .docs-marquee .marquee-title { max-width: 10ch; }
   .manual-scoreboard { grid-template-columns: 1fr; }
   .manual-scoreboard div { min-height: 74px; }
   .manual-jumpbar { position: static; }

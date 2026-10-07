@@ -1,0 +1,41 @@
+/* Accessibility helpers shared by every page. */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 1000;
+  padding: 0.7rem 1rem;
+  color: var(--stroke-dark);
+  background: var(--arcade-gold);
+  border: 2px solid var(--stroke-dark);
+  border-radius: 4px;
+  box-shadow: var(--shadow-press);
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transform: translateY(calc(-100% - 1rem));
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: none;
+  outline: 3px solid var(--text-bright);
+  outline-offset: 2px;
+}
+
+/* Skip-link targets take focus programmatically; they need no ring. */
+[tabindex='-1']:focus { outline: none; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
