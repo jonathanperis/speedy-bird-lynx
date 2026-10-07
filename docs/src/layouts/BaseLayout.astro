@@ -77,7 +77,6 @@ const jsonLd = {
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
     <title>{title}</title>
-    <Analytics />
   </head>
   <body>
     <div class="particles">
@@ -90,5 +89,6 @@ const jsonLd = {
     </div>
 
     <slot />
+    <Analytics />
   </body>
 </html>

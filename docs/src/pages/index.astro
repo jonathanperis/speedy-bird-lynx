@@ -1,7 +1,8 @@
 ---
+import Analytics from '../components/Analytics.astro';
+import { GA_ID } from '../lib/analytics';
 import '../styles/home.css';
 
-const gaId = import.meta.env.PUBLIC_GA_ID;
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 const faviconHref = `${basePath}/favicon.ico`;
 const faviconPngHref = `${basePath}/favicon.png`;
@@ -35,17 +36,6 @@ const jsonLd = `{
 <!doctype html>
 <html lang="en">
 <head>
-  {gaId && (
-    <>
-      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
-      <script define:vars={{ gaId }}>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', gaId);
-      </script>
-    </>
-  )}
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Speedy Bird - Pixel Art Side-Scroller</title>
@@ -368,6 +358,11 @@ const jsonLd = `{
     <p style="margin-top: 0.25rem;">
       Sprites from <a href="https://www.spriters-resource.com/fullview/59894/" target="_blank" rel="noreferrer noopener">The Spriters Resource</a>.
     </p>
+    {GA_ID && (
+      <p class="footer-settings">
+        <button type="button" class="link-button" data-analytics-settings hidden>Analytics settings</button>
+      </p>
+    )}
   </footer>
 
   <!-- Navigation and section reveals -->
@@ -419,5 +414,6 @@ const jsonLd = `{
     }
   </script>
 
+  <Analytics />
 </body>
 </html>
