@@ -10,7 +10,7 @@ This project exists to learn Lynx by building something real. A Flappy Bird clon
 - Per-frame animation — a main-thread frame loop that updates element styles without React renders
 - Touch input — main-thread tap handlers with no cross-thread round trip
 - Asset loading — images, sprites, audio
-- Cross-platform code — Android host and web preview, with an iOS source scaffold requiring Xcode setup
+- Cross-platform code — Android and iOS hosts plus web preview from one bundle
 - CI/CD — automated build and release pipeline
 
 ## How Lynx Differs from Other Frameworks

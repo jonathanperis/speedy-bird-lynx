@@ -6,18 +6,18 @@ All automation runs on GitHub Actions. Workflows are in `.github/workflows/`.
 
 | Workflow | File | Trigger | Description |
 |----------|------|---------|-------------|
-| Build Check | `ci.yml` | Manual, push to `main`, PR to `main`, weekly | Audit dependencies, lint/format, check bundles/web host/docs, validate site links/metadata, compile/lint Android, verify APK bundle; calls Build Android after `main` pushes pass |
-| CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript, Actions, Python, and Kotlin security analysis |
+| Build Check | `ci.yml` | Manual, push to `main`, every PR, weekly | Audit dependencies, lint/format, check bundles/web host/docs, validate site links/metadata, compile/lint Android, verify APK bundle; calls Build Android after `main` pushes pass |
+| CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript, Actions, Python, and Kotlin security analysis; Swift (full Xcode build) on `main` and weekly |
 | Deploy Web | `deploy.yml` | Push to `main`, manual | Build and deploy the Astro `docs/` site to GitHub Pages via the shared Pages workflow |
 | Build Android | `build-android.yml` | Called by Build Check on `main`, manual from `main` | Read-only APK build followed by a separate build-prerelease publisher |
-| Build iOS | `build-ios.yml` | Manual | Skip without an Xcode project; otherwise build an unsigned archive |
+| Build iOS | `build-ios.yml` | Manual | Unsigned archive |
 | Release | `release.yml` | `v*` tags on `main`, manual from `main` | Full release pipeline with all artifacts |
 
 Shared steps live in composite actions: `.github/actions/setup-js` installs Node.js 24, the Bun version pinned by each package's `packageManager` field, restores Bun's package cache, and runs a frozen install; `.github/actions/setup-android` installs JDK 21, the Android SDK platform, and Gradle caching. The release APK and unsigned iOS archive are reusable workflows (`reusable-android-apk.yml`, `reusable-ios-archive.yml`) shared by the build and release pipelines. Every job declares `timeout-minutes`, and only publishing jobs receive `contents: write`.
 
 ## Build Check
 
-Runs on manual dispatch, pushes to `main`, pull requests targeting `main`, and weekly. Pull-request runs cancel superseded runs; `main` runs queue so every verified commit can publish. Validates the codebase compiles and builds:
+Runs on manual dispatch, pushes to `main`, every pull request (including stacked ones), and weekly. Pull-request runs cancel superseded runs; `main` runs queue so every verified commit can publish. Validates the codebase compiles and builds:
 
 1. `bun install --frozen-lockfile` — install dependencies
 2. `bun audit --audit-level=high` — fail on high or critical advisories; the weekly run reports every severity
@@ -27,8 +27,9 @@ Runs on manual dispatch, pushes to `main`, pull requests targeting `main`, and w
 6. `bun run assets:check` — docs asset copies match `assets/`
 7. `bun run build` and `bun run build:web-host` — build Lynx/web bundles and the development host
 8. Upload bundles as artifact (14-day retention)
-9. Compile and lint the Android debug host in a read-only job without signing secrets, then verify the APK contains the current bundle
-10. Install the frozen docs lockfile, audit it, build the site, and check every generated page's local links, fragments, unique IDs, and canonical/OG URL
+9. Compile and lint the Android debug host in a read-only job without signing secrets, then verify the APK contains the current bundle and every sound
+10. Build the iOS host and run its UI smoke tests on a simulator (see Build iOS)
+11. Install the frozen docs lockfile, audit it, build the site, and check every generated page's local links, fragments, unique IDs, and canonical/OG URL
 
 Successful builds and static checks do not establish device behavior or accessibility conformance.
 
@@ -78,14 +79,10 @@ The signing step learns only whether `KEYSTORE_BASE64` is configured (secrets ca
 
 ## Build iOS
 
-Scaffolded but requires manual setup:
+Build Check's `ios` job (macOS) builds the bundle, installs the locked pods with `pod install --deployment`, builds the app, and runs the XCUITest smoke tests on the newest available iPhone simulator; the result bundle is uploaded when it fails. `build-ios.yml` (manual) and the release pipeline produce an unsigned archive through `reusable-ios-archive.yml`. Paid membership is not needed for either.
 
-1. Create and track an Xcode project with a shared `SpeedyBird` scheme (see [Native Host Apps](native-host-apps.md)).
-2. Build/package the bundle and install the locked Ruby/CocoaPods dependencies.
-3. Build an unsigned archive. Paid membership is not needed for this operation.
-
-The checked-in `ios/` directory contains a Swift/CocoaPods scaffold, not a generated `.xcodeproj`. The workflows always disable code signing; Apple secrets are not read. Signed device distribution would require additional workflow implementation as well as Apple signing assets. Dependency resolution alone is not an app/archive build.
+The workflows always disable code signing; Apple secrets are not read. Signed device distribution would require additional workflow implementation as well as Apple signing assets.
 
 ## Release
 
-Triggered by version tags (`v*`) or manual dispatch from `main`. The tagged commit must be on `main`; the pipeline audits, lints, type-checks, and tests before building. This is the sole publisher for versioned releases, avoiding concurrent publishers racing an immutable release. Builds Lynx bundles and conditionally builds Android/iOS when their native projects exist; a failed build blocks publication. The publishing job uploads all available assets to a draft, then publishes the immutable release. Subsequent corrections require a new release instead of replacing published assets.
+Triggered by version tags (`v*`) or manual dispatch from `main`. The tagged commit must be on `main`; the pipeline audits, lints, type-checks, and tests before building. This is the sole publisher for versioned releases, avoiding concurrent publishers racing an immutable release. Builds Lynx bundles, the Android APK, and the unsigned iOS archive; a failed build blocks publication. The publishing job uploads all available assets to a draft, then publishes the immutable release. Subsequent corrections require a new release instead of replacing published assets.

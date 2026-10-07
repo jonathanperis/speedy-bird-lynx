@@ -5,7 +5,7 @@
 - **Bun** for dependency installation and root scripts
 - **Node.js** >=22.12 for the build toolchains; use npm scripts to run Astro
 - **Java 21**, Android SDK **Platform 37.2**, and current Android command-line tools (minimum supported device API remains 21)
-- **Xcode**, **Ruby >=3.2**, and Bundler (for iOS after creating a project from the source scaffold)
+- **Xcode**, **Ruby >=3.2**, and Bundler (for iOS)
 
 See [Dependencies and Upgrades](dependency-updates.md) for exact versions and compatibility holds.
 
@@ -43,24 +43,21 @@ bun run build
 cd android && ./gradlew assembleDebug
 ```
 
-The APK is at `android/app/build/outputs/apk/debug/app-debug.apk`. Gradle stages the current root bundle into generated assets; no manual copy is needed. Install via `adb install` or transfer to your device. Run `./gradlew lintDebug` for Android API checks, or `./gradlew assembleRelease` for a release APK.
+The APK is at `android/app/build/outputs/apk/debug/app-debug.apk`. Gradle stages the current root bundle and sound effects into generated assets; no manual copy is needed. Install via `adb install` or transfer to your device. Run `./gradlew lintDebug` for Android API checks, or `./gradlew assembleRelease` for a release APK.
 
 For release builds with signing, see [CI/CD Pipeline](ci-cd-pipeline.md).
 
 ## iOS
 
-> Requires Xcode and an Xcode project (`.xcodeproj`). The repository includes the Swift/CocoaPods source scaffold, but the Xcode project/workspace must be created locally before building. See [Native Host Apps](native-host-apps.md) for setup instructions.
-
 ```bash
 bun run build
-cp dist/main.lynx.bundle ios/SpeedyBird/Resources/
 cd ios
 bundle install
 bundle exec pod install
 open SpeedyBird.xcworkspace
 ```
 
-Configure the project, scheme, resources, and deployment target in Xcode, then build for your selected simulator or device. Device distribution requires signing configuration; the checked-in CI commands always produce unsigned archives when a project exists.
+Pick a simulator or device and run. The project packages the current `dist/main.lynx.bundle` and the sounds directly; no copy step is needed. Running on a device requires selecting your own signing team in Xcode; CI always builds unsigned. See [Native Host Apps](native-host-apps.md) for the UI tests and project generator.
 
 ## Web / GitHub Pages
 

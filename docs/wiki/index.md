@@ -1,6 +1,6 @@
 # Speedy Bird Lynx
 
-Flappy Bird clone built with [ReactLynx](https://lynxjs.org/) and TypeScript. The checked-in project runs on Android and Web from a single codebase and includes iOS host source files for Xcode project setup. Lynx uses a native C++ rendering engine and dual-threaded architecture instead of a WebView.
+Flappy Bird clone built with [ReactLynx](https://lynxjs.org/) and TypeScript. One codebase runs on Android, iOS, and the Web. Lynx uses a native C++ rendering engine and dual-threaded architecture instead of a WebView.
 
 ## Wiki Pages
 
@@ -10,15 +10,16 @@ Flappy Bird clone built with [ReactLynx](https://lynxjs.org/) and TypeScript. Th
 | [Architecture](architecture.md) | Project structure, component hierarchy, rendering approach, and dual-threaded model |
 | [Assets and Sprites](assets-and-sprites.md) | Sprite organization, asset loading, tile-based pipe rendering, and audio |
 | [CI/CD Pipeline](ci-cd-pipeline.md) | GitHub Actions workflows for building, signing, deploying, and releasing |
-| [Game Engine](game-engine.md) | Physics, collision detection, state machine, scoring, and the game loop |
+| [Game Engine](game-engine.md) | Pure rules engine, main-thread frame loop, physics, scoring, and host bridge |
 | [Getting Started](getting-started.md) | Setup, dev server, production builds, and platform-specific instructions |
-| [Native Host Apps](native-host-apps.md) | Android host and iOS source scaffold |
+| [Native Host Apps](native-host-apps.md) | Android and iOS hosts, native bridge, lifecycle, and UI tests |
 | [Dependencies and Upgrades](dependency-updates.md) | Current toolchains, compatibility holds, and upgrade checks |
 
 ## Key Features
 
-- Tap/click to flap in the ReactLynx app; the GitHub Pages canvas demo also supports Space
-- Speed increases 1% per pipe cleared
+- Tap/click to flap; the standalone web host and the GitHub Pages canvas demo also support Space
+- Speed increases 1% per pipe cleared; frame-rate-independent physics on a main-thread loop
+- Best score saved on every platform; pause when the app is backgrounded; screen-reader announcements
 - Medal system: Bronze (10+), Silver (25+), Gold (50+), Platinum (100+)
 - Element-based ReactLynx rendering with CSS transforms; a separate Canvas demo powers the public website
 - Tile-based pipe construction and parallax scrolling
@@ -27,7 +28,7 @@ Flappy Bird clone built with [ReactLynx](https://lynxjs.org/) and TypeScript. Th
 
 ## Platform status
 
-Android has a checked-in buildable Kotlin host. ReactLynx has a development web preview and standalone host. GitHub Pages runs the independent Canvas game and this manual. iOS requires a locally created Xcode project; its CI archive path is conditional and always unsigned. The Canvas demo has sound; ReactLynx native/worker audio requires a bridge implementation.
+Android and iOS have buildable native hosts with sound and saved scores; CI compiles both, lints Android, and runs iOS UI tests on a simulator (iOS archives are unsigned). ReactLynx also has a development web preview and a self-contained standalone web host. GitHub Pages runs the Canvas game and this manual.
 
 ---
 
