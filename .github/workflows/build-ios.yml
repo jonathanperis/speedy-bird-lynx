@@ -11,5 +11,3 @@ permissions:
 jobs:
   ios:
     uses: ./.github/workflows/reusable-ios-archive.yml
-    with:
-      ref: ${{ github.sha }}
