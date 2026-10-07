@@ -51,7 +51,7 @@ export default function ScoreDisplay({ score, visible }: ScoreDisplayProps) {
         {digits.map((d, i) => (
           <image
             key={i}
-            src={DIGIT_SPRITES[parseInt(d)]}
+            src={DIGIT_SPRITES[Number(d)]}
             style={{
               width: `${DIGIT_W}px`,
               height: `${DIGIT_H}px`,

@@ -1,4 +1,50 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>jonathanperis/.github"]
+  "extends": ["github>jonathanperis/.github"],
+  "packageRules": [
+    {
+      "description": "ReactLynx, its compiler plugin, Rspeedy and the web runtime must move together and be verified on device; see docs/wiki/dependency-updates.md",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["/^@lynx-js\\//"],
+      "groupName": "lynx",
+      "automerge": false,
+      "labels": ["dependencies", "lynx"]
+    },
+    {
+      "description": "Native Lynx SDK and PrimJS releases are coordinated across Android and iOS; ignore nightly/prerelease builds",
+      "matchManagers": ["gradle", "cocoapods"],
+      "matchPackageNames": ["/^org\\.lynxsdk\\.lynx:/", "Lynx", "PrimJS", "LynxService"],
+      "groupName": "lynx-native",
+      "allowedVersions": "!/(nightly|alpha|beta|rc)/",
+      "automerge": false,
+      "labels": ["dependencies", "lynx"]
+    },
+    {
+      "description": "Rspeedy's TypeScript peer range ends at 6.0.x; the independent docs package may use newer TypeScript",
+      "matchManagers": ["npm"],
+      "matchFileNames": ["package.json"],
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7"
+    },
+    {
+      "description": "LynxService/Image pins these exact versions in its podspec; upgrade only with the Lynx SDK",
+      "matchManagers": ["cocoapods"],
+      "matchPackageNames": ["SDWebImage", "SDWebImageWebPCoder"],
+      "enabled": false
+    },
+    {
+      "description": "Keep every Fresco module on the same release",
+      "matchManagers": ["gradle"],
+      "matchPackageNames": ["/^com\\.facebook\\.fresco:/"],
+      "groupName": "fresco",
+      "automerge": false
+    },
+    {
+      "description": "Android Gradle Plugin and Kotlin are verified together with the Gradle wrapper",
+      "matchManagers": ["gradle", "gradle-wrapper"],
+      "matchPackageNames": ["com.android.application", "org.jetbrains.kotlin.android", "gradle"],
+      "groupName": "android-build-toolchain",
+      "automerge": false
+    }
+  ]
 }

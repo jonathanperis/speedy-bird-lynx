@@ -1,7 +1,7 @@
-import { BIRD_W, BIRD_H, BIRD_X } from '../constants.js';
 import bird0 from '../../assets/sprites/bird-0.png';
 import bird1 from '../../assets/sprites/bird-1.png';
 import bird2 from '../../assets/sprites/bird-2.png';
+import { BIRD_H, BIRD_W, BIRD_X } from '../constants.js';
 
 const BIRD_SPRITES = [bird0, bird1, bird2, bird1];
 

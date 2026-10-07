@@ -1,9 +1,9 @@
-import { CANVAS_HEIGHT } from '../constants.js';
 import gameOverSrc from '../../assets/sprites/game-over.png';
 import medalBronze from '../../assets/sprites/medals/medal-bronze.png';
-import medalSilver from '../../assets/sprites/medals/medal-silver.png';
 import medalGold from '../../assets/sprites/medals/medal-gold.png';
 import medalPlatinum from '../../assets/sprites/medals/medal-platinum.png';
+import medalSilver from '../../assets/sprites/medals/medal-silver.png';
+import { CANVAS_HEIGHT } from '../constants.js';
 
 const IMG_W = 226;
 const IMG_H = 158;

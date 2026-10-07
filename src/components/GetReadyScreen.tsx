@@ -1,5 +1,5 @@
-import { CANVAS_HEIGHT } from '../constants.js';
 import getReadySrc from '../../assets/sprites/get-ready.png';
+import { CANVAS_HEIGHT } from '../constants.js';
 
 const IMG_W = 174;
 const IMG_H = 160;

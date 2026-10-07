@@ -1,5 +1,5 @@
-import { BG_W, BG_H, CANVAS_HEIGHT, GROUND_H } from '../constants.js';
 import bgSrc from '../../assets/sprites/background.png';
+import { BG_H, BG_W, CANVAS_HEIGHT, GROUND_H } from '../constants.js';
 
 interface BackgroundProps {
   bgX: number;
