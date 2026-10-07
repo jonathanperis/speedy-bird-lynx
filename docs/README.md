@@ -38,7 +38,7 @@ Open the preview URL with `/speedy-bird-lynx/` appended. Build output is `out/`;
 | `src/styles/globals.css`, `docs.css` | Manual base and manual styles |
 | `public/assets/` | Browser copies of root game sprites and sounds |
 | `public/og-image.png`, icons | Social preview and browser icons |
-| `scripts/check-site.mjs` | Generated routes, local links/fragments, unique IDs, and canonical/OG validation |
+| `scripts/check-site.mjs` | Offline build checks: wiki routes, local links/fragments, unique IDs, canonical/OG URLs, that every local asset (images, stylesheets, scripts, social images, fonts, and the game's sprite/sound lists) exists, that JSON-LD parses, and that no page has inline event handlers or script URLs and no guide has scripts. Paths resolve from `docs/`, so it runs from any directory |
 | `astro.config.mjs` | Site URL, development/production base, output directory, and sitemap |
 
 ## Add or edit a guide
@@ -89,6 +89,6 @@ With an ID, `src/components/Analytics.astro` (rendered at the end of every page'
 
 `.github/workflows/deploy.yml` pins the shared `jonathanperis/.github` Pages workflow by full commit SHA. It runs on pushes to `main` or manual dispatch from `main`, installs the frozen Bun lockfile, executes Astro using Node, and publishes `docs/out/`. Only the optional public analytics ID is forwarded.
 
-Build Check independently runs the docs build and `npm run check:site`. The checker is offline and covers generated routes and HTML references; it does not establish browser behavior, external-link availability, gameplay, or accessibility conformance. A successful local build is not a deployed-site update: publication happens through the normal branch/PR workflow.
+Build Check independently runs the docs build and `npm run check:site`. The checker is offline and covers generated routes, HTML and asset references, structured data, and unsafe markup; it does not establish browser behavior, external-link availability, gameplay, or accessibility conformance. A successful local build is not a deployed-site update: publication happens through the normal branch/PR workflow.
 
 Current dependencies and compatibility decisions are documented in [Dependencies and Upgrades](wiki/dependency-updates.md). The root [README](../README.md) explains the ReactLynx app, native hosts, and separate web surfaces.
