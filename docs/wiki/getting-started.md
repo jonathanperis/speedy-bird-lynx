@@ -77,14 +77,14 @@ npm run check:site
 npm run preview
 ```
 
-The static output is written to `docs/out/`. Development serves `/` and `/docs/`; production/preview uses `/speedy-bird-lynx/` and `/speedy-bird-lynx/docs/`. The shared Pages workflow deploys that production output. Content authoring and asset maintenance are documented in `docs/README.md`.
+The static output is written to `docs/out/`. Development, preview, and production all serve `/speedy-bird-lynx/` and `/speedy-bird-lynx/docs/` (set `SITE_BASE` to change the base). The shared Pages workflow deploys that production output. Content authoring and asset maintenance are documented in `docs/README.md`.
 
 ## Web Surfaces
 
 | Surface | How to use it | Notes |
 |---------|---------------|-------|
 | ReactLynx web preview | `bun run dev`, then open `http://localhost:3000/__web_preview?casename=main.web.bundle` | Uses the compiled `main.web.bundle` from Rspeedy for development |
-| GitHub Pages canvas demo | `cd docs && npm run dev`, then open the local Astro URL | Browser-only playable demo in `docs/src/pages/index.astro`; physics mirror the ReactLynx game, while the 400x600 viewport is adapted to the landing-page phone frame |
+| GitHub Pages canvas demo | `cd docs && npm run dev`, then open `http://localhost:4321/speedy-bird-lynx/` | Browser-only playable demo (`docs/src/game/`) that runs the app's own engine on the full 400x750 playfield; click, tap, or Space/Enter while the game has focus |
 | Standalone web host | `bun run dev:web-host` at `http://localhost:4000` | Also run `bun run dev` at port 3000; the host loads `http://localhost:3000/main.web.bundle`. Implements sound, the saved best score, Space/Enter, and pause on tab switch |
 
 In development the host needs two terminals; both servers configure cross-origin isolation headers. Pass `?bundle=<url>` to load a bundle from elsewhere. For a self-contained build, run `bun run build` and then `bun run build:web-host`: `dist-web-host/` then contains the host, `main.web.bundle`, the audio, and the bridge module, and `bunx rsbuild preview --config rsbuild.web-host.config.ts` serves it with the required headers.

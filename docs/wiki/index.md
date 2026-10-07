@@ -17,18 +17,18 @@ Flappy Bird clone built with [ReactLynx](https://lynxjs.org/) and TypeScript. On
 
 ## Key Features
 
-- Tap/click to flap; the standalone web host and the GitHub Pages canvas demo also support Space
+- Tap/click to flap; the standalone web host and the GitHub Pages canvas demo also accept Space/Enter while the game has focus
 - Speed increases 1% per pipe cleared; frame-rate-independent physics on a main-thread loop
 - Best score saved on every platform; pause when the app is backgrounded; screen-reader announcements
 - Medal system: Bronze (10+), Silver (25+), Gold (50+), Platinum (100+)
-- Element-based ReactLynx rendering with CSS transforms; a separate Canvas demo powers the public website
+- Element-based ReactLynx rendering with CSS transforms; the public website draws the same engine with Canvas
 - Tile-based pipe construction and parallax scrolling
 - AABB collision detection with circular hitbox approximation
 - Automated CI/CD for type-checking, bundle builds, CodeQL, Pages deployment, and release artifacts
 
 ## Platform status
 
-Android and iOS have buildable native hosts with sound and saved scores; CI compiles both, lints Android, and runs iOS UI tests on a simulator (iOS archives are unsigned). ReactLynx also has a development web preview and a self-contained standalone web host. GitHub Pages runs the Canvas game and this manual.
+Android and iOS have buildable native hosts with sound and saved scores; CI compiles both, lints Android, and runs iOS UI tests on a simulator (iOS archives are unsigned). ReactLynx also has a development web preview and a self-contained standalone web host. GitHub Pages runs a Canvas build of the game, which shares the app's engine, and this manual.
 
 ---
 

@@ -99,7 +99,8 @@ The frame loop, taps, simulation, and per-frame styles run on the Lynx main thre
 - **Host bridge**: `SpeedyBirdModule` (`play`, `stopAudio`, `loadPreferences`, `savePreferences`, optional `announce`) and the `SpeedyBirdPause`/`SpeedyBirdResume`/`SpeedyBirdTap` global events.
 - **State machine**: `STATE_READY` → `STATE_PLAY` → `STATE_OVER`; restart only after the bird lands plus 30 steps.
 - **AABB collision**: circular bird hitbox approximated by its bounding square.
-- **Controls**: tap/click flaps; the web host also forwards Space/Enter. The Pages canvas demo supports Space.
+- **Controls**: tap/click flaps; the web host also forwards Space/Enter. The Pages canvas demo accepts Space/Enter only while the canvas has focus.
+- **Pages canvas demo**: `docs/src/game/` imports the engine, constants, preferences, and announcements from `src/`, so rule changes reach it automatically; keep `docs/src/game/renderer.ts` in step with `src/components/` when visuals change.
 
 ---
 
