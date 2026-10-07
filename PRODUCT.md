@@ -9,7 +9,7 @@ brand
 Speedy Bird serves two overlapping audiences:
 
 - **Players** who arrive from GitHub Pages or a shared link and want a fast, instantly understandable browser game with low setup friction.
-- **Developers and technical reviewers** who want to understand how a complete ReactLynx game is built, shipped, and documented across Web, iOS, and Android.
+- **Developers and technical reviewers** who want to understand how a complete ReactLynx game is built, shipped, and documented: a browser build on GitHub Pages, an Android host, and an iOS host app built from source in Xcode (it is not distributed through an app store).
 
 The page should work first as a playable arcade surface and second as a credible technical artifact. A visitor should be able to play within seconds, then discover the engine, source code, platform story, and documentation without leaving the visual world.
 

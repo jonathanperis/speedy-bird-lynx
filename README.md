@@ -10,7 +10,7 @@
 
 ## About
 
-[Lynx](https://lynxjs.org/) is an open-source cross-platform native UI framework created by ByteDance. It uses a native rendering engine rather than a WebView on mobile. Speedy Bird runs its frame loop, taps, and simulation on the Lynx main thread with Main Thread Script, and uses React on the background thread only for discrete UI such as the score and overlays. It demonstrates element-based rendering, frame-rate-independent physics, native modules, assets, and automated builds. The public website contains a separate HTML Canvas implementation of the game.
+[Lynx](https://lynxjs.org/) is an open-source cross-platform native UI framework created by ByteDance. It uses a native rendering engine rather than a WebView on mobile. Speedy Bird runs its frame loop, taps, and simulation on the Lynx main thread with Main Thread Script, and uses React on the background thread only for discrete UI such as the score and overlays. It demonstrates element-based rendering, frame-rate-independent physics, native modules, assets, and automated builds. The public website draws the same game engine with HTML Canvas.
 
 | Surface | Current status |
 |---------|----------------|
@@ -39,7 +39,7 @@ Versions reviewed **2026-10-07**. See [Dependencies and Upgrades](https://jonath
 
 ## Features
 
-- Tap/click to flap; the standalone web host and the GitHub Pages canvas demo also support Space
+- Tap/click to flap; the standalone web host and the GitHub Pages canvas demo also accept Space/Enter while the game has focus
 - Speed increases 1% per pipe cleared; points score the moment the bird clears a pipe
 - Frame-rate-independent physics (fixed 1/60 s steps) on a main-thread frame loop
 - Scales to any screen: extra height becomes sky, wide screens are letterboxed
@@ -108,7 +108,7 @@ There are three web-related surfaces in the repository:
 | Surface | Location | Purpose |
 |---------|----------|---------|
 | ReactLynx web preview | `bun run dev`, then `http://localhost:3000/__web_preview?casename=main.web.bundle` | Development preview of the compiled `main.web.bundle` |
-| GitHub Pages canvas demo | `docs/src/pages/index.astro` | Public playable browser demo; it mirrors the game physics but uses a 400x600 viewport to fit the phone frame |
+| GitHub Pages canvas demo | `docs/src/pages/index.astro` and `docs/src/game/` | Public playable browser demo; it imports `src/game/engine.ts`, so gameplay matches the app on the same 400x750 playfield |
 | Standalone web host | `bun run dev:web-host` at `http://localhost:4000` | Development-only `<lynx-view>` host; also run `bun run dev` on port 3000 to supply the bundle |
 
 ### Android build
