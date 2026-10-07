@@ -1,6 +1,7 @@
 ---
 import Analytics from '../components/Analytics.astro';
 import { GA_ID } from '../lib/analytics';
+import { jsonLd } from '../lib/json-ld';
 import '../styles/home.css';
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -12,26 +13,42 @@ const assetsHref = `${basePath}/assets/`;
 const docsHref = `${basePath}/docs/`;
 const socialImageUrl = 'https://jonathanperis.github.io/speedy-bird-lynx/og-image.png';
 
-const jsonLd = `{
-  "@context": "https://schema.org",
-  "@type": "VideoGame",
-  "name": "Speedy Bird",
-  "description": "A Flappy Bird-inspired arcade game with an Android ReactLynx host and a playable browser Canvas demo.",
-  "url": "https://jonathanperis.github.io/speedy-bird-lynx/",
-  "image": "${socialImageUrl}",
-  "genre": ["Arcade", "Pixel Art", "Side-Scroller"],
-  "gamePlatform": ["Web Browser", "Android"],
-  "applicationCategory": "Game",
-  "operatingSystem": ["Android", "Web"],
-  "author": {
-    "@type": "Person",
-    "name": "Jonathan Peris",
-    "url": "https://github.com/jonathanperis"
-  },
-  "isAccessibleForFree": true,
-  "license": "https://github.com/jonathanperis/speedy-bird-lynx/blob/main/LICENSE",
-  "codeRepository": "https://github.com/jonathanperis/speedy-bird-lynx"
-}`;
+const siteUrl = 'https://jonathanperis.github.io/speedy-bird-lynx/';
+const repositoryUrl = 'https://github.com/jonathanperis/speedy-bird-lynx';
+const author = { '@type': 'Person', name: 'Jonathan Peris', url: 'https://github.com/jonathanperis' };
+const license = `${repositoryUrl}/blob/main/LICENSE`;
+// The game and its source code are separate entities: codeRepository belongs to SoftwareSourceCode.
+const structuredData = jsonLd({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'VideoGame',
+      '@id': `${siteUrl}#game`,
+      name: 'Speedy Bird',
+      description: 'A Flappy Bird-inspired arcade game with an Android ReactLynx host and a playable browser Canvas demo.',
+      url: siteUrl,
+      image: socialImageUrl,
+      genre: ['Arcade', 'Pixel Art', 'Side-Scroller'],
+      gamePlatform: ['Web Browser', 'Android'],
+      applicationCategory: 'GameApplication',
+      operatingSystem: ['Android', 'Web'],
+      author,
+      isAccessibleForFree: true,
+      license,
+    },
+    {
+      '@type': 'SoftwareSourceCode',
+      '@id': `${siteUrl}#source`,
+      name: 'Speedy Bird Lynx source code',
+      codeRepository: repositoryUrl,
+      programmingLanguage: 'TypeScript',
+      runtimePlatform: 'ReactLynx',
+      license,
+      author,
+      targetProduct: { '@id': `${siteUrl}#game` },
+    },
+  ],
+});
 ---
 
 <!doctype html>
@@ -46,7 +63,8 @@ const jsonLd = `{
   <link rel="icon" type="image/png" href={faviconPngHref}>
   <link rel="icon" type="image/png" sizes="32x32" href={favicon32Href}>
   <link rel="apple-touch-icon" href={appleTouchIconHref}>
-  <link rel="canonical" href="https://jonathanperis.github.io/speedy-bird-lynx/">
+  <link rel="canonical" href={siteUrl}>
+  <link rel="sitemap" type="application/xml" href={`${basePath}/sitemap-index.xml`}>
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
@@ -73,7 +91,7 @@ const jsonLd = `{
   <!-- Theme -->
   <meta name="theme-color" content="#04111e">
 
-  <script type="application/ld+json" set:html={jsonLd}></script>
+  <script type="application/ld+json" set:html={structuredData}></script>
 
 </head>
 <body>

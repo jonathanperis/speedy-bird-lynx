@@ -1,6 +1,7 @@
 ---
 import '../styles/globals.css';
 import Analytics from '../components/Analytics.astro';
+import { jsonLd } from '../lib/json-ld';
 
 interface Props {
   title?: string;
@@ -20,7 +21,7 @@ const favicon32Href = `${basePath}/favicon-32x32.png`;
 const appleTouchIconHref = `${basePath}/apple-touch-icon.png`;
 const socialImageUrl = 'https://jonathanperis.github.io/speedy-bird-lynx/og-image.png';
 
-const jsonLd = {
+const structuredData = {
   '@context': 'https://schema.org',
   '@type': 'TechArticle',
   'headline': title,
@@ -49,6 +50,7 @@ const jsonLd = {
     <link rel="icon" type="image/png" sizes="32x32" href={favicon32Href} />
     <link rel="apple-touch-icon" href={appleTouchIconHref} />
     <link rel="canonical" href={canonicalUrl} />
+    <link rel="sitemap" type="application/xml" href={`${basePath}/sitemap-index.xml`} />
     <meta name="theme-color" content="#04111e" />
 
     <!-- Open Graph -->
@@ -74,7 +76,7 @@ const jsonLd = {
     <meta name="twitter:creator" content="@jperis_silva" />
 
     <!-- JSON-LD Structured Data -->
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script type="application/ld+json" set:html={jsonLd(structuredData)} />
 
     <title>{title}</title>
   </head>
