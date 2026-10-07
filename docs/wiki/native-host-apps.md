@@ -86,7 +86,7 @@ The iOS host is in `ios/`, with a generated Xcode project and a committed `Podfi
 | `Gemfile` / `Gemfile.lock` | CocoaPods 1.17.0 and xcodeproj 1.28.1 |
 | `AppDelegate.swift` | `@main` entry point; initializes `LynxEnv` |
 | `SceneDelegate.swift` | Creates the window with `ViewController` |
-| `ViewController.swift` | Edge-to-edge `LynxView` that follows every size change, registers `SpeedyBirdModule`, and forwards lifecycle events |
+| `ViewController.swift` | Edge-to-edge `LynxView` that follows every size change, registers `SpeedyBirdModule`, and forwards lifecycle events: losing focus (Home, app switcher, Control Center, a call) pauses the game, and only entering the background suspends Lynx |
 | `SpeedyBirdModule.swift` | `AVAudioPlayer` sounds (ambient session: respects the silent switch, mixes with music), `UserDefaults` best score, VoiceOver announcements |
 | `BundleTemplateProvider.swift` | Loads `main.lynx.bundle` from the app bundle off the main thread |
 | `Info.plist` | Launch screen, versions from build settings, orientations, export compliance |
