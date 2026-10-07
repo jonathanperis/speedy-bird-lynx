@@ -1,0 +1,541 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2C2452E2079808927652C47B /* audio in Resources */ = {isa = PBXBuildFile; fileRef = 8B9D80E863F65F8D3B797082 /* audio */; };
+		368BA0C7E51ECF6BC11550DE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C15883BED45AA2CC9D3CECD /* SceneDelegate.swift */; };
+		5979D5FBD5B10B5BDEC6DCDB /* SpeedyBirdUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0634EB8B91EC4CDEE8A71C69 /* SpeedyBirdUITests.swift */; };
+		5CB2B489537690E1D597C8F2 /* SpeedyBirdModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0026A6AE0BB28117537FBE56 /* SpeedyBirdModule.swift */; };
+		78059B490A4A3C8EAA87264B /* main.lynx.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 26A9A926EFBC8B97370D6B6B /* main.lynx.bundle */; };
+		79F9396B9845B8C225BED223 /* BundleTemplateProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA87B266B35AFFBB430D50DE /* BundleTemplateProvider.swift */; };
+		7DE35DA594F21E8352C737DD /* LynxResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 42EA241A357275553B4FD6CD /* LynxResources.bundle */; };
+		8C85D131A599A42B32ED77B2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AB0A8F1A7755F73E6C30E7D /* Foundation.framework */; };
+		AA1193AAFE24F2F99E9E4BD5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AB0A8F1A7755F73E6C30E7D /* Foundation.framework */; };
+		B091522F0565B84E6BF11B5F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 0F18A5769F50087DD049F2C6 /* PrivacyInfo.xcprivacy */; };
+		B363A9640F578CBCB554CC42 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D7D31CADF33F2261A3B11DD8 /* Assets.xcassets */; };
+		BE480252A054C1E0E0E8AE74 /* libPods-SpeedyBird.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 87E0963B10746B6707FFD2A7 /* libPods-SpeedyBird.a */; };
+		CFD43D0C22296085F3AA8DF0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A9392DE5EF0F81206F141F /* AppDelegate.swift */; };
+		E58395D012CED92B4DCA9217 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937F51612ED95912AB43380A /* ViewController.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3F4CAA86260BDAFBEBAE96FE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CCDFF83D0D3E1E1E801A6BFC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D3C1E1F6E4D2D5F1C3546552;
+			remoteInfo = SpeedyBird;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0026A6AE0BB28117537FBE56 /* SpeedyBirdModule.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpeedyBirdModule.swift; sourceTree = "<group>"; };
+		0634EB8B91EC4CDEE8A71C69 /* SpeedyBirdUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpeedyBirdUITests.swift; sourceTree = "<group>"; };
+		0F18A5769F50087DD049F2C6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		1AB0A8F1A7755F73E6C30E7D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		1C15883BED45AA2CC9D3CECD /* SceneDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		2165DF314F329538F3EA42BE /* Pods-SpeedyBird.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpeedyBird.release.xcconfig"; path = "Target Support Files/Pods-SpeedyBird/Pods-SpeedyBird.release.xcconfig"; sourceTree = "<group>"; };
+		231FABCF1DA195FC0EFC67DF /* SpeedyBird-Bridging-Header.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SpeedyBird-Bridging-Header.h"; sourceTree = "<group>"; };
+		26A9A926EFBC8B97370D6B6B /* main.lynx.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = main.lynx.bundle; path = dist/main.lynx.bundle; sourceTree = "<group>"; };
+		42EA241A357275553B4FD6CD /* LynxResources.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "wrapper.plug-in"; name = LynxResources.bundle; path = Lynx/LynxResources.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		57A9392DE5EF0F81206F141F /* AppDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		87E0963B10746B6707FFD2A7 /* libPods-SpeedyBird.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SpeedyBird.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8819B89AEB2EC8238B544388 /* SpeedyBird.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpeedyBird.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8A6826278F47CB46F5414E24 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8B9D80E863F65F8D3B797082 /* audio */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = audio; path = assets/audio; sourceTree = "<group>"; };
+		937F51612ED95912AB43380A /* ViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		BA87B266B35AFFBB430D50DE /* BundleTemplateProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BundleTemplateProvider.swift; sourceTree = "<group>"; };
+		C623D1DB50E6C4A4DA02DA1B /* SpeedyBirdUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpeedyBirdUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D7D31CADF33F2261A3B11DD8 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F28BDBAC2E68FB91E9FAF453 /* Pods-SpeedyBird.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpeedyBird.debug.xcconfig"; path = "Target Support Files/Pods-SpeedyBird/Pods-SpeedyBird.debug.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		214907B692C1BB0E67962E33 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8C85D131A599A42B32ED77B2 /* Foundation.framework in Frameworks */,
+				BE480252A054C1E0E0E8AE74 /* libPods-SpeedyBird.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B02AC886B4D967CE9A5CC3EC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA1193AAFE24F2F99E9E4BD5 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0DF630941AD6F9ADCAC5BC48 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				1AB0A8F1A7755F73E6C30E7D /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		415198A3ED0ECB9F15A4DA50 /* SpeedyBirdUITests */ = {
+			isa = PBXGroup;
+			children = (
+				0634EB8B91EC4CDEE8A71C69 /* SpeedyBirdUITests.swift */,
+			);
+			name = SpeedyBirdUITests;
+			path = SpeedyBirdUITests;
+			sourceTree = "<group>";
+		};
+		78895CA60923DC585A489146 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				2165DF314F329538F3EA42BE /* Pods-SpeedyBird.release.xcconfig */,
+				F28BDBAC2E68FB91E9FAF453 /* Pods-SpeedyBird.debug.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		99978870EC4B4D8C2230777D = {
+			isa = PBXGroup;
+			children = (
+				EEEEFF36CEAE5B4C8FB33A2D /* Products */,
+				D7DABBBD34505F710D95D157 /* Frameworks */,
+				B6CB9D318C82F2432DE45D3B /* SpeedyBird */,
+				FCFFC524F5D28B30D2311A53 /* Game */,
+				415198A3ED0ECB9F15A4DA50 /* SpeedyBirdUITests */,
+				78895CA60923DC585A489146 /* Pods */,
+				42EA241A357275553B4FD6CD /* LynxResources.bundle */,
+			);
+			sourceTree = "<group>";
+		};
+		B6CB9D318C82F2432DE45D3B /* SpeedyBird */ = {
+			isa = PBXGroup;
+			children = (
+				57A9392DE5EF0F81206F141F /* AppDelegate.swift */,
+				BA87B266B35AFFBB430D50DE /* BundleTemplateProvider.swift */,
+				1C15883BED45AA2CC9D3CECD /* SceneDelegate.swift */,
+				0026A6AE0BB28117537FBE56 /* SpeedyBirdModule.swift */,
+				937F51612ED95912AB43380A /* ViewController.swift */,
+				231FABCF1DA195FC0EFC67DF /* SpeedyBird-Bridging-Header.h */,
+				8A6826278F47CB46F5414E24 /* Info.plist */,
+				D7D31CADF33F2261A3B11DD8 /* Assets.xcassets */,
+				0F18A5769F50087DD049F2C6 /* PrivacyInfo.xcprivacy */,
+			);
+			name = SpeedyBird;
+			path = SpeedyBird;
+			sourceTree = "<group>";
+		};
+		D7DABBBD34505F710D95D157 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0DF630941AD6F9ADCAC5BC48 /* iOS */,
+				87E0963B10746B6707FFD2A7 /* libPods-SpeedyBird.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		EEEEFF36CEAE5B4C8FB33A2D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8819B89AEB2EC8238B544388 /* SpeedyBird.app */,
+				C623D1DB50E6C4A4DA02DA1B /* SpeedyBirdUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FCFFC524F5D28B30D2311A53 /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				26A9A926EFBC8B97370D6B6B /* main.lynx.bundle */,
+				8B9D80E863F65F8D3B797082 /* audio */,
+			);
+			name = Game;
+			path = ..;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D021F84619034AE14F66C2E2 /* SpeedyBirdUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 23B768AC7C33520A7C70C266 /* Build configuration list for PBXNativeTarget "SpeedyBirdUITests" */;
+			buildPhases = (
+				74144ACA43171974DE97BFBF /* Sources */,
+				B02AC886B4D967CE9A5CC3EC /* Frameworks */,
+				E31FA5C97585A09725D5BE19 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3B4749C3AEFD1A785333CC7A /* PBXTargetDependency */,
+			);
+			name = SpeedyBirdUITests;
+			productName = SpeedyBirdUITests;
+			productReference = C623D1DB50E6C4A4DA02DA1B /* SpeedyBirdUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		D3C1E1F6E4D2D5F1C3546552 /* SpeedyBird */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3CBC204300EC559003E961AC /* Build configuration list for PBXNativeTarget "SpeedyBird" */;
+			buildPhases = (
+				9E485B81A40D1CD910C045D9 /* [CP] Check Pods Manifest.lock */,
+				17300DD07181CE208C22C555 /* Sources */,
+				214907B692C1BB0E67962E33 /* Frameworks */,
+				3F89AE1095D7CF8C0118092B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SpeedyBird;
+			productName = SpeedyBird;
+			productReference = 8819B89AEB2EC8238B544388 /* SpeedyBird.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CCDFF83D0D3E1E1E801A6BFC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = 04633E2160D2099C288E708E /* Build configuration list for PBXProject "SpeedyBird" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 99978870EC4B4D8C2230777D;
+			minimizedProjectReferenceProxies = 0;
+			preferredProjectObjectVersion = 100;
+			productRefGroup = EEEEFF36CEAE5B4C8FB33A2D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D3C1E1F6E4D2D5F1C3546552 /* SpeedyBird */,
+				D021F84619034AE14F66C2E2 /* SpeedyBirdUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3F89AE1095D7CF8C0118092B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B363A9640F578CBCB554CC42 /* Assets.xcassets in Resources */,
+				B091522F0565B84E6BF11B5F /* PrivacyInfo.xcprivacy in Resources */,
+				78059B490A4A3C8EAA87264B /* main.lynx.bundle in Resources */,
+				2C2452E2079808927652C47B /* audio in Resources */,
+				7DE35DA594F21E8352C737DD /* LynxResources.bundle in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E31FA5C97585A09725D5BE19 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		9E485B81A40D1CD910C045D9 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SpeedyBird-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		17300DD07181CE208C22C555 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CFD43D0C22296085F3AA8DF0 /* AppDelegate.swift in Sources */,
+				79F9396B9845B8C225BED223 /* BundleTemplateProvider.swift in Sources */,
+				368BA0C7E51ECF6BC11550DE /* SceneDelegate.swift in Sources */,
+				5CB2B489537690E1D597C8F2 /* SpeedyBirdModule.swift in Sources */,
+				E58395D012CED92B4DCA9217 /* ViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		74144ACA43171974DE97BFBF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5979D5FBD5B10B5BDEC6DCDB /* SpeedyBirdUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3B4749C3AEFD1A785333CC7A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SpeedyBird;
+			target = D3C1E1F6E4D2D5F1C3546552 /* SpeedyBird */;
+			targetProxy = 3F4CAA86260BDAFBEBAE96FE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		058D08D3C373057C9737A8D4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		2E348533C870E326155BB09A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jonathanperis.speedybird.uitests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SpeedyBird;
+			};
+			name = Debug;
+		};
+		2FFFB06FF85B3426F9577AD7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2165DF314F329538F3EA42BE /* Pods-SpeedyBird.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SpeedyBird/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jonathanperis.speedybird;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "SpeedyBird/SpeedyBird-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		52B54934CF83C9AC81C2A8C8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		84D4BDFE46415E5D367867EB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F28BDBAC2E68FB91E9FAF453 /* Pods-SpeedyBird.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SpeedyBird/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jonathanperis.speedybird;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "SpeedyBird/SpeedyBird-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DFAB92863FD67BD15D71863F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jonathanperis.speedybird.uitests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SpeedyBird;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		04633E2160D2099C288E708E /* Build configuration list for PBXProject "SpeedyBird" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				52B54934CF83C9AC81C2A8C8 /* Debug */,
+				058D08D3C373057C9737A8D4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		23B768AC7C33520A7C70C266 /* Build configuration list for PBXNativeTarget "SpeedyBirdUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DFAB92863FD67BD15D71863F /* Release */,
+				2E348533C870E326155BB09A /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3CBC204300EC559003E961AC /* Build configuration list for PBXNativeTarget "SpeedyBird" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2FFFB06FF85B3426F9577AD7 /* Release */,
+				84D4BDFE46415E5D367867EB /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CCDFF83D0D3E1E1E801A6BFC /* Project object */;
+}

@@ -26,7 +26,7 @@ post_integrate do |installer|
   project = installer.aggregate_targets.first.user_project
   target = project.targets.find { |item| item.name == 'SpeedyBird' }
   phase = target.shell_script_build_phases.find { |item| item.name == '[CP] Copy Pods Resources' }
-  phase.remove_from_project
+  phase&.remove_from_project
   resource = project.files.find { |file| file.path == 'Lynx/LynxResources.bundle' }
   resource ||= project.main_group.new_file('Lynx/LynxResources.bundle', 'BUILT_PRODUCTS_DIR')
   target.resources_build_phase.add_file_reference(resource, true)
