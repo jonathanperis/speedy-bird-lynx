@@ -1,18 +1,163 @@
 ---
-const GA_ID = import.meta.env.PUBLIC_GA_ID;
+// Optional Google Analytics with Consent Mode v2. Nothing renders unless PUBLIC_GA_ID is set.
+// Every storage type defaults to "denied", and gtag.js is not even requested until the visitor
+// accepts in the banner below; the choice is remembered in localStorage. Render this at the end
+// of <body>. Buttons marked [data-analytics-settings] (render them only when GA_ID is set, with
+// the hidden attribute) reopen the banner.
+import { GA_ID as gaId } from '../lib/analytics';
 ---
 
-{GA_ID && (
+{gaId && (
   <>
-    <script
-      async
-      src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-    ></script>
-    <script define:vars={{ GA_ID }}>
+    <section id="analytics-consent" class="consent" aria-labelledby="analytics-consent-title" hidden>
+      <p id="analytics-consent-title" class="consent-title">Analytics</p>
+      <p class="consent-text">
+        Can we count your visit with Google Analytics? It stays off, with no cookies, unless you accept.
+      </p>
+      <div class="consent-actions">
+        <button type="button" class="consent-accept" data-consent="granted">Accept</button>
+        <button type="button" class="consent-decline" data-consent="denied">Decline</button>
+      </div>
+    </section>
+    <script is:inline define:vars={{ gaId }}>
+      const STORAGE_KEY = 'speedy-bird.analytics-consent';
       window.dataLayer = window.dataLayer || [];
-      function gtag() { dataLayer.push(arguments); }
-      gtag('js', new Date());
-      gtag('config', GA_ID);
+      function gtag() { window.dataLayer.push(arguments); }
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'denied',
+        functionality_storage: 'denied',
+        personalization_storage: 'denied',
+        security_storage: 'denied',
+      });
+
+      let loaded = false;
+      const load = () => {
+        if (loaded) return;
+        loaded = true;
+        gtag('js', new Date());
+        gtag('config', gaId);
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gaId)}`;
+        document.head.append(script);
+      };
+      const read = () => {
+        try { return localStorage.getItem(STORAGE_KEY); } catch { return null; }
+      };
+      const write = (value) => {
+        try { localStorage.setItem(STORAGE_KEY, value); } catch { /* Ask again next visit. */ }
+      };
+      const clearCookies = () => {
+        for (const cookie of document.cookie.split(';')) {
+          const name = cookie.split('=')[0].trim();
+          if (name === '_ga' || name.startsWith('_ga_')) {
+            for (const domain of ['', `; domain=${location.hostname}`, `; domain=.${location.hostname}`]) {
+              document.cookie = `${name}=; max-age=0; path=/${domain}`;
+            }
+          }
+        }
+      };
+
+      const banner = document.getElementById('analytics-consent');
+      const apply = (choice) => {
+        if (choice === 'granted') {
+          gtag('consent', 'update', { analytics_storage: 'granted' });
+          load();
+        } else if (loaded) {
+          gtag('consent', 'update', { analytics_storage: 'denied' });
+          clearCookies();
+        }
+      };
+
+      const saved = read();
+      if (saved === 'granted' || saved === 'denied') apply(saved);
+      else banner.hidden = false;
+
+      banner.addEventListener('click', (event) => {
+        const choice = event.target.closest('[data-consent]')?.dataset.consent;
+        if (!choice) return;
+        write(choice);
+        apply(choice);
+        banner.hidden = true;
+      });
+      banner.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') banner.hidden = true; // Dismiss for now; ask again next visit.
+      });
+      for (const button of document.querySelectorAll('[data-analytics-settings]')) {
+        button.hidden = false;
+        button.addEventListener('click', () => {
+          banner.hidden = false;
+          banner.querySelector('[data-consent]').focus();
+        });
+      }
     </script>
   </>
 )}
+
+<style>
+  .consent {
+    position: fixed;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    z-index: 200;
+    width: min(24rem, calc(100vw - 2rem));
+    padding: 1rem 1.1rem;
+    color: var(--text-bright);
+    background: var(--panel-blue);
+    border: 2px solid var(--arcade-gold);
+    border-radius: 4px;
+    box-shadow: var(--shadow-press), 0 18px 40px rgba(4, 17, 30, 0.45);
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    text-align: left;
+  }
+
+  .consent[hidden] { display: none; }
+
+  .consent-title {
+    margin: 0 0 0.35rem;
+    color: var(--arcade-gold);
+    font-family: 'Nunito', system-ui, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .consent-text {
+    margin: 0 0 0.9rem;
+    color: var(--text-bright);
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .consent-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .consent-actions button {
+    min-height: 40px;
+    padding: 0.55rem 1rem;
+    border: 2px solid var(--stroke-dark);
+    border-radius: 4px;
+    box-shadow: var(--shadow-press);
+    font-family: 'Nunito', system-ui, sans-serif;
+    font-size: 0.82rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .consent-actions .consent-accept { color: var(--stroke-dark); background: var(--arcade-gold); }
+  .consent-actions .consent-decline { color: var(--text-bright); background: var(--stroke-dark); border-color: var(--pipe-highlight); }
+
+  .consent-actions button:focus-visible {
+    outline: 3px solid rgba(255, 209, 102, 0.9);
+    outline-offset: 3px;
+  }
+</style>

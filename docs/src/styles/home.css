@@ -865,6 +865,18 @@ footer a {
   transition: color 0.2s;
 }
 footer a:hover { color: var(--text-bright); }
+.footer-settings { margin-top: 0.25rem; }
+.link-button {
+  padding: 0;
+  color: var(--arcade-gold);
+  background: none;
+  border: 0;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.link-button:hover { color: var(--text-bright); }
 
 /* Scroll reveals */
 .reveal { opacity: 0; transform: translateY(30px); transition: opacity 520ms var(--ease-out-expo), transform 520ms var(--ease-out-expo); }
