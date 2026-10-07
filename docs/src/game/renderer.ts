@@ -41,6 +41,8 @@ export interface Renderer {
   /** Match the backing store to the canvas's displayed size and pixel density. */
   resize(): void;
   draw(state: GameSnapshot, paused: boolean): void;
+  /** Fill the playfield with the sky color. */
+  clear(): void;
   setSprites(sprites: Sprites): void;
 }
 
@@ -154,6 +156,11 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
     },
     setSprites(next) {
       sprites = next;
+    },
+    clear() {
+      if (!context) return;
+      context.fillStyle = BG_COLOR;
+      context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     },
     draw(state, paused) {
       if (!context) return;
