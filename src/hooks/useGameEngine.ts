@@ -1,36 +1,34 @@
-import { useRef, useCallback, useEffect, useState } from '@lynx-js/react';
-
+import { useCallback, useEffect, useRef, useState } from '@lynx-js/react';
+import { audioModule } from '../audio/audio.js';
 import {
-  CANVAS_WIDTH,
-  CANVAS_HEIGHT,
-  BIRD_X,
-  BIRD_Y_START,
-  BIRD_H,
-  BIRD_RADIUS,
-  BIRD_FLAP,
-  BIRD_GRAVITY,
   ANIM_GETREADY_INTERVAL,
   ANIM_PLAY_INTERVAL,
-  ROTATION_UP,
-  ROTATION_NEUTRAL,
-  ROTATION_DOWN,
-  PIPE_W,
-  PIPE_H,
-  PIPE_GAP,
-  PIPE_DX,
-  PIPE_MIN_Y,
-  PIPE_MAX_Y,
-  PIPE_SPAWN_INTERVAL,
-  BG_W,
   BG_DX,
-  GROUND_W,
-  GROUND_H,
+  BG_W,
+  BIRD_FLAP,
+  BIRD_GRAVITY,
+  BIRD_H,
+  BIRD_RADIUS,
+  BIRD_X,
+  BIRD_Y_START,
+  CANVAS_HEIGHT,
+  CANVAS_WIDTH,
   GROUND_DX,
+  GROUND_H,
+  GROUND_W,
+  PIPE_DX,
+  PIPE_GAP,
+  PIPE_H,
+  PIPE_MAX_Y,
+  PIPE_MIN_Y,
+  PIPE_SPAWN_INTERVAL,
+  PIPE_W,
+  ROTATION_DOWN,
+  ROTATION_NEUTRAL,
+  ROTATION_UP,
 } from '../constants.js';
-
-import { PipeData, STATE_READY, STATE_PLAY, STATE_OVER } from '../types.js';
 import type { GameState } from '../types.js';
-import { audioModule } from '../audio/audio.js';
+import { type PipeData, STATE_OVER, STATE_PLAY, STATE_READY } from '../types.js';
 
 let nextPipeId = 0;
 
