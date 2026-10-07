@@ -47,7 +47,9 @@ const decodeEntities = (value) =>
     .replace(/&#(\d+);?/g, (_, decimal) => String.fromCodePoint(Number(decimal)))
     .replace(/&colon;/gi, ':')
     .replace(/&(tab|newline);/gi, '');
-const isScriptUrl = (value) => /^(javascript|vbscript):/i.test(decodeEntities(value).replace(/[\u0000-\u0020]/g, ''));
+// Browsers ignore control characters and spaces inside a URL scheme ("java\tscript:").
+const stripControls = (value) => [...value].filter((char) => (char.codePointAt(0) ?? 0) > 0x20).join('');
+const isScriptUrl = (value) => /^(javascript|vbscript):/i.test(stripControls(decodeEntities(value)));
 const URL_ATTRIBUTES = ['href', 'src', 'action', 'formaction', 'poster', 'data', 'xlink:href'];
 
 const pages = new Map();
@@ -186,8 +188,12 @@ for (const file of [...(await filesIn(output, '.css')), ...(await filesIn(output
   const content = await readFile(file, 'utf8');
   const fileUrl = new URL(relative, site);
   const references = file.endsWith('.css')
-    ? [...content.matchAll(/url\(\s*(['"]?)([^'")]+)\1\s*\)/g)].map((match) => match[2]).filter((u) => !u.startsWith('data:'))
-    : [...content.matchAll(/["'`]((?:sprites|audio)\/[\w./-]+\.(?:png|wav))["'`]/g)].map((match) => `assets/${match[1]}`);
+    ? [...content.matchAll(/url\(\s*(['"]?)([^'")]+)\1\s*\)/g)]
+        .map((match) => match[2])
+        .filter((u) => !u.startsWith('data:'))
+    : [...content.matchAll(/["'`]((?:sprites|audio)\/[\w./-]+\.(?:png|wav))["'`]/g)].map(
+        (match) => `assets/${match[1]}`,
+      );
   for (const reference of references) {
     const target = file.endsWith('.css') ? new URL(reference, fileUrl) : new URL(reference, site);
     if (target.origin !== site.origin) continue;
