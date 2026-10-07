@@ -92,7 +92,7 @@ The iOS host is in `ios/`, with a generated Xcode project and a committed `Podfi
 | `Info.plist` | Launch screen, versions from build settings, orientations, export compliance |
 | `PrivacyInfo.xcprivacy` | Privacy manifest: no tracking or collected data; declares `UserDefaults` access (reason `CA92.1`) |
 | `Assets.xcassets` | App icon and launch background color |
-| `SpeedyBirdUITests/` | XCUITest smoke tests that drive the real app through its accessibility label |
+| `SpeedyBirdUITests/` | XCUITest smoke tests that drive the real app through its accessibility label: start, crash, restart lock, backgrounding |
 
 The app bundles `../dist/main.lynx.bundle` and the `../assets/audio` folder directly, so every build packages the current `bun run build` output and the canonical sounds. iPhone runs in portrait; iPad supports every orientation and window size (Split View, Stage Manager) because the game letterboxes itself. The status bar is hidden, the home indicator auto-hides, and taps near the bottom edge reach the game first.
 
@@ -108,7 +108,7 @@ xcodebuild test -workspace SpeedyBird.xcworkspace -scheme SpeedyBird \
   -destination 'platform=iOS Simulator,name=iPhone 15 Pro'
 ```
 
-`xcodebuild test` builds the app and runs the UI smoke tests: start a run, crash, check the restart lock, and pause a run by backgrounding the app. To change the project structure (new files or targets), edit `scripts/generate-ios-project.rb`, then run `bundle exec ruby ../scripts/generate-ios-project.rb && bundle exec pod install` from `ios/`.
+`xcodebuild test` builds the app and runs the UI smoke tests: start a run, crash, check the restart lock, and survive backgrounding. XCUITest waits for the app to go idle after each tap and a run animates every frame, so it cannot press Home mid-run; mid-run pausing is covered by the App component tests (host pause event and the stall safeguard). To change the project structure (new files or targets), edit `scripts/generate-ios-project.rb`, then run `bundle exec ruby ../scripts/generate-ios-project.rb && bundle exec pod install` from `ios/`.
 
 The Podfile uses both CocoaPods trunk and the official `lynx-family/Specs` repository. Its image-library versions are exact upstream requirements. It raises pod deployment targets to iOS 15 to match Xcode's supported range and uses a native resource-copy phase so user script sandboxing stays enabled. See [Dependencies and Upgrades](dependency-updates.md) for the scoped upstream compiler adjustments.
 
