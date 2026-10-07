@@ -1,33 +1,32 @@
 import bgSrc from '../../assets/sprites/background.png';
 import { BG_H, BG_W, CANVAS_HEIGHT, GROUND_H } from '../constants.js';
 
-interface BackgroundProps {
-  bgX: number;
-}
+const TILES = [0, 1, 2, 3, 4];
 
-export default function Background({ bgX }: BackgroundProps) {
-  // Position from top instead of bottom for Lynx native compatibility
-  const y = CANVAS_HEIGHT - GROUND_H - BG_H;
-
+/** City skyline tiles; the main-thread loop scrolls them with `transform`. */
+export default function Background() {
   return (
     <view
+      id="background"
       style={{
         position: 'absolute',
-        top: `${y}px`,
+        top: `${CANVAS_HEIGHT - GROUND_H - BG_H}px`,
         left: '0px',
-        width: `${BG_W * 5}px`,
+        width: `${BG_W * TILES.length}px`,
         height: `${BG_H}px`,
         zIndex: 0,
         display: 'flex',
         flexDirection: 'row',
-        transform: `translateX(${bgX}px)`,
       }}
     >
-      <image src={bgSrc} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
-      <image src={bgSrc} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
-      <image src={bgSrc} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
-      <image src={bgSrc} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
-      <image src={bgSrc} style={{ width: `${BG_W}px`, height: `${BG_H}px` }} />
+      {TILES.map((tile) => (
+        <image
+          key={tile}
+          src={bgSrc}
+          // Overlap by one pixel so fractional scaling never shows a seam between tiles.
+          style={{ width: `${BG_W + 1}px`, height: `${BG_H}px`, marginRight: '-1px' }}
+        />
+      ))}
     </view>
   );
 }

@@ -11,8 +11,11 @@
     "dev": "rspeedy dev",
     "build": "rspeedy build",
     "check": "tsc --noEmit",
+    "test": "rstest run",
     "lint": "biome ci .",
     "format": "biome check --write .",
+    "assets:sync": "node scripts/sync-assets.mjs",
+    "assets:check": "node scripts/sync-assets.mjs --check",
     "dev:web-host": "rsbuild dev --config rsbuild.web-host.config.ts",
     "build:web-host": "rsbuild build --config rsbuild.web-host.config.ts"
   },
@@ -28,7 +31,9 @@
     "@lynx-js/rspeedy": "^0.18.0",
     "@lynx-js/types": "^4.3.0",
     "@rsbuild/core": "^2.2.12",
+    "@rstest/core": "^0.12.3",
     "@types/react": "^19.3.0",
+    "jsdom": "^30.1.2",
     "typescript": "~6.0.3"
   },
   "overrides": {

@@ -4,29 +4,40 @@ import medalGold from '../../assets/sprites/medals/medal-gold.png';
 import medalPlatinum from '../../assets/sprites/medals/medal-platinum.png';
 import medalSilver from '../../assets/sprites/medals/medal-silver.png';
 import { CANVAS_HEIGHT } from '../constants.js';
+import { medalForScore } from '../game/engine.js';
+import type { Medal } from '../types.js';
 
 const IMG_W = 226;
 const IMG_H = 158;
 const MEDAL_SIZE = 44;
 
-function getMedalSrc(score: number): string | null {
-  if (score >= 100) return medalPlatinum;
-  if (score >= 50) return medalGold;
-  if (score >= 25) return medalSilver;
-  if (score >= 10) return medalBronze;
-  return null;
-}
+const MEDAL_SPRITES: Record<Medal, string> = {
+  bronze: medalBronze,
+  silver: medalSilver,
+  gold: medalGold,
+  platinum: medalPlatinum,
+};
+
+const valueStyle = (top: number) => ({
+  position: 'absolute' as const,
+  top: `${top}px`,
+  left: '138px',
+  color: '#ffffff',
+  fontSize: '13px',
+  fontWeight: 'bold' as const,
+});
 
 interface GameOverScreenProps {
   visible: boolean;
   score: number;
   bestScore: number;
+  newBest: boolean;
 }
 
-export default function GameOverScreen({ visible, score, bestScore }: GameOverScreenProps) {
+export default function GameOverScreen({ visible, score, bestScore, newBest }: GameOverScreenProps) {
   if (!visible) return null;
 
-  const medalSrc = getMedalSrc(score);
+  const medal = medalForScore(score);
 
   return (
     <view
@@ -40,72 +51,28 @@ export default function GameOverScreen({ visible, score, bestScore }: GameOverSc
         justifyContent: 'center',
       }}
     >
-      {/* Panel container — game-over image as background-like element */}
-      <view
-        style={{
-          width: `${IMG_W}px`,
-          height: `${IMG_H}px`,
-          position: 'relative',
-        }}
-      >
-        {/* Game over panel sprite */}
+      <view style={{ width: `${IMG_W}px`, height: `${IMG_H}px`, position: 'relative' }}>
         <image
           src={gameOverSrc}
-          style={{
-            position: 'absolute',
-            top: '0px',
-            left: '0px',
-            width: `${IMG_W}px`,
-            height: `${IMG_H}px`,
-          }}
+          style={{ position: 'absolute', top: '0px', left: '0px', width: `${IMG_W}px`, height: `${IMG_H}px` }}
         />
-        {/* Medal — absolutely positioned in its own view */}
-        {medalSrc ? (
-          <view
+        {medal ? (
+          <image
+            src={MEDAL_SPRITES[medal]}
             style={{
               position: 'absolute',
               top: '88px',
               left: '24px',
               width: `${MEDAL_SIZE}px`,
               height: `${MEDAL_SIZE}px`,
-              zIndex: 10,
             }}
-          >
-            <image
-              src={medalSrc}
-              style={{
-                width: `${MEDAL_SIZE}px`,
-                height: `${MEDAL_SIZE}px`,
-              }}
-            />
-          </view>
+          />
         ) : null}
-        {/* Score */}
-        <text
-          style={{
-            position: 'absolute',
-            top: '60px',
-            left: '138px',
-            color: '#ffffff',
-            fontSize: '13px',
-            fontWeight: 'bold',
-          }}
-        >
-          {score}
-        </text>
-        {/* Best */}
-        <text
-          style={{
-            position: 'absolute',
-            top: '100px',
-            left: '138px',
-            color: '#ffffff',
-            fontSize: '13px',
-            fontWeight: 'bold',
-          }}
-        >
-          {bestScore}
-        </text>
+        <text style={valueStyle(60)}>{score}</text>
+        <text style={valueStyle(100)}>{bestScore}</text>
+        {newBest ? (
+          <text style={{ ...valueStyle(100), left: '168px', color: '#fbb025', fontSize: '10px' }}>NEW</text>
+        ) : null}
       </view>
     </view>
   );
