@@ -16,6 +16,6 @@ export const PAGE_META: Record<string, { title: string; description: string }> =
   'ci-cd-pipeline': { title: 'CI/CD Pipeline', description: 'Build checks, documentation validation, Android artifacts, conditional iOS archives, and immutable GitHub releases.' },
   'game-engine': { title: 'Game Engine', description: 'The pure rules engine, main-thread frame loop, physics, collisions, scoring, restart lock, and host bridge.' },
   'getting-started': { title: 'Getting Started', description: 'Install dependencies and run the ReactLynx app, Canvas demo, documentation site, and native hosts.' },
-  'native-host-apps': { title: 'Native Host Apps', description: 'Build the Kotlin Android host and configure the Swift iOS scaffold, with explicit audio and signing limitations.' },
+  'native-host-apps': { title: 'Native Host Apps', description: 'Build and test the Kotlin Android and Swift iOS hosts: native bridge, lifecycle, UI tests, and signing.' },
   'dependency-updates': { title: 'Dependencies and Upgrades', description: 'Verified dependency versions, native toolchain requirements, compatibility holds, and the upgrade verification process.' },
 };
