@@ -1,11 +1,10 @@
-import type { SoundName } from '../types.js';
-
+import sfxDie from '../../assets/audio/sfx_die.wav';
+import sfxHit from '../../assets/audio/sfx_hit.wav';
+import sfxPoint from '../../assets/audio/sfx_point.wav';
+import sfxSwoosh from '../../assets/audio/sfx_swooshing.wav';
 // Import audio files through bundler so they get proper URLs
 import sfxWing from '../../assets/audio/sfx_wing.wav';
-import sfxPoint from '../../assets/audio/sfx_point.wav';
-import sfxHit from '../../assets/audio/sfx_hit.wav';
-import sfxDie from '../../assets/audio/sfx_die.wav';
-import sfxSwoosh from '../../assets/audio/sfx_swooshing.wav';
+import type { SoundName } from '../types.js';
 
 interface AudioModule {
   play(sound: SoundName): void;
@@ -50,7 +49,9 @@ class WebAudioModule implements AudioModule {
 class NativeAudioModule implements AudioModule {
   play(sound: SoundName): void {
     try {
-      const mod = (globalThis as { __lynx_requireModule?: (name: string) => AudioModule | undefined }).__lynx_requireModule?.('AudioModule');
+      const mod = (
+        globalThis as { __lynx_requireModule?: (name: string) => AudioModule | undefined }
+      ).__lynx_requireModule?.('AudioModule');
       if (mod) {
         mod.play(sound);
       } else {

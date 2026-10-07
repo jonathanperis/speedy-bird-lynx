@@ -1,8 +1,8 @@
-import { PIPE_W, PIPE_H, PIPE_GAP } from '../constants.js';
-import pipeTopBody from '../../assets/sprites/pipes/pipe-top.png';
-import pipeTopMouth from '../../assets/sprites/pipes/pipe-top-mouth.png';
 import pipeBottomBody from '../../assets/sprites/pipes/pipe-bottom.png';
 import pipeBottomMouth from '../../assets/sprites/pipes/pipe-bottom-mouth.png';
+import pipeTopBody from '../../assets/sprites/pipes/pipe-top.png';
+import pipeTopMouth from '../../assets/sprites/pipes/pipe-top-mouth.png';
+import { PIPE_GAP, PIPE_H, PIPE_W } from '../constants.js';
 
 const TILE_H = Math.round(25 * (PIPE_W / 26)); // ~53px display height per tile
 
@@ -32,7 +32,7 @@ export default function Pipe({ x, y }: PipeProps) {
           width: `${PIPE_W}px`,
           height: `${TILE_H + 1}px`,
         }}
-      />
+      />,
     );
   }
   // Mouth at the exact collision boundary
@@ -47,7 +47,7 @@ export default function Pipe({ x, y }: PipeProps) {
         width: `${PIPE_W}px`,
         height: `${TILE_H}px`,
       }}
-    />
+    />,
   );
 
   // Bottom pipe: collision box from (y+PIPE_H+PIPE_GAP) downward
@@ -68,7 +68,7 @@ export default function Pipe({ x, y }: PipeProps) {
         width: `${PIPE_W}px`,
         height: `${TILE_H}px`,
       }}
-    />
+    />,
   );
   // Body tiles extending down past ground
   const bottomBodyCount = Math.ceil((PIPE_H + 400) / TILE_H);
@@ -84,7 +84,7 @@ export default function Pipe({ x, y }: PipeProps) {
           width: `${PIPE_W}px`,
           height: `${TILE_H + 1}px`,
         }}
-      />
+      />,
     );
   }
 

@@ -1,5 +1,5 @@
-import { GROUND_W, GROUND_H, CANVAS_HEIGHT } from '../constants.js';
 import groundSrc from '../../assets/sprites/ground.png';
+import { CANVAS_HEIGHT, GROUND_H, GROUND_W } from '../constants.js';
 
 interface GroundProps {
   groundX: number;

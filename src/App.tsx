@@ -1,13 +1,13 @@
-import { useGameEngine } from './hooks/useGameEngine.js';
-import { BG_COLOR } from './constants.js';
-import { STATE_READY, STATE_PLAY, STATE_OVER } from './types.js';
-import Bird from './components/Bird.js';
-import Pipe from './components/Pipe.js';
 import Background from './components/Background.js';
-import Ground from './components/Ground.js';
-import ScoreDisplay from './components/ScoreDisplay.js';
-import GetReadyScreen from './components/GetReadyScreen.js';
+import Bird from './components/Bird.js';
 import GameOverScreen from './components/GameOverScreen.js';
+import GetReadyScreen from './components/GetReadyScreen.js';
+import Ground from './components/Ground.js';
+import Pipe from './components/Pipe.js';
+import ScoreDisplay from './components/ScoreDisplay.js';
+import { BG_COLOR } from './constants.js';
+import { useGameEngine } from './hooks/useGameEngine.js';
+import { STATE_OVER, STATE_PLAY, STATE_READY } from './types.js';
 
 export default function App() {
   const { renderState, handleTap } = useGameEngine();
@@ -37,11 +37,7 @@ export default function App() {
       <ScoreDisplay score={score} visible={gameState === STATE_PLAY} />
 
       <GetReadyScreen visible={gameState === STATE_READY} />
-      <GameOverScreen
-        visible={gameState === STATE_OVER}
-        score={score}
-        bestScore={bestScore}
-      />
+      <GameOverScreen visible={gameState === STATE_OVER} score={score} bestScore={bestScore} />
     </view>
   );
 }
