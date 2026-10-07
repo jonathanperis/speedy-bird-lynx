@@ -1,0 +1,18 @@
+/* Design tokens shared by the landing page and the manual (see DESIGN.md). */
+:root {
+  --sky-deep: #04111e;
+  --sky-mid: #0a2a4a;
+  --sky-surface: #0d1e3a;
+  --sky-dawn: #0d4a7a;
+  --arcade-gold: #ffd166;
+  --speed-orange: #ff6b35;
+  --pipe-green: #2d6a4f;
+  --pipe-highlight: #4a9e6f;
+  --text-bright: #e8f8ff;
+  --text-body: #c8e8ff;
+  --text-dim: #6ba8c8;
+  --panel-blue: #0a1e3c;
+  --stroke-dark: #07131f;
+  --shadow-press: 0 4px 0 var(--stroke-dark);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
