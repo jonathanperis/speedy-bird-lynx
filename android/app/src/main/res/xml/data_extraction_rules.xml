@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+: the saved best score follows the player to a new device. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <include domain="sharedpref" path="speedy-bird.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="sharedpref" path="speedy-bird.xml" />
+    </device-transfer>
+</data-extraction-rules>
