@@ -11,7 +11,7 @@ bun install --frozen-lockfile
 npm run dev
 ```
 
-Development normally serves `http://localhost:4321/` and `/docs/`, without the GitHub repository prefix. Production uses `/speedy-bird-lynx/`:
+Every command uses the GitHub Pages base path, so development serves `http://localhost:4321/speedy-bird-lynx/` and `/speedy-bird-lynx/docs/`, exactly like production. Set `SITE_BASE` (for example `SITE_BASE=/ npm run dev`) to use another base. To build, check, and preview:
 
 ```sh
 npm run build
@@ -39,7 +39,7 @@ Open the preview URL with `/speedy-bird-lynx/` appended. Build output is `out/`;
 | `public/assets/` | Browser copies of root game sprites and sounds |
 | `public/og-image.png`, icons | Social preview and browser icons |
 | `scripts/check-site.mjs` | Offline build checks: wiki routes, local links/fragments, unique IDs, canonical/OG URLs, that every local asset (images, stylesheets, scripts, social images, fonts, and the game's sprite/sound lists) exists, that JSON-LD parses, and that no page has inline event handlers or script URLs and no guide has scripts. Paths resolve from `docs/`, so it runs from any directory |
-| `astro.config.mjs` | Site URL, development/production base, output directory, and sitemap |
+| `astro.config.mjs` | Site URL, base path (`SITE_BASE`, default `/speedy-bird-lynx`), output directory, sitemap, and the dev server's file access |
 
 ## Add or edit a guide
 
@@ -49,9 +49,11 @@ Open the preview URL with `/speedy-bird-lynx/` appended. Build output is `out/`;
 4. Link to sibling sources as `[Guide](your-guide.md)` or `[Section](your-guide.md#heading)`. The build converts these to base-aware public URLs. Use `index.md` for the combined manual.
 5. Build and run `npm run check:site`. The route checker verifies every wiki file has a generated route.
 
-The public `/docs/` route combines all guides. `/docs/<slug>/` renders a single guide. Section IDs such as `#game-engine` remain stable. On the combined page, generated heading IDs are prefixed with their guide slug to avoid collisions; on individual pages, heading fragments remain unprefixed. A heading matching its section slug uses the enclosing section's ID rather than duplicating it.
+The public `/docs/` route combines all guides. `/docs/<slug>/` renders a single guide. Section IDs such as `#game-engine` remain stable. On the combined page, generated heading IDs are prefixed with their guide slug to avoid collisions; on individual pages, heading fragments remain unprefixed. A heading matching its section slug uses the enclosing section's ID rather than duplicating it. Each page has one H1: a guide's own H1 on its route, and the manual title on the combined page, where `render-doc.ts` moves every guide heading down one level. Styles target the `doc-h<level>` class from the Markdown level, so guides look the same in both places.
 
-Sidebar search filters sections on the combined manual; it is intentionally hidden on individual guides. Page titles and descriptions come from `PAGE_META`; the layout derives canonical and `og:url` from the current route. The landing page has separate VideoGame metadata, which must describe actual platform availability.
+The site ships no `robots.txt`: crawlers only read it from the host root (`jonathanperis.github.io/robots.txt`), which this project does not control. Pages link the sitemap with `<link rel="sitemap">` instead.
+
+Sidebar search filters sections on the combined manual; it is intentionally hidden on individual guides. Sidebar entries scroll to sections on the combined manual and link to guide routes on individual guides. Page titles and descriptions come from `PAGE_META`; the layout derives canonical and `og:url` from the current route. The landing page has its own JSON-LD graph: a VideoGame, which must describe actual platform availability, and a SoftwareSourceCode entry that carries the repository URL.
 
 ## Assets and credits
 
