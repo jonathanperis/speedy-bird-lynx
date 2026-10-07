@@ -2,28 +2,26 @@ package com.jonathanperis.speedybird
 
 import android.content.Context
 import com.lynx.tasm.provider.AbsTemplateProvider
-import java.io.ByteArrayOutputStream
+import java.util.concurrent.Executors
 
+/** Loads Lynx bundles packaged in the APK's assets, off the UI thread. */
 class AssetTemplateProvider(context: Context) : AbsTemplateProvider() {
 
     private val appContext: Context = context.applicationContext
 
     override fun loadTemplate(uri: String, callback: Callback) {
-        Thread {
+        loader.execute {
             try {
-                appContext.assets.open(uri).use { inputStream ->
-                    ByteArrayOutputStream().use { output ->
-                        val buffer = ByteArray(4096)
-                        var length: Int
-                        while (inputStream.read(buffer).also { length = it } != -1) {
-                            output.write(buffer, 0, length)
-                        }
-                        callback.onSuccess(output.toByteArray())
-                    }
-                }
+                callback.onSuccess(appContext.assets.open(uri).use { it.readBytes() })
             } catch (e: Exception) {
-                callback.onFailed(e.message ?: "Failed to load template")
+                callback.onFailed(e.message ?: "Failed to load template $uri")
             }
-        }.start()
+        }
+    }
+
+    private companion object {
+        val loader = Executors.newSingleThreadExecutor { runnable ->
+            Thread(runnable, "lynx-template-loader").apply { isDaemon = true }
+        }
     }
 }
