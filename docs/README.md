@@ -81,7 +81,9 @@ Outputs are `public/og-image.png` (1200×630), `favicon.png` (256×256), `favico
 
 ## Optional analytics
 
-Copy `.env.example` to `.env` only when configuring local analytics. `PUBLIC_GA_ID` is an optional public GA4 measurement ID; without it, the site emits no analytics tag. Never place credentials in `PUBLIC_*` variables.
+Copy `.env.example` to `.env` only when configuring local analytics. `PUBLIC_GA_ID` is an optional public GA4 measurement ID; without it (or with a malformed value), the site emits no analytics markup or script at all. Never place credentials in `PUBLIC_*` variables.
+
+With an ID, `src/components/Analytics.astro` (rendered at the end of every page's `<body>`) implements Google Consent Mode v2: every consent type defaults to `denied`, and `gtag.js` is not requested until the visitor accepts in a small banner. Accepting grants only `analytics_storage`; declining is remembered and clears any `_ga` cookies. The choice is stored in `localStorage` (`speedy-bird.analytics-consent`), and an "Analytics settings" button in the landing footer and manual sidebar reopens the banner.
 
 ## Deployment and verification
 
