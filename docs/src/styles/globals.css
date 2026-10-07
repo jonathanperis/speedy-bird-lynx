@@ -1,6 +1,7 @@
 /* Base for pages that use BaseLayout (the manual). The manual's own styles live in docs.css. */
 @import './fonts.css';
 @import './tokens.css';
+@import './a11y.css';
 
 *,
 *::before,
