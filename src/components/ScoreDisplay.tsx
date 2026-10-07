@@ -23,8 +23,7 @@ interface ScoreDisplayProps {
 export default function ScoreDisplay({ score, visible }: ScoreDisplayProps) {
   if (!visible) return null;
 
-  const digits = score.toString().split('');
-  const totalWidth = digits.length * DIGIT_W + (digits.length - 1) * DIGIT_GAP;
+  const digits = String(score).split('').map(Number);
 
   return (
     <view
@@ -35,31 +34,21 @@ export default function ScoreDisplay({ score, visible }: ScoreDisplayProps) {
         width: '100%',
         zIndex: 4,
         display: 'flex',
+        flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'center',
       }}
     >
-      <view
-        style={{
-          width: `${totalWidth}px`,
-          height: `${DIGIT_H}px`,
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}
-      >
-        {digits.map((d, i) => (
-          <image
-            key={i}
-            src={DIGIT_SPRITES[Number(d)]}
-            style={{
-              width: `${DIGIT_W}px`,
-              height: `${DIGIT_H}px`,
-              marginLeft: i > 0 ? `${DIGIT_GAP}px` : '0px',
-            }}
-          />
-        ))}
-      </view>
+      {digits.map((digit, index) => (
+        <image
+          key={index}
+          src={DIGIT_SPRITES[digit]}
+          style={{
+            width: `${DIGIT_W}px`,
+            height: `${DIGIT_H}px`,
+            marginLeft: index > 0 ? `${DIGIT_GAP}px` : '0px',
+          }}
+        />
+      ))}
     </view>
   );
 }

@@ -64,10 +64,11 @@ jobs:
       - name: Audit dependencies
         run: bun audit --audit-level=high
 
-      - name: Lint and type check
+      - name: Lint, type check, and test
         run: |
           bun run lint
           bun run check
+          bun run test
 
       - name: Build Lynx bundles
         run: bun run build

@@ -40,6 +40,12 @@ jobs:
       - name: Type check
         run: bun run check
 
+      - name: Unit and component tests
+        run: bun run test
+
+      - name: Check docs asset copies
+        run: bun run assets:check
+
       - name: Build
         run: bun run build
 

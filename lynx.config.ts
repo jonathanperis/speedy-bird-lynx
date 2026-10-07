@@ -11,7 +11,6 @@ export default defineConfig({
     entry: {
       main: './src/index.tsx',
     },
-    assetsInclude: [/\.wav$/],
   },
   output: {
     // Native hosts copy one bundle, so its sprite images must work offline.

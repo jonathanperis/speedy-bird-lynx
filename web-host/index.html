@@ -6,19 +6,18 @@
   <title>Speedy Bird — Lynx</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: rgba(0,0,0,0.95);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
+    html, body { height: 100%; background: #04111e; }
+    lynx-view { display: block; width: 100vw; height: 100dvh; }
+    lynx-view:focus-visible { outline: 3px solid #fbb025; outline-offset: -3px; }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   </style>
 </head>
 <body>
-  <lynx-view
-    style="width: 100vw; height: 100vh;"
-    url="http://localhost:3000/main.web.bundle"
-  ></lynx-view>
+  <main>
+    <h1 class="visually-hidden">Speedy Bird</h1>
+    <!-- biome-ignore lint/a11y/useSemanticElements: the Lynx view hosts the whole game and cannot be a <button>. -->
+    <lynx-view tabindex="0" role="button" aria-label="Speedy Bird game. Press Space or Enter, or tap, to flap." aria-describedby="game-status"></lynx-view>
+    <p id="game-status" class="visually-hidden" role="status" aria-live="polite"></p>
+  </main>
 </body>
 </html>
