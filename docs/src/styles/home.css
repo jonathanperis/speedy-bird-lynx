@@ -1,4 +1,5 @@
 /* Landing page: the Night Arcade Cabinet (see DESIGN.md). */
+@import './fonts.css';
 @import './tokens.css';
 
 * { margin: 0; padding: 0; box-sizing: border-box; }

@@ -33,6 +33,7 @@ Open the preview URL with `/speedy-bird-lynx/` appended. Build output is `out/`;
 | `src/layouts/BaseLayout.astro` | Documentation HTML shell, per-route canonical/OG URLs, TechArticle metadata |
 | `src/styles/tokens.css` | Design tokens shared by every page (colors, shadows, easing; see `DESIGN.md`) |
 | `src/styles/home.css` | Landing page styles |
+| `src/styles/fonts.css` | Self-hosted Nunito and Space Grotesk (`@fontsource`, latin subset); the site requests no third-party fonts |
 | `src/styles/globals.css`, `docs.css` | Manual base and manual styles |
 | `public/assets/` | Browser copies of root game sprites and sounds |
 | `public/og-image.png`, icons | Social preview and browser icons |

@@ -1,0 +1,8 @@
+/* Self-hosted fonts: latin subset, font-display: swap. Weights match the former Google Fonts request. */
+@import '@fontsource/nunito/latin-400.css';
+@import '@fontsource/nunito/latin-700.css';
+@import '@fontsource/nunito/latin-800.css';
+@import '@fontsource/nunito/latin-900.css';
+@import '@fontsource/space-grotesk/latin-300.css';
+@import '@fontsource/space-grotesk/latin-400.css';
+@import '@fontsource/space-grotesk/latin-500.css';
