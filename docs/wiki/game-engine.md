@@ -126,3 +126,5 @@ Hosts send these through Lynx's `GlobalEventEmitter`:
 | `SpeedyBirdPause` | Stop the frame loop and audio. A run in progress shows "PAUSED" and resumes on the next tap. |
 | `SpeedyBirdResume` | Restart the frame loop on the Ready or Game Over screens (a paused run waits for a tap). |
 | `SpeedyBirdTap` | Same as a tap; used for keyboard input. |
+
+As a safeguard the main-thread loop also pauses a run by itself when a frame arrives 500 ms or more after the previous one (`STALL_PAUSE_MS`), which means the app was suspended or frozen. A run is never resumed under the player's finger, even if a host's pause event arrives late.
