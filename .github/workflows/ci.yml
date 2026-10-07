@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+  # Every pull request, including stacked ones that target another feature branch.
   pull_request:
-    branches: [main]
   schedule:
     # Weekly run catches upstream advisories and toolchain drift between changes.
     - cron: '0 6 * * 1'
