@@ -5,8 +5,11 @@ export const CANVAS_HEIGHT = 750;
 // Fixed simulation step. Physics constants are per step, so gameplay speed does not
 // depend on the display refresh rate.
 export const STEP_MS = 1000 / 60;
-// Longest frame gap simulated after a stall; anything longer is treated as a pause.
+// Longest frame gap simulated after a short stall.
 export const MAX_FRAME_MS = 250;
+// A frame gap this long during a run means the app was suspended or frozen: pause the run
+// instead of resuming it under the player's finger, even if the host's pause event is late.
+export const STALL_PAUSE_MS = 500;
 
 // Bird
 export const BIRD_X = 80;
