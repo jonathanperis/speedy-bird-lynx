@@ -1,0 +1,7 @@
+name: speedy-bird-lynx CodeQL config
+
+query-filters:
+  # ReactLynx compiler directives ('main thread', 'background only') select which thread
+  # a function runs on. CodeQL does not know them and reports every use.
+  - exclude:
+      id: js/unknown-directive
