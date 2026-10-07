@@ -107,6 +107,20 @@ describe('App', () => {
     expect(frames).toHaveLength(0);
   });
 
+  test('a long frame gap during a run pauses instead of continuing', async () => {
+    const { container } = render(<App />);
+    await advance(16);
+    fireEvent.tap(root(container));
+    await advance(16, 3);
+    // The app was suspended for two seconds without a pause event.
+    await advance(2_000);
+    expect(label(container)).toBe('Speedy Bird paused. Score 0. Tap to resume.');
+    expect(frames).toHaveLength(0);
+    fireEvent.tap(root(container));
+    await advance(16, 2);
+    expect(label(container)).toBe('Speedy Bird. Score 0. Tap to flap.');
+  });
+
   test('the host pause event freezes a run until the next tap', async () => {
     const { container } = render(<App />);
     await advance(16);

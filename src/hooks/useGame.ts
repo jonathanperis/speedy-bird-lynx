@@ -9,7 +9,7 @@ import {
 } from '@lynx-js/react';
 import type { LayoutChangeEvent, MainThread } from '@lynx-js/types';
 
-import { BIRD_H, BIRD_W, BIRD_X, PIPE_GAP, PIPE_H, PIPE_POOL_SIZE } from '../constants.js';
+import { BIRD_H, BIRD_W, BIRD_X, PIPE_GAP, PIPE_H, PIPE_POOL_SIZE, STALL_PAUSE_MS } from '../constants.js';
 import type { HudSummary } from '../game/announcements.js';
 import { announcementFor } from '../game/announcements.js';
 import { consumeElapsed, createGame, fitViewport, isIdle, step, tap } from '../game/engine.js' with {
@@ -188,8 +188,14 @@ export function useGame() {
       handle = 0;
       if (paused) return;
       const now = Date.now();
-      const steps = consumeElapsed(clock, now - lastTime);
+      const elapsed = now - lastTime;
       lastTime = now;
+      if (game.gameState === STATE_PLAY && elapsed >= STALL_PAUSE_MS) {
+        paused = true;
+        publish([]);
+        return;
+      }
+      const steps = consumeElapsed(clock, elapsed);
       const sounds: SoundName[] = [];
       for (let index = 0; index < steps; index++) {
         const transition = step(game);
