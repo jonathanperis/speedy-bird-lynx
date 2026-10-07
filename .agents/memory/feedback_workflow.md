@@ -28,13 +28,13 @@ Always use `gh` CLI for all GitHub operations (repos, PRs, checks, merges, relea
 
 ---
 
-Repo-wide files (SECURITY.md, CODE_OF_CONDUCT.md, CONTRIBUTING.md, FUNDING.yml, issue templates, PR templates, CODEOWNERS) live in the user's `.github` repo, not in individual project repos.
+Repo-wide files (SECURITY.md, CODE_OF_CONDUCT.md, CONTRIBUTING.md, FUNDING.yml, issue templates, and PR templates) live in the user's `.github` repo, not in individual project repos.
 
 **Why:** GitHub automatically inherits these from the `.github` community health repo. Duplicating them creates maintenance burden and was already cleaned up once (commit 5c4f1d7).
 
-**How to apply:** Never create SECURITY.md, CODE_OF_CONDUCT.md, CONTRIBUTING.md, FUNDING.yml, issue/PR templates, or CODEOWNERS in this repo. If the user needs these, suggest updating the `.github` repo instead.
+**How to apply:** Never create SECURITY.md, CODE_OF_CONDUCT.md, CONTRIBUTING.md, FUNDING.yml, or issue/PR templates in this repo. If the user needs these, suggest updating the `.github` repo instead.
 
-Note (2026-10-07): GitHub does not inherit `CODEOWNERS` from the `.github` repo; it only works in the repository itself. A root `CODEOWNERS` currently exists here; leave it unless the user decides otherwise.
+Exception: GitHub does not inherit `CODEOWNERS` from the `.github` repository; it only works in the repository itself, so the root `CODEOWNERS` here is kept and maintained (decided 2026-10-07).
 
 ---
 
