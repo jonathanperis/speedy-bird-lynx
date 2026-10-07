@@ -70,6 +70,7 @@ export function mountDemo({ root, canvas, startButton, muteButton, status, asset
   /** A run interrupted by hiding the tab or scrolling away; the next tap resumes it. */
   let paused = false;
   let inView = false;
+  let spritesSettled = false;
   let lastHud: HudSummary | null = null;
   let announceTimer = 0;
 
@@ -81,7 +82,8 @@ export function mountDemo({ root, canvas, startButton, muteButton, status, asset
     paused,
   });
 
-  const render = () => renderer.draw(game, paused);
+  // Until the sprites arrive (or the start timeout passes), show plain sky rather than fallbacks.
+  const render = () => (spritesSettled || started ? renderer.draw(game, paused) : renderer.clear());
 
   const announce = (message: string) => {
     // Clear first so repeating the same message is announced again.
@@ -156,6 +158,7 @@ export function mountDemo({ root, canvas, startButton, muteButton, status, asset
   const prepare = () => {
     spritesReady ??= loadSprites(assetsUrl).then((sprites: Sprites) => {
       renderer.setSprites(sprites);
+      spritesSettled = true;
       render();
     });
     return spritesReady;
@@ -166,8 +169,10 @@ export function mountDemo({ root, canvas, startButton, muteButton, status, asset
     starting = true;
     audio.unlock();
     startButton.disabled = true;
-    startButton.textContent = 'Loading…';
-    root.setAttribute('aria-busy', 'true');
+    if (!spritesSettled) {
+      startButton.textContent = 'Loading…';
+      root.setAttribute('aria-busy', 'true');
+    }
     // Never wait on audio, and never wait forever on sprites.
     await Promise.race([prepare(), new Promise((resolve) => window.setTimeout(resolve, SPRITE_TIMEOUT_MS))]);
     started = true;
