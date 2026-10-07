@@ -1,0 +1,36 @@
+# Coordinated native dependency versions. Lynx SDK, PrimJS, and Fresco move together;
+# see docs/wiki/dependency-updates.md before changing them.
+#
+# Fresco must match the release Lynx's image service is compiled against (2.3.0 for
+# Lynx 4.1.0). Fresco 3 turned CloseableBitmap into an interface, and the app crashes with
+# IncompatibleClassChangeError as soon as it loads an image.
+[versions]
+agp = "9.4.1"
+kotlin = "2.4.20"
+lynx = "4.1.0"
+primjs = "4.1.1"
+fresco = "2.3.0"
+gson = "2.14.0"
+androidx-core = "1.17.0"
+
+[libraries]
+lynx = { module = "org.lynxsdk.lynx:lynx", version.ref = "lynx" }
+lynx-jssdk = { module = "org.lynxsdk.lynx:lynx-jssdk", version.ref = "lynx" }
+lynx-trace = { module = "org.lynxsdk.lynx:lynx-trace", version.ref = "lynx" }
+lynx-service-image = { module = "org.lynxsdk.lynx:lynx-service-image", version.ref = "lynx" }
+lynx-service-log = { module = "org.lynxsdk.lynx:lynx-service-log", version.ref = "lynx" }
+primjs = { module = "org.lynxsdk.lynx:primjs", version.ref = "primjs" }
+fresco = { module = "com.facebook.fresco:fresco", version.ref = "fresco" }
+fresco-animated-base = { module = "com.facebook.fresco:animated-base", version.ref = "fresco" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+# Fresco 2.x needs androidx.core at runtime but does not declare it.
+androidx-core = { module = "androidx.core:core", version.ref = "androidx-core" }
+
+[bundles]
+lynx = ["lynx", "lynx-jssdk", "lynx-trace", "primjs", "lynx-service-image", "lynx-service-log"]
+# The game shows only static PNGs; animated GIF/WebP decoders (and their native libraries) are not needed.
+fresco = ["fresco", "fresco-animated-base"]
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

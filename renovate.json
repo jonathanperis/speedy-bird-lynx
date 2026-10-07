@@ -33,11 +33,18 @@
       "enabled": false
     },
     {
-      "description": "Keep every Fresco module on the same release",
+      "description": "Fresco must match the release lynx-service-image is compiled against (2.3.0 for Lynx 4.1.0); Fresco 3 crashes at launch",
       "matchManagers": ["gradle"],
       "matchPackageNames": ["/^com\\.facebook\\.fresco:/"],
       "groupName": "fresco",
+      "allowedVersions": "<3",
       "automerge": false
+    },
+    {
+      "description": "androidx.core 1.18+ requires API 23; the app supports API 21",
+      "matchManagers": ["gradle"],
+      "matchPackageNames": ["androidx.core:core"],
+      "allowedVersions": "<1.18"
     },
     {
       "description": "Android Gradle Plugin and Kotlin are verified together with the Gradle wrapper",
