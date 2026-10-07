@@ -14,13 +14,14 @@ Cross-platform Flappy Bird clone built with ReactLynx + TypeScript. The checked-
 
 | Technology | Version | Purpose |
 |-----------|---------|---------|
-| ReactLynx | 0.126.1 | Game component model and hooks |
-| React | 19.3.0 | Compatibility dependencies and typings |
+| ReactLynx | 0.126.2 | Game component model and hooks |
+| React types | 19.3.0 | JSX typings consumed by ReactLynx |
 | TypeScript | 6.0.3 app / 7.0.2 docs | Root limited by Rspeedy's supported peer range |
-| Rspeedy / ReactLynx plugin | 0.17.2 / 0.20.2 | Coordinated Lynx bundler/compiler |
-| Rsbuild | 2.2.7 | Web build target |
-| Lynx SDK / PrimJS | 4.1.0 / 4.1.1 | Native hosts; TypeScript bindings use `@lynx-js/types` 4.2.1 |
-| Astro / Tailwind | 7.3.3 / 4.3.3 | Documentation website |
+| Rspeedy / ReactLynx plugin | 0.18.0 / 0.20.3 | Coordinated Lynx bundler/compiler |
+| Rsbuild | 2.2.12 | Standalone web host |
+| Lynx SDK / PrimJS | 4.1.0 / 4.1.1 | Native hosts; TypeScript bindings use `@lynx-js/types` 4.3.0 |
+| Biome | 2.5.15 | Lint and format |
+| Astro / Tailwind | 7.3.6 / 4.3.3 | Documentation website |
 | AGP / Gradle / Kotlin | 9.4.0 / 9.7.1 / 2.4.20 | Android; Java 21, compile SDK 37.2, target 37, min 21 |
 
 ---
@@ -32,7 +33,9 @@ Use Bun for root ReactLynx/Rspeedy installs and command examples because the roo
 ```sh
 bun install --frozen-lockfile       # Install exact dependencies
 bun run dev                         # Dev server with HMR on :3000
-bun run check                      # Type check only
+bun run check                       # Type check only
+bun run lint                        # Biome lint + format check (CI mode)
+bun run format                      # Apply Biome fixes and formatting
 bun run build                       # Production build
 bun run build:web-host              # Compile standalone development web host
 ```
@@ -143,12 +146,14 @@ speedy-bird-lynx/
 
 | Workflow | File | Trigger | Actions |
 |----------|------|---------|---------|
-| Build Check | `ci.yml` | Manual, push to `main`/`lynx-migration`, PR to `main` | Audits, type-check, bundles/web-host/docs builds, site validation, Android compilation/lint and APK bundle verification |
-| CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript and Actions analysis |
+| Build Check | `ci.yml` | Manual, push to `main`, PR to `main`, weekly | Audits, Biome, type-check, bundles/web-host/docs builds, site validation, Android compilation/lint and APK bundle verification; calls Build Android after `main` pushes pass |
+| CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript, Actions, Python, and Kotlin analysis |
 | Deploy Web | `deploy.yml` | Push to `main`, manual | Reusable GitHub Pages docs deploy for `docs/` |
-| Build Android | `build-android.yml` | Push to `main`, manual from `main` | Build/sign APK with a read-only job; separate job publishes the immutable build release |
-| Build iOS | `build-ios.yml` | `v*` tags, manual | Build unsigned archive when Xcode project exists |
-| Release | `release.yml` | `v*` tags, manual from `main` or a version tag | Sole versioned-release publisher; upload all assets before immutable publication |
+| Build Android | `build-android.yml` | Called by Build Check on `main`, manual from `main` | Read-only APK build; separate job publishes an immutable `build/*` prerelease |
+| Build iOS | `build-ios.yml` | Manual | Unsigned archive when the Xcode project exists |
+| Release | `release.yml` | `v*` tags on `main`, manual from `main` | Sole versioned-release publisher; upload all assets before immutable publication |
+
+Shared setup lives in `.github/actions/setup-js` (Node.js, the Bun version pinned by `packageManager`, cached frozen install) and `.github/actions/setup-android`. APK and iOS archive builds are reusable workflows (`reusable-android-apk.yml`, `reusable-ios-archive.yml`). Required status checks match job names (`build`, `android`, `docs`, `Analyze (...)`); rename jobs only together with the ruleset.
 
 ---
 
@@ -157,7 +162,7 @@ speedy-bird-lynx/
 - **Branch + PR workflow**: All changes go through a branch and PR. Never push directly to main.
 - **Rebase-only merges**: Linear history is enforced. Do not use merge commits or squash merges.
 - **Use `gh` CLI**: Prefer `gh` for repository, PR, issue, release, and checks operations.
-- **Repo-wide files**: `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, issue/PR templates, `CODEOWNERS`, and `FUNDING.yml` live in the centralized `.github` repo; do not create duplicates here.
+- **Repo-wide files**: `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, issue/PR templates, and `FUNDING.yml` live in the centralized `.github` repo; do not create duplicates here. `CODEOWNERS` is the exception: GitHub only reads it from this repository.
 - **Branch protection**: `main` has required linear history enabled and force pushes disabled.
 - **Release tags**: Semver `v*` tags trigger the release pipeline.
 - **Build tags**: `build/0.0.0-{sha}` tags are created by Android CI on main pushes.
@@ -168,8 +173,8 @@ speedy-bird-lynx/
 
 - **TypeScript strict mode**: Enabled; app code must pass `bun run check`. Set `jsxImportSource` to `@lynx-js/react` for Lynx element types.
 - **Focused verification**: Generated-site and APK bundle checks exist. Gameplay unit tests and browser UI tests are not configured.
-- **No linter/formatter yet**: Biome is a good fit if formatting/linting is added.
+- **Biome**: `bun run lint` must pass; `biome.json` covers app, web host, tests, and scripts.
 - **CodeQL**: Runs on every push/PR and weekly for security analysis.
-- **Dependabot**: Weekly updates for npm packages and GitHub Actions.
+- **Renovate**: `renovate.json` extends the shared preset and encodes the upgrade holds below (grouped Lynx packages, root TypeScript <7, Lynx-pinned pods). GitHub Dependabot security alerts remain enabled.
 
 Dependency upgrades must preserve the coordinated ReactLynx/compiler versions and native pod constraints. See `docs/wiki/dependency-updates.md` for reviewed versions and holds; a newer registry version is not automatically a supported upgrade.
