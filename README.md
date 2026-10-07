@@ -1,6 +1,6 @@
 # speedy-bird-lynx
 
-> Flappy Bird clone built with ReactLynx and TypeScript — runs on Android and Web from a single codebase, with iOS host source included for Xcode project setup
+> Flappy Bird clone built with ReactLynx and TypeScript — runs on Android, iOS, and the Web from a single codebase
 
 [![Build Check](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/ci.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/ci.yml) [![Release](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/release.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/release.yml) [![CodeQL](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/codeql.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/codeql.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -17,8 +17,8 @@
 | Android | Kotlin host with Lynx 4.1.0; debug and release build paths |
 | ReactLynx web | Rspeedy preview and a self-contained standalone host with sound, saved best score, and keyboard input |
 | GitHub Pages | Playable Canvas demo and Astro documentation |
-| iOS | Swift/CocoaPods source scaffold; create an Xcode project locally |
-| Audio | Canvas demo and standalone web host; Android/iOS hosts do not register the `SpeedyBirdModule` bridge yet |
+| iOS | Swift host with a generated Xcode project, CocoaPods lockfile, and XCUITest smoke tests; unsigned builds in CI |
+| Audio and saved score | Android (SoundPool), iOS (AVAudioPlayer), and the standalone web host (Web Audio) through `SpeedyBirdModule`; the Canvas demo has its own audio |
 
 ## Tech Stack
 
@@ -32,10 +32,10 @@
 | Biome | 2.5.15 | Lint and format checks |
 | Astro / Tailwind CSS | 7.3.6 / 4.3.3 | Static documentation and Canvas demo |
 | Android (Kotlin) | Lynx SDK 4.1.0 | Native Android host app |
-| iOS (Swift + CocoaPods) | Lynx SDK 4.1.0 | Native iOS source scaffold |
+| iOS (Swift + CocoaPods) | Lynx SDK 4.1.0 | Native iOS host app |
 | GitHub Actions | SHA-pinned | CI/CD build, sign, deploy, release |
 
-Versions reviewed **2026-10-07**. See [Dependencies and Upgrades](https://jonathanperis.github.io/speedy-bird-lynx/docs/dependency-updates/) for native toolchains, supported-version holds, and upgrade evidence. Root TypeScript stays on 6.0.3 because Rspeedy does not yet support TypeScript 7; iOS image libraries follow Lynx's exact pod constraints.
+Versions reviewed **2026-10-07**. See [Dependencies and Upgrades](https://jonathanperis.github.io/speedy-bird-lynx/docs/dependency-updates/) for native toolchains, supported-version holds, and upgrade evidence. Root TypeScript stays on 6.0.3 because Rspeedy does not yet support TypeScript 7; Fresco (Android) and the iOS image libraries follow the exact versions Lynx's image services are built against.
 
 ## Features
 
@@ -61,7 +61,7 @@ Versions reviewed **2026-10-07**. See [Dependencies and Upgrades](https://jonath
 - **Bun** for dependency installation and root scripts; use the checked-in lockfiles
 - **Node.js** >=22.12 for the build toolchains and tests; run Astro through `npm run dev/build/preview`
 - **Java 21** and **Android SDK Platform 37.2** (for Android; minimum device API remains 21)
-- **Xcode**, **Ruby >=3.2**, and the CocoaPods/Bundler dependencies in `ios/Gemfile` (after creating an Xcode project)
+- **Xcode**, **Ruby >=3.2**, and the CocoaPods/Bundler dependencies in `ios/Gemfile` (for iOS)
 
 ### Quick Start
 
@@ -119,7 +119,7 @@ cd android
 ./gradlew assembleDebug assembleRelease lintDebug
 ```
 
-Gradle stages the current `dist/main.lynx.bundle` into generated APK assets. Images are embedded in the bundle; manually copied assets are not used. APKs are under `android/app/build/outputs/apk/`. Release signing remains optional and requires the documented keystore environment variables.
+Gradle stages the current `dist/main.lynx.bundle` and the sound effects into generated APK assets. Images are embedded in the bundle; manually copied assets are not used. For iOS: `cd ios && bundle install && bundle exec pod install`, then open `SpeedyBird.xcworkspace` or run `xcodebuild test` (see [Native Host Apps](docs/wiki/native-host-apps.md)). APKs are under `android/app/build/outputs/apk/`. Release signing remains optional and requires the documented keystore environment variables.
 
 ## Project Structure
 
@@ -145,7 +145,7 @@ src/
 tests/                         # Rstest unit and component tests
 
 android/                       # Native Android host app (Kotlin)
-ios/                           # Native iOS host app (Swift)
+ios/                           # Native iOS host app (Swift, generated Xcode project, UI tests)
 assets/                        # Sprites, audio, medals, digits
 docs/                          # Astro GitHub Pages site + playable canvas demo
 .github/workflows/             # CI/CD pipelines
@@ -155,11 +155,11 @@ docs/                          # Astro GitHub Pages site + playable canvas demo
 
 | Workflow | File | Trigger | Description |
 |----------|------|---------|-------------|
-| Build Check | `ci.yml` | Manual, push to `main`, PR to `main`, weekly | Audit, Biome lint/format, type-check, bundles/web host, docs/link checks, Android compilation/lint and bundle verification; on `main` pushes, then calls Build Android |
-| CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript, Actions, Python, and Kotlin security-and-quality analysis |
+| Build Check | `ci.yml` | Manual, push to `main`, every PR, weekly | Audit, Biome lint/format, type-check, tests, bundles/web host, docs/link checks, Android compilation/lint and APK verification, iOS build + UI tests; on `main` pushes, then calls Build Android |
+| CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript, Actions, Python, and Kotlin security-and-quality analysis; Swift on `main` and weekly |
 | Deploy Web | `deploy.yml` | Push to `main`, manual | Build and deploy the Astro `docs/` site to GitHub Pages via the shared Pages workflow |
 | Build Android | `build-android.yml` | Called by Build Check after a `main` push passes; manual from `main` | Read-only APK build followed by an immutable `build/*` prerelease that never becomes "Latest" |
-| Build iOS | `build-ios.yml` | Manual | Unsigned archive through the shared iOS build; skipped without a tracked Xcode project |
+| Build iOS | `build-ios.yml` | Manual | Unsigned archive through the shared iOS build |
 | Release | `release.yml` | `v*` tags on `main`, manual from `main` | Sole versioned-release publisher: verify, build Android/iOS through the shared builds, upload all assets, then publish |
 
 ### Release Artifact Matrix
@@ -169,9 +169,9 @@ docs/                          # Astro GitHub Pages site + playable canvas demo
 | Local Android debug APK | `bun run build`, then `cd android && ./gradlew assembleDebug` | Debug-signed by Android tooling; intended for local install/testing |
 | CI Android build APK | `build-android.yml` after Build Check passes on `main`, or manual dispatch from `main` | Release build published as a prerelease; signed only when keystore secrets are configured |
 | Tagged Android release APK | `release.yml` on `v*` tags | Attached to the immutable GitHub Release; signed when `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD` are configured |
-| iOS archive | `build-ios.yml` (manual) or `release.yml` | Requires a tracked Xcode project. Current workflows always disable signing; providing Apple secrets alone does not enable it |
+| iOS archive | `build-ios.yml` (manual) or `release.yml` | Unsigned; the workflows always disable signing, so providing Apple secrets alone does not enable it |
 
-Quality gates include dependency audits, Biome lint/format checks, TypeScript checks, Rstest unit and component tests, docs asset parity, bundle/web-host/docs builds, generated-site validation, Android compilation/API lint, APK bundle verification, and CodeQL.
+Quality gates include dependency audits, Biome lint/format checks, TypeScript checks, Rstest unit and component tests, docs asset parity, bundle/web-host/docs builds, generated-site validation, Android compilation/API lint, APK bundle and sound verification, iOS XCUITest smoke tests on a simulator, and CodeQL.
 
 ## Credits
 

@@ -1,61 +1,68 @@
 # Native Host Apps
 
-Lynx bundles do not run standalone — they need a thin native shell that embeds the Lynx runtime and loads the bundle. This project includes a ready-to-build Android host app and iOS source files that must be added to a locally created Xcode project before building.
+Lynx bundles do not run standalone. They need a thin native shell that embeds the Lynx runtime, loads the bundle, and supplies native modules. This project includes complete Android and iOS hosts. Both register the `SpeedyBirdModule` bridge (sound, saved best score, screen-reader announcements) and forward app lifecycle events to the game (see [Game Engine](game-engine.md#audio-and-host-bridge)).
 
 ## Android
 
-The Android host app is a minimal Kotlin application in `android/`.
+The Android host is a small Kotlin app in `android/`.
 
 ### Key Files
 
 | File | Purpose |
 |------|---------|
-| `SpeedyBirdApplication.kt` | Initializes Lynx engine, Fresco (image loading), and registers services |
-| `MainActivity.kt` | Creates a `LynxView` and loads `main.lynx.bundle` from assets |
-| `AssetTemplateProvider.kt` | Implements `AbsTemplateProvider` to read bundles from APK assets |
-| `AndroidManifest.xml` | Fullscreen, portrait-only, internet permission |
-| `build.gradle.kts` | Lynx SDK 4.1.0 dependencies, generated bundle assets, and signing config from env vars |
-| `proguard-rules.pro` | Keep rules for Lynx SDK classes during R8 minification |
+| `SpeedyBirdApplication.kt` | Initializes Fresco, registers the Lynx image and log services, and initializes `LynxEnv` |
+| `MainActivity.kt` | Creates the `LynxView`, registers `SpeedyBirdModule`, runs full-screen immersive mode, and forwards lifecycle events |
+| `SpeedyBirdModule.kt` | `SoundPool` sound effects, `SharedPreferences` best score, and announcements |
+| `AssetTemplateProvider.kt` | Reads bundles from APK assets on a background executor |
+| `AndroidManifest.xml` | No permissions; backup rules for the saved score; adaptive and round icons; Android 12+ splash screen |
+| `gradle/libs.versions.toml` | Version catalog for AGP, Kotlin, Lynx, PrimJS, Fresco, and support libraries |
+| `app/build.gradle.kts` | Generated assets (bundle + sounds), R8 with resource shrinking, signing from environment variables |
+| `proguard-rules.pro` | Keep rules for Lynx SDK classes and `@LynxMethod` module methods |
+
+### Lifecycle and Display
+
+- **Pause/resume:** `onPause` sends `SpeedyBirdPause` and calls `onEnterBackground()`; `onResume` calls `onEnterForeground()` and sends `SpeedyBirdResume`. A run in progress shows "PAUSED" and resumes on the next tap. `onDestroy` destroys the `LynxView`, which releases the module's `SoundPool`.
+- **Configuration changes:** the activity handles size, density, UI mode, keyboard, and locale changes itself, so folding, multi-window, or a dark-mode switch never restarts a run.
+- **Full screen:** system bars are hidden with `WindowInsetsController` (swipe to reveal them temporarily) and the game draws under display cutouts. The theme paints the sky color behind the window, so launch shows no white flash.
+- **Orientation:** portrait on phones. Android 16+ ignores orientation locks on large screens; the game then letterboxes itself.
+- **Accessibility:** announcements go to a 1-pixel polite live region next to the `LynxView`, the supported replacement for the deprecated `announceForAccessibility`.
 
 ### Dependencies
 
-| Artifact | Purpose |
-|----------|---------|
-| `org.lynxsdk.lynx:lynx` | Core rendering engine |
-| `org.lynxsdk.lynx:lynx-jssdk` | JavaScript bridge |
-| `org.lynxsdk.lynx:primjs` | JavaScript engine, version 4.1.1 as required by Lynx 4.1.0 |
-| `org.lynxsdk.lynx:lynx-trace` | Performance tracing |
-| `org.lynxsdk.lynx:lynx-service-image` | Image loading (wraps Fresco) |
-| `org.lynxsdk.lynx:lynx-service-log` | Logging |
-| `org.lynxsdk.lynx:lynx-service-http` | Network requests |
-| `com.facebook.fresco:*` | Image loading and animated image support required by `lynx-service-image` |
-| `com.squareup.okhttp3:okhttp` | HTTP client support for Lynx services |
-| `com.google.code.gson:gson` | JSON (required by Lynx internals) |
+| Artifact | Version | Purpose |
+|----------|---------|---------|
+| `org.lynxsdk.lynx:lynx`, `lynx-jssdk`, `lynx-trace` | 4.1.0 | Engine, JavaScript bridge, tracing |
+| `org.lynxsdk.lynx:primjs` | 4.1.1 | JavaScript engine required by Lynx 4.1.0 |
+| `org.lynxsdk.lynx:lynx-service-image`, `lynx-service-log` | 4.1.0 | Image loading (Fresco) and logging |
+| `com.facebook.fresco:fresco`, `animated-base` | 2.3.0 | The exact release `lynx-service-image` 4.1.0 is compiled against |
+| `androidx.core:core` | 1.17.0 | Required by Fresco 2.x at runtime; newest release supporting API 21 |
+| `com.google.code.gson:gson` | 2.14.0 | JSON (required by Lynx internals) |
 
-### How It Works
+The app does not request `INTERNET` and does not include the Lynx HTTP service or OkHttp: sprites are embedded in the bundle and sounds are packaged assets. Animated GIF/WebP decoders are omitted because the game shows only static PNGs.
 
-1. `SpeedyBirdApplication.onCreate()` initializes Fresco, registers Lynx services, and calls `LynxEnv.inst().init()`
-2. `MainActivity.onCreate()` builds a `LynxView` via `LynxViewBuilder`, attaches the `AssetTemplateProvider`, and calls `renderTemplateUrl("main.lynx.bundle", "")`
-3. The `AssetTemplateProvider` reads the bundle bytes from `assets/main.lynx.bundle` and passes them to the Lynx engine
-
-Run `bun run build` before Gradle. The `prepareLynxAssets` task stages that exact bundle from root `dist/` into `android/app/build/generated/lynxAssets/`. The APK assets source is this generated directory, not a manually populated source folder. Images are embedded in the bundle. After building, verify the packaged input from the repository root:
+### Build
 
 ```bash
-python3 scripts/verify_android_bundle.py android/app/build/outputs/apk/debug/app-debug.apk
+bun run build
+cd android
+./gradlew assembleDebug assembleRelease lintDebug
+cd .. && python3 scripts/verify_android_bundle.py android/app/build/outputs/apk/*/app-*.apk
 ```
 
-The Android toolchain uses Java 21, AGP 9.4.0, Gradle 9.7.1, and Kotlin 2.4.20 through AGP's built-in Kotlin integration. Compile SDK is 37.2, target SDK is 37, and minimum device API is 21. Run `./gradlew lintDebug` to check API usage. See [Dependencies and Upgrades](dependency-updates.md) for image-library compatibility holds.
+The `prepareLynxAssets` task stages `dist/main.lynx.bundle` and `assets/audio/*.wav` into `android/app/build/generated/lynxAssets/`; nothing is copied into `src/`, so assets cannot go stale. Sounds are stored uncompressed so `SoundPool` can load them directly. The verification script fails if an APK is missing the current bundle or any sound.
+
+The build runs on JDK 21 and compiles the app's own classes to Java 11 bytecode. Toolchain: AGP 9.4.1, Gradle 9.8.1 (checksum-pinned wrapper), Kotlin 2.4.20 through AGP's built-in Kotlin support, compile SDK 37.2, target SDK 37, minimum API 21. Configuration cache, build cache, and parallel execution are enabled.
 
 ### Signing
 
-The `build.gradle.kts` reads signing configuration from environment variables:
+`build.gradle.kts` reads signing configuration from environment variables:
 
 - `KEYSTORE_FILE` — path to keystore file
 - `KEYSTORE_PASSWORD` — keystore password
 - `KEY_ALIAS` — key alias
 - `KEY_PASSWORD` — key password
 
-These are populated by CI from GitHub Secrets. For local release builds, export the same environment variables in your shell before running Gradle.
+CI populates these from GitHub Secrets. For local release builds, export the same variables before running Gradle.
 
 ### Android Artifacts
 
@@ -66,43 +73,44 @@ These are populated by CI from GitHub Secrets. For local release builds, export 
 | CI main-build release | `build-android.yml` after Build Check passes on `main`, or manual dispatch from `main` | APK artifact followed by separate immutable build-release publication | Signed only when `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD` GitHub Secrets are configured |
 | Tagged release | `release.yml` on `v*` tags | Sole versioned-release publisher; assets uploaded before publication | Signed only when the same keystore secrets are configured |
 
-## Native Audio Status
-
-The game calls the `SpeedyBirdModule` native module for sound, the saved best score, and screen-reader announcements (see [Game Engine](game-engine.md#audio-and-host-bridge)). The standalone web host implements it. The Android and iOS hosts do not register it yet, so they run silently and do not keep the best score between launches.
-
 ## iOS
 
-The iOS host app source files are in `ios/`. An Xcode project must be created manually before the app can be built or archived.
+The iOS host is in `ios/`, with a generated Xcode project and a committed `Podfile.lock`.
 
 ### Included Files
 
 | File | Purpose |
 |------|---------|
-| `Podfile` | Lynx 4.1.0, PrimJS 4.1.1, and the image versions required by LynxService |
-| `Gemfile` / `Gemfile.lock` | Reproducible CocoaPods 1.17.0 and xcodeproj 1.28.1 tooling |
-| `AppDelegate.swift` | Initializes `LynxEnv` |
-| `SceneDelegate.swift` | Creates window with `ViewController` |
-| `ViewController.swift` | Fullscreen `LynxView`, portrait-only, hidden status bar |
-| `BundleTemplateProvider.swift` | Loads `main.lynx.bundle` from the app bundle |
-| `SpeedyBird-Bridging-Header.h` | Objective-C bridge for Lynx SDK headers |
-| `Info.plist` | App metadata, scene configuration |
+| `SpeedyBird.xcodeproj` | Generated by `scripts/generate-ios-project.rb`; app target, `SpeedyBirdUITests`, shared `SpeedyBird` scheme |
+| `Podfile` / `Podfile.lock` | Lynx 4.1.0, PrimJS 4.1.1, and the image library versions LynxService requires, locked |
+| `Gemfile` / `Gemfile.lock` | CocoaPods 1.17.0 and xcodeproj 1.28.1 |
+| `AppDelegate.swift` | `@main` entry point; initializes `LynxEnv` |
+| `SceneDelegate.swift` | Creates the window with `ViewController` |
+| `ViewController.swift` | Edge-to-edge `LynxView` that follows every size change, registers `SpeedyBirdModule`, and forwards lifecycle events |
+| `SpeedyBirdModule.swift` | `AVAudioPlayer` sounds (ambient session: respects the silent switch, mixes with music), `UserDefaults` best score, VoiceOver announcements |
+| `BundleTemplateProvider.swift` | Loads `main.lynx.bundle` from the app bundle off the main thread |
+| `Info.plist` | Launch screen, versions from build settings, orientations, export compliance |
+| `PrivacyInfo.xcprivacy` | Privacy manifest: no tracking or collected data; declares `UserDefaults` access (reason `CA92.1`) |
+| `Assets.xcassets` | App icon and launch background color |
+| `SpeedyBirdUITests/` | XCUITest smoke tests that drive the real app through its accessibility label |
 
-### Setup Steps
+The app bundles `../dist/main.lynx.bundle` and the `../assets/audio` folder directly, so every build packages the current `bun run build` output and the canonical sounds. iPhone runs in portrait; iPad supports every orientation and window size (Split View, Stage Manager) because the game letterboxes itself. The status bar is hidden, the home indicator auto-hides, and taps near the bottom edge reach the game first.
 
-1. Open Xcode > File > New > Project > App
-   - Product Name: `SpeedyBird`
-   - Bundle Identifier: `com.jonathanperis.speedybird`
-   - Language: Swift; the verified scaffold uses Swift 5 language mode
-   - iOS Deployment Target: 15.0 or newer
-2. Delete the auto-generated Swift files
-3. Add the files from `ios/SpeedyBird/`; set the target's Info.plist file to `SpeedyBird/Info.plist` instead of generating one
-4. Build Settings > Swift Compiler > Objective-C Bridging Header > set to `SpeedyBird/SpeedyBird-Bridging-Header.h`
-5. Build the root bundle and copy `dist/main.lynx.bundle` into `ios/SpeedyBird/Resources/`
-6. With Ruby >=3.2 and Bundler: `cd ios && bundle install && bundle exec pod install`
-7. Open `SpeedyBird.xcworkspace` (not `.xcodeproj`)
-8. Build Phases > Copy Bundle Resources > add `main.lynx.bundle`
+### Build and Run
 
-The Podfile uses both CocoaPods trunk and the official `lynx-family/Specs` repository. Its image-library versions are exact upstream requirements. It sets deployment target iOS 15 for the app and pods to match Xcode 27's supported range, and uses a native resource-copy phase so script sandboxing stays enabled. Dependency resolution, an unsigned app build, and an unsigned archive were verified in a temporary project; configure your own shared `SpeedyBird` scheme because that verification project is not distributed. See [Dependencies and Upgrades](dependency-updates.md) for the scoped upstream compiler adjustments.
+```bash
+bun run build
+cd ios
+bundle install
+bundle exec pod install
+open SpeedyBird.xcworkspace   # or build and test from the command line:
+xcodebuild test -workspace SpeedyBird.xcworkspace -scheme SpeedyBird \
+  -destination 'platform=iOS Simulator,name=iPhone 15 Pro'
+```
+
+`xcodebuild test` builds the app and runs the UI smoke tests: start a run, crash, check the restart lock, and pause a run by backgrounding the app. To change the project structure (new files or targets), edit `scripts/generate-ios-project.rb`, then run `bundle exec ruby ../scripts/generate-ios-project.rb && bundle exec pod install` from `ios/`.
+
+The Podfile uses both CocoaPods trunk and the official `lynx-family/Specs` repository. Its image-library versions are exact upstream requirements. It raises pod deployment targets to iOS 15 to match Xcode's supported range and uses a native resource-copy phase so user script sandboxing stays enabled. See [Dependencies and Upgrades](dependency-updates.md) for the scoped upstream compiler adjustments.
 
 ### Apple Developer Program
 
@@ -114,4 +122,4 @@ The Podfile uses both CocoaPods trunk and the official `lynx-family/Specs` repos
 | App Store distribution | No | Yes |
 | CI signing (certificates) | No | Yes |
 
-Simulator builds and unsigned archives do not require paid membership. TestFlight/App Store distribution requires membership and signing configuration. The checked-in workflows always pass `CODE_SIGNING_ALLOWED=NO` and skip without an Xcode project. They do not import signing certificates or consume Apple signing secrets, so adding secrets alone does not enable a signed iOS release.
+Simulator builds and unsigned archives do not require paid membership. The workflows always pass `CODE_SIGNING_ALLOWED=NO` and never read Apple signing secrets, so adding secrets alone does not enable a signed iOS release.
