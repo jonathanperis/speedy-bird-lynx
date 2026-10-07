@@ -1,15 +1,11 @@
 name: Android release APK
 
 # Reusable build shared by the main-branch build release and the versioned release.
-# The job is read-only; callers own publication.
+# It builds the calling run's commit; the job is read-only and callers own publication.
 
 on:
   workflow_call:
     inputs:
-      ref:
-        description: Commit to build.
-        type: string
-        required: true
       version-name:
         description: Android versionName and release asset suffix.
         type: string
@@ -35,7 +31,6 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.ref }}
           persist-credentials: false
 
       - uses: ./.github/actions/setup-js

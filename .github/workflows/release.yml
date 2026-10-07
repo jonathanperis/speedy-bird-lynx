@@ -84,7 +84,6 @@ jobs:
     needs: verify
     uses: ./.github/workflows/reusable-android-apk.yml
     with:
-      ref: ${{ github.sha }}
       version-name: ${{ needs.verify.outputs.version-name }}
     secrets:
       KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
@@ -95,8 +94,6 @@ jobs:
   ios:
     needs: verify
     uses: ./.github/workflows/reusable-ios-archive.yml
-    with:
-      ref: ${{ github.sha }}
 
   create-release:
     needs: [verify, android, ios]
