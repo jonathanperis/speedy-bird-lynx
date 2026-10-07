@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.SpeedyBird" parent="android:Theme.Material.NoActionBar.Fullscreen">
+        <!-- Sky color instead of a white flash while the bundle loads. -->
+        <item name="android:windowBackground">@color/sky</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

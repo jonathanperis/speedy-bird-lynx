@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Matches BG_COLOR in src/constants.ts so launch and letterbox areas blend in. -->
+    <color name="sky">#00BBC4</color>
+</resources>
