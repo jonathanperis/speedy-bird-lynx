@@ -1,4 +1,5 @@
 plugins {
-    id("com.android.application") version "9.4.0" apply false
-    id("org.jetbrains.kotlin.android") version "2.4.20" apply false
+    alias(libs.plugins.android.application) apply false
+    // Supplies the Kotlin compiler used by AGP's built-in Kotlin support.
+    alias(libs.plugins.kotlin.android) apply false
 }
