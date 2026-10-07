@@ -6,13 +6,17 @@ type: reference
 
 ## Game Mechanics
 
-Source of truth: `src/constants.ts` and `src/hooks/useGameEngine.ts`.
+Source of truth: `src/constants.ts` and `src/game/engine.ts`.
 
 - **Bird impulse**: `BIRD_FLAP = 7.25`
 - **Gravity**: `BIRD_GRAVITY = 0.28`
 - **Pipe gap**: `PIPE_GAP = 150`
 - **Pipe speed**: `PIPE_DX = 2.7`, with 1% speed increase per pipe cleared
-- **Pipe spawn cadence**: `PIPE_SPAWN_INTERVAL = 77` frames
+- **Fixed step**: `STEP_MS = 1000 / 60`; long gaps clamp at `MAX_FRAME_MS = 250`
+- **Pipe spawn cadence**: `PIPE_SPAWN_INTERVAL = 77` steps (floor 20)
+- **Scoring**: when the bird's trailing edge clears a pipe (`passed` flag), not on despawn
+- **Restart lock**: landed + `RESTART_DELAY_STEPS = 30`
+- **Tilt**: `clamp((v - 2) * 7, -15, 70)` degrees
 - **Background parallax**: `BG_DX = 0.2`
 - **Medal thresholds**: Bronze (10+), Silver (25+), Gold (50+), Platinum (100+)
 - **Pipe rendering**: Tile-based top/bottom pipe construction; no sprite stretching

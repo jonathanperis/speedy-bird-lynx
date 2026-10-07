@@ -68,7 +68,7 @@ These are populated by CI from GitHub Secrets. For local release builds, export 
 
 ## Native Audio Status
 
-The adapter in `src/audio/audio.ts` uses `HTMLAudioElement` only in JavaScript contexts where `Audio` exists. Native and worker-based web runtimes currently use a placeholder and continue without sound. The current interface is `play(sound)` only; there is no preload bridge method. A future implementation must replace the optional internal lookup with Lynx's supported background-thread `NativeModules` API, implement and register platform modules, and package their sound resources. The separate Canvas demo already uses browser audio.
+The game calls the `SpeedyBirdModule` native module for sound, the saved best score, and screen-reader announcements (see [Game Engine](game-engine.md#audio-and-host-bridge)). The standalone web host implements it. The Android and iOS hosts do not register it yet, so they run silently and do not keep the best score between launches.
 
 ## iOS
 

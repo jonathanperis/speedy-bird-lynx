@@ -14,7 +14,7 @@ export const PAGE_META: Record<string, { title: string; description: string }> =
   architecture: { title: 'Architecture', description: 'Speedy Bird component hierarchy, ref-based physics, render snapshots, and the three web surfaces.' },
   'assets-and-sprites': { title: 'Assets and Sprites', description: 'Sprite loading, tile-based pipes, embedded native images, browser audio, asset synchronization, and credits.' },
   'ci-cd-pipeline': { title: 'CI/CD Pipeline', description: 'Build checks, documentation validation, Android artifacts, conditional iOS archives, and immutable GitHub releases.' },
-  'game-engine': { title: 'Game Engine', description: 'The 17ms game loop, physics constants, collisions, offscreen-pipe scoring, speed scaling, and medals.' },
+  'game-engine': { title: 'Game Engine', description: 'The pure rules engine, main-thread frame loop, physics, collisions, scoring, restart lock, and host bridge.' },
   'getting-started': { title: 'Getting Started', description: 'Install dependencies and run the ReactLynx app, Canvas demo, documentation site, and native hosts.' },
   'native-host-apps': { title: 'Native Host Apps', description: 'Build the Kotlin Android host and configure the Swift iOS scaffold, with explicit audio and signing limitations.' },
   'dependency-updates': { title: 'Dependencies and Upgrades', description: 'Verified dependency versions, native toolchain requirements, compatibility holds, and the upgrade verification process.' },
