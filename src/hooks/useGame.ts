@@ -41,6 +41,8 @@ interface FrameScheduler {
 export function useGame() {
   const rootRef = useMainThreadRef<MainThread.Element | null>(null);
   const controllerRef = useMainThreadRef<Controller | null>(null);
+  // Taps that arrive before the controller exists (the first frames after launch).
+  const pendingTapRef = useMainThreadRef(false);
   const savedBest = useRef(DEFAULT_PREFERENCES.bestScore);
   const lastHud = useRef<Hud | null>(null);
   const [hud, setHud] = useState<Hud>({
@@ -253,11 +255,16 @@ export function useGame() {
     render();
     publish([]);
     wake();
+    if (pendingTapRef.current) {
+      pendingTapRef.current = false;
+      controllerRef.current.tap();
+    }
   };
 
   const handleTap = () => {
     'main thread';
-    controllerRef.current?.tap();
+    if (controllerRef.current) controllerRef.current.tap();
+    else pendingTapRef.current = true;
   };
   const pauseOnMain = () => {
     'main thread';

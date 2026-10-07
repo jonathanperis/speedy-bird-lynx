@@ -54,7 +54,6 @@ export default function App() {
         <ScoreDisplay score={score} visible={gameState === STATE_PLAY} />
         <GetReadyScreen visible={gameState === STATE_READY} />
         <GameOverScreen visible={gameState === STATE_OVER} score={score} bestScore={bestScore} newBest={newBest} />
-        <PausedOverlay visible={paused} />
       </view>
 
       {/* Screens wider than the playfield: cover the sides so pipes never pop in. */}
@@ -82,6 +81,9 @@ export default function App() {
           />
         </>
       ) : null}
+
+      {/* Dims the whole screen, including the sky above the playfield. */}
+      <PausedOverlay visible={paused} />
     </view>
   );
 }
