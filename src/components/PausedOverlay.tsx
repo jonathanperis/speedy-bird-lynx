@@ -1,5 +1,3 @@
-import { CANVAS_HEIGHT } from '../constants.js';
-
 interface PausedOverlayProps {
   visible: boolean;
 }
@@ -15,8 +13,7 @@ export default function PausedOverlay({ visible }: PausedOverlayProps) {
         top: '0px',
         left: '0px',
         width: '100%',
-        height: `${CANVAS_HEIGHT}px`,
-        zIndex: 6,
+        height: '100%',
         backgroundColor: 'rgba(4, 17, 30, 0.55)',
         display: 'flex',
         flexDirection: 'column',
