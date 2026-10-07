@@ -57,6 +57,7 @@ const description = isRoot
 const base = import.meta.env.BASE_URL;
 const docsBase = base.replace(/\/$/, '') + '/docs';
 const backHomeUrl = base.replace(/\/$/, '') + '/';
+const guideUrl = (id: string) => (id === 'home' ? `${docsBase}/` : `${docsBase}/${id}/`);
 const renderedSections = await Promise.all(sectionsToRender.map(async ({ slug, page }) => ({
   slug,
   html: await renderDoc(await page.compiledContent(), slug, docsBase, isRoot),
@@ -65,7 +66,7 @@ const renderedSections = await Promise.all(sectionsToRender.map(async ({ slug, p
 
 <BaseLayout title={pageTitle} description={description}>
   <div class="mobile-header">
-    <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu" aria-controls="sidebar" aria-expanded="false">
+    <button type="button" class="menu-toggle" id="menuToggle" aria-label="Open manual navigation" aria-controls="sidebar" aria-expanded="false">
       <span></span>
       <span></span>
       <span></span>
@@ -73,15 +74,15 @@ const renderedSections = await Promise.all(sectionsToRender.map(async ({ slug, p
     <div class="repo-title">Speedy Bird Manual</div>
   </div>
 
-  <div class="overlay" id="overlay"></div>
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
 
-  <aside class="sidebar" id="sidebar">
+  <aside class="sidebar" id="sidebar" aria-label="Manual navigation">
     <div class="sidebar-header">
       <p class="repo-title">Speedy Bird Manual</p>
       <p class="repo-description">Arcade service notes for the ReactLynx game: speed curve, engine, sprites, native shells, and deploy pipeline.</p>
       <input type="text" id="searchInput" class="search-box" placeholder="Search documentation..." aria-label="Search documentation" hidden={!isRoot}>
     </div>
-    <div class="sidebar-nav-container">
+    <nav class="sidebar-nav-container" aria-label="Manual pages">
       {SECTION_CATEGORIES.map((cat) => {
         const catIds = cat.ids;
         return (
@@ -89,10 +90,16 @@ const renderedSections = await Promise.all(sectionsToRender.map(async ({ slug, p
             {cat.label && <div class="sidebar-category">{cat.label}</div>}
             <ul>
               {catIds.map((id) => {
-                 const anchor = id;
+                // The combined manual scrolls to its sections; guide pages link to guide routes.
+                const current = !isRoot && id === requestedKey;
                 return (
                   <li>
-                    <a class="nav-item" href={`${docsBase}/#${anchor}`} data-nav-id={anchor}>
+                    <a
+                      class:list={['nav-item', { active: current }]}
+                      href={isRoot ? `#${id}` : guideUrl(id)}
+                      data-nav-id={id}
+                      aria-current={current ? 'page' : undefined}
+                    >
                       {PAGE_META[id].title}
                     </a>
                   </li>
@@ -102,7 +109,7 @@ const renderedSections = await Promise.all(sectionsToRender.map(async ({ slug, p
           </div>
         );
       })}
-    </div>
+    </nav>
     <div class="sidebar-footer">
       <a href={backHomeUrl} class="back-home">← Back to home</a>
       <a href="https://github.com/jonathanperis/speedy-bird-lynx" target="_blank" rel="noopener noreferrer">View on GitHub</a>
@@ -112,17 +119,19 @@ const renderedSections = await Promise.all(sectionsToRender.map(async ({ slug, p
   </aside>
 
   <div class="content-wrapper">
-    <main class="content" id="mainContent">
-      <header class="docs-marquee" aria-label="Speedy Bird documentation overview">
+    <main class="content" id="main-content" tabindex="-1">
+      <header class="docs-marquee">
         <div>
           <p class="manual-kicker">Builder's Manual · Night Arcade Cabinet</p>
-          <h1>{isRoot ? 'Speedy Bird Service Manual' : pageTitle.replace(' - Speedy Bird Lynx', '')}</h1>
+          {isRoot
+            ? <h1 class="marquee-title">Speedy Bird Service Manual</h1>
+            : <p class="marquee-title">{PAGE_META[requestedKey].title}</p>}
           <p class="manual-lede">
             Source-backed guides to the speed curve, ReactLynx architecture, sprites, native hosts,
             documentation site, and release pipeline.
           </p>
         </div>
-        <div class="manual-scoreboard" aria-label="Documentation quick stats">
+        <div class="manual-scoreboard" role="group" aria-label="Documentation quick stats">
           <div><strong>{SECTION_ORDER.length}</strong><span>Manual pages</span></div>
           <div><strong>+1%</strong><span>Speed / pipe</span></div>
           <div><strong>iOS</strong><span>Source scaffold</span></div>
@@ -131,9 +140,9 @@ const renderedSections = await Promise.all(sectionsToRender.map(async ({ slug, p
 
       <nav class="manual-jumpbar" aria-label="Manual quick links">
         <a href={backHomeUrl}>Play</a>
-        <a href={`${docsBase}/#game-engine`}>Engine</a>
-        <a href={`${docsBase}/#assets-and-sprites`}>Sprites</a>
-        <a href={`${docsBase}/#ci-cd-pipeline`}>Deploy</a>
+        <a href={isRoot ? '#game-engine' : guideUrl('game-engine')}>Engine</a>
+        <a href={isRoot ? '#assets-and-sprites' : guideUrl('assets-and-sprites')}>Sprites</a>
+        <a href={isRoot ? '#ci-cd-pipeline' : guideUrl('ci-cd-pipeline')}>Deploy</a>
         <a href="https://github.com/jonathanperis/speedy-bird-lynx" target="_blank" rel="noopener noreferrer">GitHub</a>
       </nav>
 
@@ -143,121 +152,84 @@ const renderedSections = await Promise.all(sectionsToRender.map(async ({ slug, p
     </main>
   </div>
 
-  {requestedSlug && <script is:inline define:vars={{ slug: requestedSlug, isRoot }}>window.__docsSlug = slug; window.__isRoot = isRoot;</script>}
+  <script is:inline define:vars={{ isRoot }}>
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const contentWrapper = document.querySelector('.content-wrapper');
+    const mobile = window.matchMedia('(max-width: 768px)');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const navItems = document.querySelectorAll('.nav-item');
+    const sections = document.querySelectorAll('section.doc-section');
+    const isOpen = () => sidebar.classList.contains('open');
 
-  <script is:inline>
-    document.addEventListener('DOMContentLoaded', () => {
-      const menuToggle = document.getElementById('menuToggle');
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('overlay');
-
-      function toggleMenu() {
-        const isOpen = sidebar.classList.toggle('open');
-        overlay.classList.toggle('open');
-        if (menuToggle) menuToggle.setAttribute('aria-expanded', String(isOpen));
+    // On small screens the sidebar is an off-canvas drawer. While closed it is removed from the
+    // tab order and the accessibility tree; while open, the page behind it is inert.
+    const sync = () => {
+      const open = isOpen();
+      sidebar.inert = mobile.matches && !open;
+      contentWrapper.inert = mobile.matches && open;
+      menuToggle.setAttribute('aria-expanded', String(open));
+      menuToggle.setAttribute('aria-label', open ? 'Close manual navigation' : 'Open manual navigation');
+    };
+    const setOpen = (open, restoreFocus) => {
+      sidebar.classList.toggle('open', open);
+      overlay.classList.toggle('open', open);
+      sync();
+      if (open) {
+        const target = sidebar.querySelector('[aria-current="page"]') ?? sidebar.querySelector('input:not([hidden]), .nav-item');
+        target?.focus();
+      } else if (restoreFocus) {
+        menuToggle.focus();
       }
+    };
+    menuToggle.addEventListener('click', () => setOpen(!isOpen(), false));
+    overlay.addEventListener('click', () => setOpen(false, true));
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || !isOpen()) return;
+      event.preventDefault();
+      setOpen(false, true);
+    });
+    mobile.addEventListener('change', () => (isOpen() && !mobile.matches ? setOpen(false, false) : sync()));
+    sync();
 
-      if (menuToggle) menuToggle.addEventListener('click', toggleMenu);
-      if (overlay) overlay.addEventListener('click', toggleMenu);
-
-      const isRoot = window.__isRoot !== false;
-      const prefersReducedMotion = !window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
-      const sections = document.querySelectorAll('section.doc-section');
-      const navItems = document.querySelectorAll('.nav-item');
-
-      // Auto-scroll: root uses section slug; single-section lets browser handle deep-link hashes
-      if (isRoot) {
-        const targetSlug = window.__docsSlug;
-        const hash = window.location.hash;
-        const sectionId = targetSlug || (hash && hash.length > 1 ? hash.slice(1) : null);
-        if (sectionId) {
-          const target = document.getElementById(sectionId);
-          if (target) {
-            setTimeout(() => target.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' }), 100);
+    if (isRoot) {
+      // Scrollspy: highlight the section in view.
+      const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          for (const item of navItems) {
+            const current = item.dataset.navId === entry.target.id;
+            item.classList.toggle('active', current);
+            if (current) {
+              item.setAttribute('aria-current', 'location');
+              item.scrollIntoView({ behavior: reducedMotion.matches ? 'auto' : 'smooth', block: 'nearest' });
+            } else {
+              item.removeAttribute('aria-current');
+            }
           }
         }
-      }
+      }, { rootMargin: '-80px 0px -60% 0px', threshold: 0 });
+      sections.forEach((section) => observer.observe(section));
+      navItems.forEach((item) => item.addEventListener('click', () => {
+        if (mobile.matches) setOpen(false, false);
+      }));
 
-      // Scrollspy + nav click: only meaningful with multiple sections
-      if (isRoot && sections.length > 1) {
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              const sectionId = entry.target.id;
-              navItems.forEach(item => {
-                item.classList.toggle('active', item.dataset.navId === sectionId);
-                if (item.dataset.navId === sectionId) {
-                  item.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'nearest' });
-                }
-              });
-            }
-          });
-        }, { root: null, rootMargin: '-80px 0px -60% 0px', threshold: 0 });
-
-        sections.forEach(section => observer.observe(section));
-
-        navItems.forEach(item => {
-          item.addEventListener('click', () => {
-            if (window.innerWidth <= 768) toggleMenu();
-          });
-        });
-      }
-
-      // Search: only on root (full tree); single-section has nothing to filter
-      if (isRoot) {
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-          searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const content = document.getElementById('mainContent');
-            if (!content) return;
-
-            if (query === '') {
-              sections.forEach(s => s.classList.remove('hidden-section'));
-              navItems.forEach(item => {
-                item.style.display = '';
-                item.parentElement.style.display = '';
-              });
-              document.querySelectorAll('.sidebar-category-group').forEach(group => {
-                group.style.display = '';
-                const catLabel = group.querySelector('.sidebar-category');
-                if (catLabel) catLabel.style.display = '';
-              });
-              return;
-            }
-
-            sections.forEach(section => {
-              const text = section.textContent.toLowerCase();
-              const navItem = document.querySelector(`.nav-item[data-nav-id="${section.id}"]`);
-              const li = navItem ? navItem.parentElement : null;
-
-              if (text.includes(query)) {
-                section.classList.remove('hidden-section');
-                if (li) li.style.display = '';
-              } else {
-                section.classList.add('hidden-section');
-                if (li) li.style.display = 'none';
-              }
-            });
-
-            // Hide empty categories
-            document.querySelectorAll('.sidebar-category-group').forEach(group => {
-              const items = group.querySelectorAll('.nav-item');
-              let visibleCount = 0;
-              items.forEach(item => {
-                const id = item.dataset.navId;
-                const sec = document.getElementById(id ?? '');
-                const vis = !sec || !sec.classList.contains('hidden-section');
-                item.style.display = vis ? '' : 'none';
-                if (vis) visibleCount++;
-              });
-              const catLabel = group.querySelector('.sidebar-category');
-              if (catLabel) catLabel.style.display = visibleCount === 0 ? 'none' : '';
-              group.style.display = visibleCount === 0 ? 'none' : '';
-            });
-          });
+      // Search filters the combined manual's sections and their sidebar entries.
+      const searchInput = document.getElementById('searchInput');
+      searchInput?.addEventListener('input', () => {
+        const query = searchInput.value.trim().toLowerCase();
+        for (const section of sections) {
+          const match = !query || section.textContent.toLowerCase().includes(query);
+          section.classList.toggle('hidden-section', !match);
+          const item = document.querySelector(`.nav-item[data-nav-id="${section.id}"]`);
+          if (item) item.parentElement.style.display = match ? '' : 'none';
         }
-      }
-    });
+        for (const group of document.querySelectorAll('.sidebar-category-group')) {
+          const visible = [...group.querySelectorAll('.nav-item')].some((item) => item.parentElement.style.display !== 'none');
+          group.style.display = visible ? '' : 'none';
+        }
+      });
+    }
   </script>
 </BaseLayout>

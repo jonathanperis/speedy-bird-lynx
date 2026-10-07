@@ -9,6 +9,7 @@ const faviconPngHref = `${basePath}/favicon.png`;
 const favicon32Href = `${basePath}/favicon-32x32.png`;
 const appleTouchIconHref = `${basePath}/apple-touch-icon.png`;
 const assetsHref = `${basePath}/assets/`;
+const docsHref = `${basePath}/docs/`;
 const socialImageUrl = 'https://jonathanperis.github.io/speedy-bird-lynx/og-image.png';
 
 const jsonLd = `{
@@ -76,15 +77,15 @@ const jsonLd = `{
 
 </head>
 <body>
-    <div class="particles">
-        <div class="particle"></div><div class="particle"></div>
-        <div class="particle"></div><div class="particle"></div>
-        <div class="particle"></div><div class="particle"></div>
-    </div>
-
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <div class="particles" aria-hidden="true">
+    <div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div>
+  </div>
 
   <!-- Sky hero -->
-  <section class="hero">
+  <header class="hero">
     <div class="clouds-container" aria-hidden="true">
       <div class="cloud cloud-1"></div>
       <div class="cloud cloud-2"></div>
@@ -106,7 +107,7 @@ const jsonLd = `{
       <h1 class="hero-title">SPEEDY BIRD</h1>
       <p class="hero-tagline">Flappy Bird, but every pipe makes the run faster.</p>
 
-      <div class="hero-hud" aria-label="Speedy Bird rules summary">
+      <div class="hero-hud" role="group" aria-label="Speedy Bird rules summary">
         <div class="speed-badge hero-hud-card">
           <div class="speed-readout"><span class="speed-num">1.00</span><span class="speed-x">×</span></div>
           <span class="speed-label">Starting Speed</span>
@@ -127,7 +128,7 @@ const jsonLd = `{
       </div>
       <p class="hero-control-note">Click or tap the game to flap, or press Space or Enter while it has focus.</p>
     </div>
-  </section>
+  </header>
 
   <!-- Floating pill nav -->
   <nav class="pill-nav" id="pill-nav" aria-label="Speedy Bird sections">
@@ -138,6 +139,7 @@ const jsonLd = `{
     <a href="https://github.com/jonathanperis/speedy-bird-lynx" target="_blank" rel="noreferrer noopener">GitHub</a>
   </nav>
 
+  <main id="main" tabindex="-1">
   <!-- Pipe divider -->
   <div class="pipe-divider" aria-hidden="true">
     <div class="pipe pipe-top"></div>
@@ -198,7 +200,7 @@ const jsonLd = `{
         Pipes move 1% faster per point, so a calm opening becomes a precision test by the medal tiers.
       </p>
 
-      <div class="difficulty-track reveal" id="speedMeter" aria-label="Speed multiplier milestones">
+      <div class="difficulty-track reveal" id="speedMeter" role="group" aria-label="Speed multiplier milestones">
         <div class="track-line"><div class="speed-fill"></div></div>
         <div class="track-marker marker-start">
           <span class="marker-value">1.00×</span>
@@ -227,7 +229,7 @@ const jsonLd = `{
         </div>
       </div>
 
-      <div class="medal-cabinet reveal" aria-label="Medal cabinet">
+      <div class="medal-cabinet reveal" role="group" aria-label="Medal cabinet">
         <div class="cabinet-header">
           <span>Medal Cabinet</span>
           <strong>Try for Platinum</strong>
@@ -289,7 +291,7 @@ const jsonLd = `{
         to a native rendering engine instead of a WebView, which makes this project a compact game-shaped
         proof of the framework's rendering, touch input, asset, and release pipeline.
       </p>
-      <div class="lynx-strip" aria-label="Lynx platform highlights">
+      <div class="lynx-strip" role="group" aria-label="Lynx platform highlights">
         <span>React components</span>
         <span>Native rendering</span>
         <span>CSS transforms</span>
@@ -306,36 +308,36 @@ const jsonLd = `{
     <h2>BUILDER'S MANUAL</h2>
     <p class="docs-lede">Open the manual when you want implementation details, native host setup, or release notes.</p>
     <p class="docs-cta-row">
-      <a href="docs/" class="cta-btn docs-primary">View full documentation</a>
+      <a href={`${docsHref}`} class="cta-btn docs-primary">View full documentation</a>
       <a href="https://github.com/jonathanperis/speedy-bird-lynx" class="secondary-btn docs-secondary" target="_blank" rel="noreferrer noopener">View source</a>
     </p>
     <div class="docs-grid">
-      <a class="doc-card" href="docs/">
+      <a class="doc-card" href={`${docsHref}`}>
         <span class="doc-index">01</span>
         <h3>Start Here</h3>
         <p>Project overview, Lynx setup, architecture, and getting started.</p>
       </a>
-      <a class="doc-card" href="docs/game-engine/">
+      <a class="doc-card" href={`${docsHref}game-engine/`}>
         <span class="doc-index">02</span>
         <h3>Game Engine</h3>
         <p>Physics, collision detection, scoring, and game state machine.</p>
       </a>
-      <a class="doc-card" href="docs/architecture/">
+      <a class="doc-card" href={`${docsHref}architecture/`}>
         <span class="doc-index">03</span>
         <h3>Architecture</h3>
         <p>File structure, game loop, component hierarchy, and module breakdown.</p>
       </a>
-      <a class="doc-card" href="docs/assets-and-sprites/">
+      <a class="doc-card" href={`${docsHref}assets-and-sprites/`}>
         <span class="doc-index">04</span>
         <h3>Assets &amp; Sprites</h3>
         <p>Sprites, audio files, tile-based rendering, and asset attribution.</p>
       </a>
-      <a class="doc-card" href="docs/getting-started/">
+      <a class="doc-card" href={`${docsHref}getting-started/`}>
         <span class="doc-index">05</span>
         <h3>Run It Locally</h3>
         <p>Controls, local setup, and Lynx Explorer testing for mobile devices.</p>
       </a>
-      <a class="doc-card" href="docs/dependency-updates/">
+      <a class="doc-card" href={`${docsHref}dependency-updates/`}>
         <span class="doc-index">06</span>
         <h3>Dependencies &amp; Upgrades</h3>
         <p>Current versions, compatibility holds, native toolchains, and verification.</p>
@@ -343,12 +345,14 @@ const jsonLd = `{
     </div>
   </section>
 
+  </main>
+
   <!-- Footer -->
   <footer>
     <p>
       <a href="https://github.com/jonathanperis/speedy-bird-lynx" target="_blank" rel="noreferrer noopener">GitHub Repository</a>
       &nbsp;&middot;&nbsp;
-      <a href="docs/">Documentation</a>
+      <a href={`${docsHref}`}>Documentation</a>
     </p>
     <p style="margin-top: 0.5rem;">
       Created by <a href="https://github.com/jonathanperis" target="_blank" rel="noreferrer noopener">jonathanperis</a>.
