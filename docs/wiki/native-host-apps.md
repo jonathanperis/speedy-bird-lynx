@@ -21,7 +21,7 @@ The Android host is a small Kotlin app in `android/`.
 
 ### Lifecycle and Display
 
-- **Pause/resume:** `onPause` sends `SpeedyBirdPause` and calls `onEnterBackground()`; `onResume` calls `onEnterForeground()` and sends `SpeedyBirdResume`. A run in progress shows "PAUSED" and resumes on the next tap. `onDestroy` destroys the `LynxView`, which releases the module's `SoundPool`.
+- **Pause/resume:** `onPause` sends `SpeedyBirdPause` and `onResume` sends `SpeedyBirdResume`; Lynx is suspended only in `onStop` (`onEnterBackground()`) and resumed in `onStart`, so the pause is always handled first. A run in progress shows "PAUSED" and resumes on the next tap. `onDestroy` destroys the `LynxView`, which releases the module's `SoundPool`.
 - **Configuration changes:** the activity handles size, density, UI mode, keyboard, and locale changes itself, so folding, multi-window, or a dark-mode switch never restarts a run.
 - **Full screen:** system bars are hidden with `WindowInsetsController` (swipe to reveal them temporarily) and the game draws under display cutouts. The theme paints the sky color behind the window, so launch shows no white flash.
 - **Orientation:** portrait on phones. Android 16+ ignores orientation locks on large screens; the game then letterboxes itself.
