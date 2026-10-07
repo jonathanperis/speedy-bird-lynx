@@ -1,6 +1,6 @@
 - [User Profile](user_profile.md) — Jonathan Peris: cross-platform dev, ReactLynx, terse style, gh CLI
 - [Workflow Preferences](feedback_workflow.md) — Branch+PR, rebase-only, gh CLI, no repo-wide files here
-- [Architecture](architecture.md) — useGameEngine hook, dual-threaded Lynx model, CSS-based rendering
+- [Architecture](architecture.md) — pure engine, main-thread frame loop, host bridge, viewport fit
 - [Game Constants](game_constants.md) — Source-backed physics constants, build targets, Android signing behavior
 - [GitHub Config](project_github.md) — Branch protection, rulesets, CI/CD workflows, release strategy
-- [Code Health](project_codehealth.md) — Current build/site/APK gates, missing gameplay tests, and remaining implementation gaps
+- [Code Health](project_codehealth.md) — Tests (Rstest, Node-only), Biome, remaining device-verification gaps

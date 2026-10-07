@@ -6,14 +6,11 @@ type: project
 
 ## Game Engine Design
 
-The core game logic lives in `useGameEngine` (`src/hooks/useGameEngine.ts`):
-
-- **useRef for mutable state**: Physics calculations (bird position, velocity, pipe positions) stay in refs to avoid every-frame React re-renders.
-- **useState for render snapshots**: Only visual state is pushed to React (bird Y, pipe positions, score, game state).
-- **Game loop**: Interval-driven loop targeting roughly 60 FPS.
-- **State machine**: `STATE_READY` → `STATE_PLAY` → `STATE_OVER`, with transitions in the tap/click handler.
-
-ReactLynx runs React work separately from native rendering. Minimize cross-thread render churn for per-frame gameplay.
+- **Pure rules** in `src/game/engine.ts`: `createGame`, `step`, `tap`, collisions, pass-scoring, restart lock, `consumeElapsed`, `fitViewport`. Deterministic (mixed seed + xorshift32 in the snapshot), never mutates input, unit-tested in `tests/engine.test.ts`.
+- **Main-thread loop** in `src/hooks/useGame.ts`: a `'main thread'` `start()` builds a controller (stored in a `useMainThreadRef`) that steps fixed 1/60 s steps from `lynx.requestAnimationFrame` and writes styles with `setStyleProperties` to elements found by id under the root `main-thread:ref`. The engine is imported `with { runtime: 'shared' }`.
+- **React only for discrete state**: `runOnBackground(onGameEvent)` when state/score/best/pause change or sounds play; React renders the score, overlays, and accessibility label. Animated elements keep static React props so React never overwrites a frame.
+- **Host bridge**: `NativeModules.SpeedyBirdModule` (`play`, `stopAudio`, `loadPreferences`, `savePreferences`, optional `announce`); host events `SpeedyBirdPause`, `SpeedyBirdResume`, `SpeedyBirdTap` via GlobalEventEmitter (subscribed in an effect, not `useLynxGlobalEventListener`, which runs during the main-thread render in tests).
+- **State machine**: `STATE_READY` → `STATE_PLAY` → `STATE_OVER`; restart only after landing + `RESTART_DELAY_STEPS`.
 
 ## Rendering Approach
 
@@ -21,7 +18,9 @@ All ReactLynx game entities render as positioned `<view>` and `<image>` elements
 
 - Movement via CSS `transform: translate(Xpx, Ypx)` to avoid layout recalculation.
 - Sprites as `<image>` elements with frame cycling and rotation.
-- Z-index layering: Background(0) → Pipes(1) → Bird(2) → Ground(3) → Score(4) → Overlays(5).
+- Z-index layering: Background(0) → Pipes(1) → Bird(2) → Ground(3) → Score(4) → Overlays(5) → Paused(6).
+- The 400x750 playfield is scaled by `fitViewport` and anchored to the bottom; extra height is sky, wide screens get side panels.
+- Five reusable `PipeSlot`s (`id % 5`); hidden with `display: none`.
 
 ## Cross-Platform Build Strategy
 
@@ -29,11 +28,8 @@ All ReactLynx game entities render as positioned `<view>` and `<image>` elements
 - **Android host**: Kotlin + Lynx SDK 4.1.0; Gradle stages the current bundle into generated APK assets.
 - **iOS host**: Swift/CocoaPods scaffold + Lynx SDK 4.1.0, loading the bundle from app resources when an Xcode project is present. Current CI always disables signing.
 - **GitHub Pages site**: Astro site under `docs/`, including a playable canvas demo and generated wiki pages.
-- **Web preview tooling**: RSpeedy dev server with `@lynx-js/web-core` for development.
+- **Web preview tooling**: RSpeedy dev server; `web-host/` is a self-contained `<lynx-view>` host implementing the bridge.
 
 ## Audio System
 
-Runtime-detected dual implementation:
-
-- **WebAudioModule**: Uses `HTMLAudioElement` only where the JavaScript runtime exposes `Audio`; the Lynx web worker does not imply browser-document APIs.
-- **NativeAudioModule**: Stubs for native platforms until native audio APIs are wired.
+Engine steps emit sound names; the background thread forwards them to `SpeedyBirdModule.play`. WAVs are mono 22.05 kHz PCM with silence trimmed; hosts package `assets/audio/` (not the bundle). The standalone web host plays them with Web Audio.

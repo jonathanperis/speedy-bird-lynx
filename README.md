@@ -10,15 +10,15 @@
 
 ## About
 
-[Lynx](https://lynxjs.org/) is an open-source cross-platform native UI framework created by ByteDance. It uses a native rendering engine rather than a WebView on mobile. ReactLynx reconciliation and game logic run on the background thread; native rendering and touch delivery run on the main thread. Speedy Bird demonstrates element-based rendering, a 17ms game timer, touch input, assets, and automated builds. The public website contains a separate HTML Canvas implementation of the game.
+[Lynx](https://lynxjs.org/) is an open-source cross-platform native UI framework created by ByteDance. It uses a native rendering engine rather than a WebView on mobile. Speedy Bird runs its frame loop, taps, and simulation on the Lynx main thread with Main Thread Script, and uses React on the background thread only for discrete UI such as the score and overlays. It demonstrates element-based rendering, frame-rate-independent physics, native modules, assets, and automated builds. The public website contains a separate HTML Canvas implementation of the game.
 
 | Surface | Current status |
 |---------|----------------|
 | Android | Kotlin host with Lynx 4.1.0; debug and release build paths |
-| ReactLynx web | Rspeedy preview and standalone development host |
+| ReactLynx web | Rspeedy preview and a self-contained standalone host with sound, saved best score, and keyboard input |
 | GitHub Pages | Playable Canvas demo and Astro documentation |
 | iOS | Swift/CocoaPods source scaffold; create an Xcode project locally |
-| Audio | Canvas sound effects; ReactLynx uses browser audio only where available and otherwise has a native-module placeholder |
+| Audio | Canvas demo and standalone web host; Android/iOS hosts do not register the `SpeedyBirdModule` bridge yet |
 
 ## Tech Stack
 
@@ -39,15 +39,19 @@ Versions reviewed **2026-10-07**. See [Dependencies and Upgrades](https://jonath
 
 ## Features
 
-- Tap/click to flap in the ReactLynx app; the GitHub Pages canvas demo also supports Space
-- Speed increases 1% per pipe cleared
+- Tap/click to flap; the standalone web host and the GitHub Pages canvas demo also support Space
+- Speed increases 1% per pipe cleared; points score the moment the bird clears a pipe
+- Frame-rate-independent physics (fixed 1/60 s steps) on a main-thread frame loop
+- Scales to any screen: extra height becomes sky, wide screens are letterboxed
+- Best score saved by the host; restart is locked briefly after a crash so the results stay visible
+- Pauses when the app is backgrounded mid-run; screen-reader announcements for game state
 - Medal system: Bronze (10+), Silver (25+), Gold (50+), Platinum (100+)
 - ReactLynx rendering using `<view>` and `<image>` with CSS transforms; the public browser demo uses Canvas
 - Tile-based pipe construction to avoid sprite stretching
 - Parallax scrolling background and ground layers
 - Sprite-based digit rendering for in-game score
 - AABB collision detection with circular bird hitbox approximation
-- Five sound effects in the Canvas demo; ReactLynx audio needs a bridge on native and worker-based runtimes
+- Five sound effects through the `SpeedyBirdModule` host bridge
 - Astro-powered GitHub Pages site in `docs/`, including a playable canvas demo and generated wiki pages
 
 ## Getting Started
@@ -55,7 +59,7 @@ Versions reviewed **2026-10-07**. See [Dependencies and Upgrades](https://jonath
 ### Prerequisites
 
 - **Bun** for dependency installation and root scripts; use the checked-in lockfiles
-- **Node.js** >=22.12 for the build toolchains; run Astro through `npm run dev/build/preview`
+- **Node.js** >=22.12 for the build toolchains and tests; run Astro through `npm run dev/build/preview`
 - **Java 21** and **Android SDK Platform 37.2** (for Android; minimum device API remains 21)
 - **Xcode**, **Ruby >=3.2**, and the CocoaPods/Bundler dependencies in `ios/Gemfile` (after creating an Xcode project)
 
@@ -66,6 +70,10 @@ git clone https://github.com/jonathanperis/speedy-bird-lynx.git
 cd speedy-bird-lynx
 bun install --frozen-lockfile
 bun run dev
+```
+
+```bash
+bun run lint && bun run check && bun run test   # Biome, TypeScript, Rstest
 ```
 
 Open in [Lynx Explorer](https://github.com/lynx-family/lynx) or [Lynx Go](https://apps.apple.com/us/app/lynx-go-dev-explorer/id6743227790) at `http://<your-ip>:3000/main.lynx.bundle`.
@@ -117,19 +125,24 @@ Gradle stages the current `dist/main.lynx.bundle` into generated APK assets. Ima
 
 ```
 src/
-├── App.tsx                    # Root component, fullscreen game
-├── hooks/useGameEngine.ts     # Game loop, physics, collision, scoring
+├── App.tsx                    # Root view, viewport fit, main-thread tap
+├── game/engine.ts             # Pure rules: physics, collisions, scoring, restart
+├── game/announcements.ts      # Screen-reader labels and announcements
+├── game/preferences.ts        # Saved best-score format
+├── hooks/useGame.ts           # Main-thread frame loop and renderer; HUD state
+├── platform/host.ts           # SpeedyBirdModule bridge and host events
 ├── components/
 │   ├── Bird.tsx               # Animated bird with rotation
-│   ├── Pipe.tsx               # Tile-based pipes (no stretching)
+│   ├── PipeSlot.tsx           # Reusable tile-based pipe pair
 │   ├── Background.tsx         # Parallax scrolling background
 │   ├── Ground.tsx             # Scrolling ground layer
 │   ├── ScoreDisplay.tsx       # Sprite-based digit rendering
 │   ├── GetReadyScreen.tsx     # Start screen overlay
-│   └── GameOverScreen.tsx     # Game over with medals
-├── audio/audio.ts             # Audio adapter (browser where available + native placeholder)
+│   ├── GameOverScreen.tsx     # Game over with medals
+│   └── PausedOverlay.tsx      # Paused mid-run
 ├── constants.ts               # All game constants
 └── types.ts                   # TypeScript types
+tests/                         # Rstest unit and component tests
 
 android/                       # Native Android host app (Kotlin)
 ios/                           # Native iOS host app (Swift)
@@ -158,7 +171,7 @@ docs/                          # Astro GitHub Pages site + playable canvas demo
 | Tagged Android release APK | `release.yml` on `v*` tags | Attached to the immutable GitHub Release; signed when `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD` are configured |
 | iOS archive | `build-ios.yml` (manual) or `release.yml` | Requires a tracked Xcode project. Current workflows always disable signing; providing Apple secrets alone does not enable it |
 
-Quality gates include dependency audits, Biome lint/format checks, TypeScript checks, bundle/web-host/docs builds, generated-site validation, Android compilation/API lint, APK bundle verification, and CodeQL.
+Quality gates include dependency audits, Biome lint/format checks, TypeScript checks, Rstest unit and component tests, docs asset parity, bundle/web-host/docs builds, generated-site validation, Android compilation/API lint, APK bundle verification, and CodeQL.
 
 ## Credits
 

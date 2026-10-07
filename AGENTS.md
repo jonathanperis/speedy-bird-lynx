@@ -34,6 +34,7 @@ Use Bun for root ReactLynx/Rspeedy installs and command examples because the roo
 bun install --frozen-lockfile       # Install exact dependencies
 bun run dev                         # Dev server with HMR on :3000
 bun run check                       # Type check only
+bun run test                        # Rstest unit + component tests (Node.js)
 bun run lint                        # Biome lint + format check (CI mode)
 bun run format                      # Apply Biome fixes and formatting
 bun run build                       # Production build
@@ -73,30 +74,31 @@ Run `npm run build` and `npm run check:site` in `docs/`. The latter verifies all
 ## Architecture
 
 ```text
-App (root, fullscreen, tap/click listener)
-├── Background (z:0, parallax @ 0.2px/frame, tiled)
-├── Pipe[] (z:1, tile-based, scroll @ 2.7px/frame + speed scaling)
-├── Bird (z:2, animated sprite with rotation)
-├── Ground (z:3, scroll matches pipe speed)
-├── ScoreDisplay (z:4, sprite-based digits)
-├── GetReadyScreen (z:5, overlay on STATE_READY)
-└── GameOverScreen (z:5, overlay on STATE_OVER with medals)
+App (root, fullscreen, main-thread tap handler, layout → viewport fit)
+└── Playfield (400x750, scaled, bottom-anchored; side panels on wide screens)
+    ├── Background (z:0, parallax @ 0.2px/step, tiled)
+    ├── PipeSlot x5 (z:1, reusable tile-based pipes, scroll @ 2.7px/step + speed scaling)
+    ├── Bird (z:2, four mounted frames, rotation)
+    ├── Ground (z:3, scroll matches pipe speed)
+    ├── ScoreDisplay (z:4, sprite-based digits)
+    ├── GetReadyScreen (z:5, overlay on STATE_READY)
+    ├── GameOverScreen (z:5, overlay on STATE_OVER with medals, NEW best)
+    └── PausedOverlay (z:6, host paused mid-run)
 ```
 
-ReactLynx runs React work off the main rendering thread. Keep per-frame physics in refs and push only render snapshots through React state.
+The frame loop, taps, simulation, and per-frame styles run on the Lynx main thread (Main Thread Script). React on the background thread renders only discrete state (score, overlays, accessibility label) and talks to the host bridge.
 
 ---
 
 ## Key Patterns
 
-- **`useGameEngine` hook**: Core game loop, physics, collision, scoring, and state transitions.
-- **`useRef` for mutable state**: Physics engine state should not trigger every-frame React re-renders.
-- **`useState` for render snapshots**: Keep render state minimal and explicit.
-- **CSS transforms**: Movement uses `transform: translate(...)` rather than layout recalculation.
-- **State machine**: `STATE_READY` → `STATE_PLAY` → `STATE_OVER`.
-- **AABB collision**: Uses a circular bird hitbox approximation.
-- **Audio abstraction**: `HTMLAudioElement` where available; native and web-worker contexts use an unimplemented placeholder. Canvas has separate browser audio.
-- **Controls**: ReactLynx app uses tap/click to flap. The GitHub Pages canvas demo also supports Space.
+- **Pure engine**: `src/game/engine.ts` holds every rule (`step`, `tap`, collisions, scoring, restart lock, viewport fit). It is deterministic (seeded xorshift32), never mutates its input, and is imported `with { runtime: 'shared' }` so main-thread code can call it. Change rules here and cover them in `tests/engine.test.ts`.
+- **Main-thread loop**: `src/hooks/useGame.ts` runs fixed 1/60 s steps from `lynx.requestAnimationFrame` and writes styles with `setStyleProperties`. Elements it animates must keep static React props, or React would overwrite frames.
+- **Discrete React state**: `runOnBackground` delivers state/score/pause changes and sounds; React renders HUD overlays only when they change.
+- **Host bridge**: `SpeedyBirdModule` (`play`, `stopAudio`, `loadPreferences`, `savePreferences`, optional `announce`) and the `SpeedyBirdPause`/`SpeedyBirdResume`/`SpeedyBirdTap` global events.
+- **State machine**: `STATE_READY` → `STATE_PLAY` → `STATE_OVER`; restart only after the bird lands plus 30 steps.
+- **AABB collision**: circular bird hitbox approximated by its bounding square.
+- **Controls**: tap/click flaps; the web host also forwards Space/Enter. The Pages canvas demo supports Space.
 
 ---
 
@@ -106,18 +108,23 @@ ReactLynx runs React work off the main rendering thread. Keep per-frame physics 
 speedy-bird-lynx/
 ├── src/
 │   ├── index.tsx                    # Entry point
-│   ├── App.tsx                      # Root component + tap/click handler
+│   ├── App.tsx                      # Root view, viewport fit, main-thread tap
 │   ├── types.ts                     # State constants/types, PipeData, SoundName
 │   ├── constants.ts                 # Physics, dimensions, colors
-│   ├── hooks/useGameEngine.ts       # Core game loop + physics
-│   ├── components/                  # Bird, Pipe, Background, Ground, etc.
-│   └── audio/audio.ts               # Audio adapter and native placeholder
+│   ├── game/engine.ts               # Pure game rules (shared with main thread)
+│   ├── game/announcements.ts        # Accessibility labels/announcements
+│   ├── game/preferences.ts          # Saved best-score format
+│   ├── hooks/useGame.ts             # Main-thread frame loop + HUD state
+│   ├── platform/host.ts             # SpeedyBirdModule bridge + host events
+│   └── components/                  # Bird, PipeSlot, Background, Ground, overlays
+├── tests/                           # Rstest unit + component tests
 ├── android/                         # Native Android host (Kotlin)
 ├── ios/                             # Native iOS host (Swift/CocoaPods scaffold)
 ├── assets/sprites/                  # PNG sprites (bird, pipes, medals, digits)
 ├── assets/audio/                    # WAV sound effects
 ├── docs/                            # Astro GitHub Pages site + playable canvas demo
-├── web-host/                        # Advanced/dev-only standalone <lynx-view> host
+├── web-host/                        # Standalone <lynx-view> host + bridge module
+├── scripts/                         # Asset sync, APK verification
 ├── lynx.config.ts                   # Lynx build config
 ├── rsbuild.web-host.config.ts       # Web host build config
 ├── tsconfig.json                    # strict: true, react-jsx
@@ -136,7 +143,9 @@ speedy-bird-lynx/
 | `BIRD_GRAVITY` | `0.28` | Downward acceleration |
 | `PIPE_DX` | `2.7` | Base pipe scroll speed |
 | `PIPE_GAP` | `150` | Space between top and bottom pipes |
-| `PIPE_SPAWN_INTERVAL` | `77` frames | Pipe spawn cadence |
+| `PIPE_SPAWN_INTERVAL` | `77` steps | Pipe spawn cadence |
+| `STEP_MS` | `1000 / 60` | Fixed simulation step |
+| `RESTART_DELAY_STEPS` | `30` | Restart lock after landing |
 | `BG_DX` | `0.2` | Parallax background speed |
 | Medal thresholds | 10/25/50/100 | Bronze/Silver/Gold/Platinum |
 
@@ -172,7 +181,7 @@ Shared setup lives in `.github/actions/setup-js` (Node.js, the Bun version pinne
 ## Code Quality Notes
 
 - **TypeScript strict mode**: Enabled; app code must pass `bun run check`. Set `jsxImportSource` to `@lynx-js/react` for Lynx element types.
-- **Focused verification**: Generated-site and APK bundle checks exist. Gameplay unit tests and browser UI tests are not configured.
+- **Tests**: `bun run test` (Rstest + ReactLynx Testing Library, needs Node.js) covers the engine, saved preferences, announcements, and the App with a stubbed frame scheduler and bridge. Generated-site and APK bundle checks also run in CI.
 - **Biome**: `bun run lint` must pass; `biome.json` covers app, web host, tests, and scripts.
 - **CodeQL**: Runs on every push/PR and weekly for security analysis.
 - **Renovate**: `renovate.json` extends the shared preset and encodes the upgrade holds below (grouped Lynx packages, root TypeScript <7, Lynx-pinned pods). GitHub Dependabot security alerts remain enabled.
