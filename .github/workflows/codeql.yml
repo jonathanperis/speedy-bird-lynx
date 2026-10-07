@@ -65,3 +65,44 @@ jobs:
       - uses: github/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
         with:
           category: /language:java-kotlin
+
+  # Swift extraction needs a full Xcode build; run it on main and weekly to save macOS time.
+  analyze-swift:
+    name: Analyze (swift)
+    if: github.event_name != 'pull_request'
+    runs-on: macos-15
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-js
+      - name: Build Lynx bundle
+        run: bun run build
+      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+        with:
+          ruby-version: '3.3'
+          working-directory: ios
+          bundler-cache: true
+      - name: Install CocoaPods dependencies
+        working-directory: ios
+        run: bundle exec pod install --deployment
+      - uses: github/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
+        with:
+          languages: swift
+          build-mode: manual
+          queries: security-and-quality
+      - name: Build iOS host
+        run: |
+          xcodebuild build \
+            -workspace ios/SpeedyBird.xcworkspace \
+            -scheme SpeedyBird \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO
+      - uses: github/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
+        with:
+          category: /language:swift
