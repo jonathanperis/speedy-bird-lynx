@@ -44,7 +44,6 @@ jobs:
     needs: version
     uses: ./.github/workflows/reusable-android-apk.yml
     with:
-      ref: ${{ needs.version.outputs.sha }}
       version-name: ${{ needs.version.outputs.version-name }}
     secrets:
       KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
