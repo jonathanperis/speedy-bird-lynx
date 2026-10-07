@@ -13,7 +13,6 @@ dist-web-host/
 android/.gradle/
 android/app/build/
 android/build/
-android/app/src/main/assets/main.lynx.bundle
 android/app/release.keystore
 *.jks
 *.keystore
@@ -25,8 +24,6 @@ ios/Pods/
 ios/.bundle/
 ios/vendor/
 ios/SpeedyBird.xcworkspace/
-ios/SpeedyBird/Resources/main.lynx.bundle
-ios/Podfile.lock
 *.xcarchive
 
 # Local specifications and audit evidence
