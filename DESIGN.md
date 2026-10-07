@@ -75,7 +75,7 @@ components:
 
 ## 1. Overview
 
-Implementation notes reviewed 2026-09-17. The active landing page is `docs/src/pages/index.astro`; the former unused `components/home/` implementation has been removed. Product intent lives in `PRODUCT.md`, while the manual documents actual platform support and build status.
+Implementation notes reviewed 2026-10-07. The active landing page is `docs/src/pages/index.astro` with styles in `docs/src/styles/home.css`; the tokens below live once in `docs/src/styles/tokens.css`, and fonts are self-hosted (`docs/src/styles/fonts.css`). The former unused `components/home/` implementation has been removed. Product intent lives in `PRODUCT.md`, while the manual documents actual platform support and build status.
 
 **Creative North Star: "The Night Arcade Cabinet"**
 

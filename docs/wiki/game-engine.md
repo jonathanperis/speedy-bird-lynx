@@ -1,6 +1,6 @@
 # Game Engine
 
-The rules live in `src/game/engine.ts`: a pure, deterministic module with no timers, rendering, storage, audio, or framework APIs. `src/hooks/useGame.ts` runs it on Lynx's main thread, renders each frame there, and sends only discrete changes (state, score, sounds) to React on the background thread. The engine is covered by unit tests in `tests/engine.test.ts`.
+The rules live in `src/game/engine.ts`: a pure, deterministic module with no timers, rendering, storage, audio, or framework APIs. `src/hooks/useGame.ts` runs it on Lynx's main thread, renders each frame there, and sends only discrete changes (state, score, sounds) to React on the background thread. The landing-page Canvas demo imports the same module (see [Web Rendering Surfaces](architecture.md#web-rendering-surfaces)), so both play identically. The engine is covered by unit tests in `tests/engine.test.ts`.
 
 ## State Machine
 
