@@ -19,7 +19,6 @@ Last reviewed: **2026-10-07**. Versions below describe this checkout, not a prom
 | Biome | 2.5.15 | Lint and format checks for app, web host, tests, and scripts |
 | Bun | 1.3.12 | Pinned by `packageManager` in both packages; CI installs that exact version |
 | Astro | 7.3.6 | Static website and Rust-powered Markdown rendering |
-| Tailwind CSS / Vite plugin | 4.3.3 | Documentation styling |
 
 The ReactLynx, compiler plugin, and Rspeedy versions must be upgraded together. Rspeedy 0.18 removed `entries` from its exposed plugin API, follows Rsbuild's default CSS Modules class names in development, and no longer forces the progress bar on; none of these affect this app, which uses no CSS Modules or custom Rspeedy plugins. ReactLynx 0.126.2 and web core 0.26.2 are patch releases. ReactLynx 0.126 moves to Preact 11 internally: effect cleanup on component removal is deferred until the after-paint flush; page destruction still drains cleanup synchronously. This app mounts one root game engine and cleans up its timer in its effect cleanup.
 

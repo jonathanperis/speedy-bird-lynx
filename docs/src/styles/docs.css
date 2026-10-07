@@ -1,22 +1,6 @@
 :root {
-  --sky-deep: #04111e;
-  --sky-mid: #0a2a4a;
-  --sky-surface: #0d1e3a;
-  --sky-dawn: #0d4a7a;
-  --arcade-gold: #ffd166;
-  --speed-orange: #ff6b35;
-  --pipe-green: #2d6a4f;
-  --pipe-highlight: #4a9e6f;
-  --text-bright: #e8f8ff;
-  --text-body: #c8e8ff;
-  --text-dim: #6ba8c8;
-  --panel-blue: #0a1e3c;
-  --stroke-dark: #07131f;
   --border-pipe: rgba(74, 158, 111, 0.72);
-  --border-gold: rgba(255, 209, 102, 0.48);
-  --shadow-press: 0 4px 0 var(--stroke-dark);
   --sidebar-width: 304px;
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * { box-sizing: border-box; }
@@ -80,7 +64,6 @@ input:focus-visible {
   outline-offset: 3px;
 }
 
-.pill-nav { display: none !important; }
 .particles { opacity: 0.28; pointer-events: none; }
 
 .sidebar {
@@ -242,7 +225,10 @@ input:focus-visible {
 }
 
 .content {
-  width: min(1120px, 100%);
+  flex: 1;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
   padding: clamp(2rem, 5vw, 4.5rem) clamp(1.25rem, 5vw, 4rem) 6rem;
 }
 

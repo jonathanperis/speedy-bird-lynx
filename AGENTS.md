@@ -21,7 +21,7 @@ Cross-platform Flappy Bird clone built with ReactLynx + TypeScript. One codebase
 | Rsbuild | 2.2.12 | Standalone web host |
 | Lynx SDK / PrimJS | 4.1.0 / 4.1.1 | Native hosts; TypeScript bindings use `@lynx-js/types` 4.3.0 |
 | Biome | 2.5.15 | Lint and format |
-| Astro / Tailwind | 7.3.6 / 4.3.3 | Documentation website |
+| Astro | 7.3.6 | Documentation website (plain CSS, no CSS framework) |
 | AGP / Gradle / Kotlin | 9.4.1 / 9.8.1 / 2.4.20 | Android; JDK 21 build, Java 11 bytecode, compile SDK 37.2, target 37, min 21 |
 | Fresco | 2.3.0 | Held to the release `lynx-service-image` 4.1.0 is compiled against (Fresco 3 crashes at launch) |
 

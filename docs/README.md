@@ -31,11 +31,13 @@ Open the preview URL with `/speedy-bird-lynx/` appended. Build output is `out/`;
 | `src/lib/docs-sidebar.config.ts` | Navigation groups, route order, page titles, and descriptions |
 | `src/lib/render-doc.ts` | Build-time `.md` link resolution and combined-manual ID namespacing |
 | `src/layouts/BaseLayout.astro` | Documentation HTML shell, per-route canonical/OG URLs, TechArticle metadata |
-| `src/styles/docs.css`, `globals.css` | Manual styles and shared design tokens |
+| `src/styles/tokens.css` | Design tokens shared by every page (colors, shadows, easing; see `DESIGN.md`) |
+| `src/styles/home.css` | Landing page styles |
+| `src/styles/globals.css`, `docs.css` | Manual base and manual styles |
 | `public/assets/` | Browser copies of root game sprites and sounds |
 | `public/og-image.png`, icons | Social preview and browser icons |
 | `scripts/check-site.mjs` | Generated routes, local links/fragments, unique IDs, and canonical/OG validation |
-| `astro.config.mjs` | Site URL, development/production base, output directory, sitemap, and Tailwind |
+| `astro.config.mjs` | Site URL, development/production base, output directory, and sitemap |
 
 ## Add or edit a guide
 

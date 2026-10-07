@@ -30,7 +30,7 @@
 | Rspeedy / ReactLynx plugin | 0.18.0 / 0.20.3 | Coordinated native/web compiler toolchain |
 | Rsbuild | 2.2.12 | Standalone web host |
 | Biome | 2.5.15 | Lint and format checks |
-| Astro / Tailwind CSS | 7.3.6 / 4.3.3 | Static documentation and Canvas demo |
+| Astro | 7.3.6 | Static documentation and Canvas demo |
 | Android (Kotlin) | Lynx SDK 4.1.0 | Native Android host app |
 | iOS (Swift + CocoaPods) | Lynx SDK 4.1.0 | Native iOS host app |
 | GitHub Actions | SHA-pinned | CI/CD build, sign, deploy, release |
