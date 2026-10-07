@@ -57,7 +57,7 @@ const structuredData = jsonLd({
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Speedy Bird - Pixel Art Side-Scroller</title>
-  <meta name="description" content="Play Speedy Bird in your browser. Explore the ReactLynx Android host, web preview, iOS source scaffold, and implementation guides.">
+  <meta name="description" content="Play Speedy Bird in your browser. Explore the ReactLynx Android and iOS hosts, web preview, and implementation guides.">
   <meta name="keywords" content="Speedy Bird, pixel art, Lynx, ReactLynx, cross-platform, mobile game, side-scroller, open source">
   <link rel="icon" href={faviconHref} sizes="any">
   <link rel="icon" type="image/png" href={faviconPngHref}>
@@ -290,12 +290,12 @@ const structuredData = jsonLd({
         <article class="manual-panel">
           <span class="panel-code">LYNX</span>
           <h3>ReactLynx Port</h3>
-          <p>The game loop runs on Lynx's main thread in the Android host and the Lynx web preview; the iOS host is built from source in Xcode. This page draws the same engine with Canvas.</p>
+          <p>The game loop runs on Lynx's main thread in the Android and iOS hosts and the Lynx web preview. This page draws the same engine with Canvas.</p>
         </article>
         <article class="manual-panel">
           <span class="panel-code">SHIP</span>
           <h3>CI/CD Ready</h3>
-          <p>GitHub Actions check bundles, Android builds, and docs, then publish Pages and release artifacts. iOS archives require a tracked Xcode project and are always unsigned.</p>
+          <p>GitHub Actions test the engine, build Android and iOS (with simulator UI tests), check the docs, then publish Pages and release artifacts. iOS archives are unsigned.</p>
         </article>
       </div>
     </div>
@@ -314,8 +314,8 @@ const structuredData = jsonLd({
         <span>Native rendering</span>
         <span>CSS transforms</span>
         <span>Rspack toolchain</span>
-        <span>Android · Web</span>
-        <span>iOS source scaffold</span>
+        <span>Android · iOS · Web</span>
+        <span>Main-thread game loop</span>
       </div>
     </div>
   </section>
