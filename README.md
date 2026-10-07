@@ -24,17 +24,18 @@
 
 | Technology | Version | Purpose |
 |-----------|---------|---------|
-| [ReactLynx](https://lynxjs.org/) | 0.126.1 | Game component model and hooks |
-| [React](https://react.dev/) / React DOM | 19.3.0 | Compatibility dependencies |
+| [ReactLynx](https://lynxjs.org/) | 0.126.2 | Game component model and hooks |
+| React types | 19.3.0 | JSX typings consumed by ReactLynx |
 | [TypeScript](https://www.typescriptlang.org/) | 6.0.3 app / 7.0.2 docs | Separate toolchains |
-| Rspeedy / ReactLynx plugin | 0.17.2 / 0.20.2 | Coordinated native/web compiler toolchain |
-| Rsbuild | 2.2.7 | Standalone web host |
-| Astro / Tailwind CSS | 7.3.3 / 4.3.3 | Static documentation and Canvas demo |
+| Rspeedy / ReactLynx plugin | 0.18.0 / 0.20.3 | Coordinated native/web compiler toolchain |
+| Rsbuild | 2.2.12 | Standalone web host |
+| Biome | 2.5.15 | Lint and format checks |
+| Astro / Tailwind CSS | 7.3.6 / 4.3.3 | Static documentation and Canvas demo |
 | Android (Kotlin) | Lynx SDK 4.1.0 | Native Android host app |
 | iOS (Swift + CocoaPods) | Lynx SDK 4.1.0 | Native iOS source scaffold |
 | GitHub Actions | SHA-pinned | CI/CD build, sign, deploy, release |
 
-Versions reviewed **2026-09-17**. See [Dependencies and Upgrades](https://jonathanperis.github.io/speedy-bird-lynx/docs/dependency-updates/) for native toolchains, supported-version holds, and upgrade evidence. Root TypeScript stays on 6.0.3 because Rspeedy does not yet support TypeScript 7; iOS image libraries follow Lynx's exact pod constraints.
+Versions reviewed **2026-10-07**. See [Dependencies and Upgrades](https://jonathanperis.github.io/speedy-bird-lynx/docs/dependency-updates/) for native toolchains, supported-version holds, and upgrade evidence. Root TypeScript stays on 6.0.3 because Rspeedy does not yet support TypeScript 7; iOS image libraries follow Lynx's exact pod constraints.
 
 ## Features
 
@@ -141,23 +142,23 @@ docs/                          # Astro GitHub Pages site + playable canvas demo
 
 | Workflow | File | Trigger | Description |
 |----------|------|---------|-------------|
-| Build Check | `ci.yml` | Manual, push to `main`/`lynx-migration`, PR to `main` | Audits, type-check, bundles/web host, docs/link checks, Android compilation/lint and bundle verification |
-| CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript and Actions security-and-quality analysis |
+| Build Check | `ci.yml` | Manual, push to `main`, PR to `main`, weekly | Audit, Biome lint/format, type-check, bundles/web host, docs/link checks, Android compilation/lint and bundle verification; on `main` pushes, then calls Build Android |
+| CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript, Actions, Python, and Kotlin security-and-quality analysis |
 | Deploy Web | `deploy.yml` | Push to `main`, manual | Build and deploy the Astro `docs/` site to GitHub Pages via the shared Pages workflow |
-| Build Android | `build-android.yml` | Push to `main`, manual from `main` | Read-only build/signing job followed by separate immutable build-release publication |
-| Build iOS | `build-ios.yml` | `v*` tags, manual | Skip without a tracked Xcode project; otherwise build an unsigned archive |
-| Release | `release.yml` | `v*` tags, manual | Full release pipeline: build + Android + iOS + GitHub Release |
+| Build Android | `build-android.yml` | Called by Build Check after a `main` push passes; manual from `main` | Read-only APK build followed by an immutable `build/*` prerelease that never becomes "Latest" |
+| Build iOS | `build-ios.yml` | Manual | Unsigned archive through the shared iOS build; skipped without a tracked Xcode project |
+| Release | `release.yml` | `v*` tags on `main`, manual from `main` | Sole versioned-release publisher: verify, build Android/iOS through the shared builds, upload all assets, then publish |
 
 ### Release Artifact Matrix
 
 | Artifact | How it is produced | Signing/status |
 |----------|--------------------|----------------|
 | Local Android debug APK | `bun run build`, then `cd android && ./gradlew assembleDebug` | Debug-signed by Android tooling; intended for local install/testing |
-| CI Android build APK | `build-android.yml` on `main` or manual dispatch from `main` | Release build; signed only when keystore secrets are configured |
+| CI Android build APK | `build-android.yml` after Build Check passes on `main`, or manual dispatch from `main` | Release build published as a prerelease; signed only when keystore secrets are configured |
 | Tagged Android release APK | `release.yml` on `v*` tags | Attached to the immutable GitHub Release; signed when `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD` are configured |
-| iOS archive | `build-ios.yml` or `release.yml` | Requires a tracked Xcode project. Current workflows always disable signing; providing Apple secrets alone does not enable it |
+| iOS archive | `build-ios.yml` (manual) or `release.yml` | Requires a tracked Xcode project. Current workflows always disable signing; providing Apple secrets alone does not enable it |
 
-Quality gates include dependency audits, TypeScript checks, bundle/web-host/docs builds, generated-site validation, Android compilation/API lint, APK bundle verification, and CodeQL. Gameplay unit tests, browser UI tests, and JavaScript lint/format checks are not configured.
+Quality gates include dependency audits, Biome lint/format checks, TypeScript checks, bundle/web-host/docs builds, generated-site validation, Android compilation/API lint, APK bundle verification, and CodeQL.
 
 ## Credits
 
