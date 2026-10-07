@@ -1,12 +1,21 @@
 plugins {
-    id("com.android.application")
+    alias(libs.plugins.android.application)
 }
 
+// The APK packages exactly the current build outputs: the Lynx bundle from `bun run build`
+// and the canonical sound effects. Nothing is copied into src/, so assets cannot go stale.
+val repoRoot = rootProject.layout.projectDirectory.dir("..")
 val generatedLynxAssets = layout.buildDirectory.dir("generated/lynxAssets")
 val prepareLynxAssets = tasks.register<Sync>("prepareLynxAssets") {
-    val bundle = rootProject.layout.projectDirectory.file("../dist/main.lynx.bundle")
+    val bundle = repoRoot.file("dist/main.lynx.bundle")
+    val audio = repoRoot.dir("assets/audio")
     inputs.file(bundle)
+    inputs.dir(audio)
     from(bundle)
+    from(audio) {
+        include("*.wav")
+        into("audio")
+    }
     into(generatedLynxAssets)
 }
 
@@ -43,6 +52,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -54,11 +64,16 @@ android {
         }
     }
 
+    // Bytecode level for the app's own classes; the build itself runs on JDK 21.
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
 
+    androidResources {
+        // Sound effects are memory-mapped by SoundPool; keep them uncompressed in the APK.
+        noCompress += "wav"
+    }
 }
 
 tasks.named("preBuild") {
@@ -66,25 +81,10 @@ tasks.named("preBuild") {
 }
 
 dependencies {
-    // Lynx core
-    implementation("org.lynxsdk.lynx:lynx:4.1.0")
-    implementation("org.lynxsdk.lynx:lynx-jssdk:4.1.0")
-    implementation("org.lynxsdk.lynx:lynx-trace:4.1.0")
-    implementation("org.lynxsdk.lynx:primjs:4.1.1")
-
-    // Lynx services
-    implementation("org.lynxsdk.lynx:lynx-service-image:4.1.0")
-    implementation("org.lynxsdk.lynx:lynx-service-log:4.1.0")
-    implementation("org.lynxsdk.lynx:lynx-service-http:4.1.0")
-
-    // Keep the Fresco modules on the same release.
-    implementation("com.facebook.fresco:fresco:3.7.0")
-    implementation("com.facebook.fresco:animated-gif:3.7.0")
-    implementation("com.facebook.fresco:animated-webp:3.7.0")
-    implementation("com.facebook.fresco:webpsupport:3.7.0")
-    implementation("com.facebook.fresco:animated-base:3.7.0")
-    implementation("com.squareup.okhttp3:okhttp:5.5.0")
-
+    implementation(libs.bundles.lynx)
+    // Fresco is pinned to the release Lynx's image service was compiled against.
+    implementation(libs.bundles.fresco)
+    implementation(libs.androidx.core)
     // Gson (required by Lynx SDK internals)
-    implementation("com.google.code.gson:gson:2.14.0")
+    implementation(libs.gson)
 }
