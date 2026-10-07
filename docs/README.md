@@ -1,6 +1,6 @@
 # Speedy Bird website and documentation
 
-Astro 7 static site deployed to [GitHub Pages](https://jonathanperis.github.io/speedy-bird-lynx/). It contains the independent Canvas game and a manual generated from `wiki/*.md`. Astro uses its default Rust-powered Markdown pipeline; `src/lib/render-doc.ts` adapts compiled HTML links and heading IDs at build time.
+Astro 7 static site deployed to [GitHub Pages](https://jonathanperis.github.io/speedy-bird-lynx/). It contains a playable Canvas build of the game, which runs the app's own rules engine, and a manual generated from `wiki/*.md`. Astro uses its default Rust-powered Markdown pipeline; `src/lib/render-doc.ts` adapts compiled HTML links and heading IDs at build time.
 
 ## Run locally
 
@@ -25,7 +25,8 @@ Open the preview URL with `/speedy-bird-lynx/` appended. Build output is `out/`;
 
 | Path | Responsibility |
 |------|----------------|
-| `src/pages/index.astro` | Active landing page, styles, and inline Canvas game |
+| `src/pages/index.astro` | Landing page markup and metadata; mounts the Canvas demo |
+| `src/game/*.ts` | Canvas demo: controller (frame loop, input, pause, storage, announcements), renderer, sprite loader, and Web Audio. Gameplay is imported from the app's `src/game/engine.ts` |
 | `wiki/*.md` | Technical guide content |
 | `src/pages/docs/[...slug].astro` | Combined manual and individual guide routes |
 | `src/lib/docs-sidebar.config.ts` | Navigation groups, route order, page titles, and descriptions |
@@ -56,7 +57,7 @@ Sidebar search filters sections on the combined manual; it is intentionally hidd
 
 Root `assets/` is the canonical game artwork/audio source. When active assets change, synchronize the corresponding files under `public/assets/`; archived sprite sheets under `assets/sprites/unused/` are not served. The site build only copies public assets and does not perform synchronization. Preserve the original-game, upstream Canvas recreation, sprite, and sound attribution in the manual and footer.
 
-The landing Canvas has explicit 400×600 dimensions, compared with 400×750 for ReactLynx. Physics and medal values are duplicated between implementations; review both when changing gameplay. The `1.00× Starting Speed` display is a static rule explanation, not live telemetry.
+The Canvas demo imports `src/game/engine.ts`, `src/constants.ts`, `src/game/preferences.ts`, and `src/game/announcements.ts` from the app, so gameplay changes reach both surfaces automatically; only rendering lives in `src/game/renderer.ts`, which mirrors the sizes and layering of `src/components/`. `astro.config.mjs` allows the dev server to read the app's `src/` directory. The demo draws the full 400×750 playfield and stores the best score under `speedy-bird.preferences.v1` in the same format as the standalone web host. The `1.00× Starting Speed` display is a static rule explanation, not live telemetry.
 
 ### Regenerate social images and icons
 
