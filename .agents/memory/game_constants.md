@@ -32,7 +32,7 @@ Source of truth: `src/constants.ts` and `src/game/engine.ts`.
 | Web bundle | `bun run build` | `dist/main.web.bundle` |
 | Android debug | `./gradlew assembleDebug` after root bundle build | Debug APK; Gradle stages the current bundle |
 | Android release | `./gradlew assembleRelease` | Release APK, signed only when signing env vars exist |
-| iOS | `bundle exec pod install` + Xcode | Build when a configured Xcode project exists; CI archives always unsigned |
+| iOS | `cd ios && bundle exec pod install && xcodebuild test ...` | Simulator app + XCUITest; CI archives always unsigned |
 
 ## Android Signing (CI)
 

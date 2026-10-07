@@ -39,7 +39,7 @@ Both packages use `overrides` only to lift vulnerable transitive dependencies to
 | `source-map-js` | `^1.2.2` | Build and docs tooling |
 | `http-cache-semantics`, `sharp`, `postcss` (docs) | `^4.3.0`, `^0.35.5`, `^8.5.29` | Astro |
 
-Remove an override once every dependent declares the patched range. Renovate (`renovate.json`) groups Lynx npm packages and the native Lynx SDK/PrimJS releases (ignoring nightly builds), keeps the root TypeScript below 7, disables the Lynx-pinned SDWebImage pods, groups Fresco, and groups the Android Gradle Plugin with Kotlin and the Gradle wrapper. None of these groups automerge.
+Remove an override once every dependent declares the patched range. Renovate (`renovate.json`) groups Lynx npm packages and the native Lynx SDK/PrimJS releases (ignoring nightly builds), keeps the root TypeScript below 7, disables the Lynx-pinned SDWebImage pods, holds Fresco below 3 (see below), and groups the Android Gradle Plugin with Kotlin and the Gradle wrapper. None of these groups automerge.
 
 ## Native toolchains and compatibility holds
 
@@ -47,20 +47,21 @@ Remove an override once every dependent declares the patched range. Renovate (`r
 |-----------|-----------------------|--------------------|
 | Lynx Android/iOS SDK | 4.1.0 | Latest stable native release checked |
 | PrimJS | 4.1.1 | Required by Lynx 4.1.0; not the same version as the SDK |
-| Android Gradle Plugin | 9.4.0 | Uses built-in Kotlin support |
-| Gradle | 9.7.1 | Wrapper distribution is checksum-pinned |
-| Kotlin Gradle plugin | 2.4.20 | Supplies the compiler used by AGP's built-in integration |
-| Java | 21 recommended | Used by the verified local Android build and CI |
-| Android SDK | compile 37.2, target 37, minimum 21 | OkHttp 5.5 requires compile API 37 or newer |
-| OkHttp / Gson | 5.5.0 / 2.14.0 | Native HTTP and JSON support |
-| Fresco family | 3.7.0 | Coordinated image modules; Android debug/release and API lint checked with Lynx 4.1.0 |
+| Android Gradle Plugin | 9.4.1 | Uses built-in Kotlin support |
+| Gradle | 9.8.1 | Wrapper distribution is checksum-pinned |
+| Kotlin Gradle plugin | 2.4.20 | Latest stable; supplies the compiler used by AGP's built-in integration |
+| Java | JDK 21 to build; Java 11 bytecode | Used by the verified local Android build and CI |
+| Android SDK | compile 37.2, target 37, minimum 21 | |
+| Fresco (`fresco`, `animated-base`) | 2.3.0 | **Hold:** the exact release `lynx-service-image` 4.1.0 is compiled against |
+| androidx.core | 1.17.0 | Required by Fresco 2.x at runtime; 1.18+ needs API 23 |
+| Gson | 2.14.0 | JSON support required by Lynx internals |
 | SDWebImage / WebP coder | 5.15.5 / 0.11.0 | Exact dependencies in the LynxService/Image 4.1.0 podspec |
 
 TypeScript 7.0.2 is not supported by Rspeedy 0.18.0, whose declared peer range ends at 6.0.x. The root stays on `~6.0.3`; the independent docs package can use TypeScript 7. Do not force an unsupported peer range to make a version table look newer.
 
-Fresco was upgraded to 3.7.0 after Android compilation, R8 release processing, and API lint passed; its older native-library page-alignment warnings were eliminated. Lynx's image service was compiled upstream against Fresco 2.3.0, so device-level rendering remains part of future runtime verification. SDWebImage 5.21.7 and SDWebImageWebPCoder 0.15.0 were available, but the Podfile retains the exact older versions required by LynxService/Image 4.1.0. Unused XElement integrations were removed: the game uses only built-in view, image, and text elements.
+Fresco must match the release Lynx's image service is compiled against. Fresco 3.x compiles, passes R8 and lint, and then crashes on the first image load (`IncompatibleClassChangeError: CloseableBitmap`, now an interface), so every APK built with Fresco 3.7 crashed at launch; this was found on an emulator, which compilation alone cannot reveal. Fresco 2.3.0 matches Lynx's own Explorer app. Its native libraries are not 16 KB page aligned, so Android lint warns about them; resolving that needs a Lynx image service built against a newer Fresco. Renovate holds Fresco below 3. The app omits the animated GIF/WebP modules (and their native libraries) because it shows only static PNGs, and no longer ships the Lynx HTTP service or OkHttp. SDWebImage 5.21.7 and SDWebImageWebPCoder 0.15.0 were available, but the Podfile retains the exact older versions required by LynxService/Image 4.1.0. Unused XElement integrations were removed: the game uses only built-in view, image, and text elements.
 
-iOS remains a source scaffold: this repository does not track an Xcode project. Dependency resolution, an unsigned app build, and an unsigned archive were verified in a temporary Xcode 27 project targeting iOS 15. Both artifacts contain the current game bundle and Lynx resources. This does not establish a checked-in project, device installation, signing, or native audio. See [Native Host Apps](native-host-apps.md).
+The iOS Xcode project is generated by `scripts/generate-ios-project.rb` and committed with `Podfile.lock`. With Xcode 27 the app builds for the simulator and its XCUITest smoke tests pass (start, crash, restart lock, pause on backgrounding). Device installation and signing are not covered. See [Native Host Apps](native-host-apps.md).
 
 The Podfile aligns older pod deployment targets to iOS 15. For the Lynx target only, Xcode 27's unused-result/deprecation diagnostics remain warnings instead of being promoted to errors by upstream flags. Its one pinned runtime resource bundle is copied through Xcode's native resource phase, keeping user-script sandboxing enabled. Revisit these narrowly scoped integration adjustments when upgrading Lynx or CocoaPods.
 
@@ -70,8 +71,8 @@ The Podfile aligns older pod deployment targets to iOS 15. For the Lynx target o
 2. Update compatible packages and regenerate both Bun lockfiles. Re-run frozen installs to prove reproducibility.
 3. Run `bun run lint`, `bun run check`, `bun run build`, and `bun run build:web-host` at the repository root, then `bun audit`.
 4. In `docs/`, run `npm run build`, `npm run check:site`, and `bun audit` using Node.js >=22.12.
-5. After the bundle build, run `./gradlew assembleDebug assembleRelease lintDebug` in `android/`. Inspect signing status rather than assuming a release APK is signed.
-6. Resolve the iOS pods and build from a configured Xcode project when available. Report compilation, signing, simulator, and device evidence separately.
+5. After the bundle build, run `./gradlew assembleDebug assembleRelease lintDebug` in `android/`, then install the APK on an emulator and play a round: compilation does not catch binary incompatibilities such as the Fresco 3 crash. Inspect signing status rather than assuming a release APK is signed.
+6. Run `bundle exec pod install` and `xcodebuild test` in `ios/`. Report compilation, simulator, signing, and device evidence separately.
 7. Update this page, setup instructions, workflow pins, and the platform matrix. Keep historical migration plans marked as historical.
 
 ## Sources
@@ -80,5 +81,5 @@ The Podfile aligns older pod deployment targets to iOS 15. For the Lynx target o
 - [Rspeedy changelog](https://github.com/lynx-family/lynx-stack/blob/main/packages/rspeedy/core/CHANGELOG.md)
 - [ReactLynx compiler plugin changelog](https://github.com/lynx-family/lynx-stack/blob/main/packages/rspeedy/plugin-react/CHANGELOG.md)
 - [Lynx native releases](https://github.com/lynx-family/lynx/releases)
-- [Lynx image-service Android dependencies](https://github.com/lynx-family/lynx/blob/4.1.0/platform/android/lynx_service/lynx_service_image/build.gradle)
+- [Lynx image-service Android dependencies](https://github.com/lynx-family/lynx/blob/4.1.0/platform/android/lynx_service/lynx_service_image/build.gradle) (Fresco 2.3.0)
 - [LynxService 4.1.0 podspec](https://github.com/lynx-family/Specs/blob/master/LynxService/4.1.0/LynxService.podspec.json)
