@@ -90,17 +90,26 @@ class MainActivity : Activity() {
         if (hasFocus) enterImmersiveMode()
     }
 
+    // Losing focus pauses the game; only leaving the screen suspends Lynx, after the pause
+    // event has been handled (see the matching iOS ViewController).
+    override fun onStart() {
+        super.onStart()
+        lynxView.onEnterForeground()
+    }
+
     override fun onResume() {
         super.onResume()
-        lynxView.onEnterForeground()
         lynxView.sendGlobalEvent(RESUME_EVENT, JavaOnlyArray())
     }
 
     override fun onPause() {
-        // Pause a run in progress before the app leaves the foreground.
         lynxView.sendGlobalEvent(PAUSE_EVENT, JavaOnlyArray())
-        lynxView.onEnterBackground()
         super.onPause()
+    }
+
+    override fun onStop() {
+        lynxView.onEnterBackground()
+        super.onStop()
     }
 
     override fun onDestroy() {
