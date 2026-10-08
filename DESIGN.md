@@ -1,231 +1,180 @@
----
-name: Speedy Bird
-description: A retro arcade ReactLynx Flappy Bird variant where every pipe makes the game faster.
-colors:
-  sky-deep: "#04111e"
-  sky-mid: "#0a2a4a"
-  sky-surface: "#0d1e3a"
-  sky-dawn: "#0d4a7a"
-  arcade-gold: "#ffd166"
-  speed-orange: "#ff6b35"
-  pipe-green: "#2d6a4f"
-  pipe-highlight: "#4a9e6f"
-  text-bright: "#e8f8ff"
-  text-dim: "#6ba8c8"
-  panel-blue: "#0a1e3c"
-  stroke-dark: "#07131f"
-typography:
-  display:
-    fontFamily: "Nunito, system-ui, sans-serif"
-    fontSize: "clamp(3.5rem, 10vw, 8rem)"
-    fontWeight: 900
-    lineHeight: 1
-    letterSpacing: "-0.02em"
-  headline:
-    fontFamily: "Nunito, system-ui, sans-serif"
-    fontSize: "clamp(2rem, 5vw, 4rem)"
-    fontWeight: 900
-    lineHeight: 1.05
-  title:
-    fontFamily: "Nunito, system-ui, sans-serif"
-    fontSize: "1.25rem"
-    fontWeight: 800
-    lineHeight: 1.2
-  body:
-    fontFamily: "Space Grotesk, system-ui, sans-serif"
-    fontSize: "1rem"
-    fontWeight: 400
-    lineHeight: 1.6
-  label:
-    fontFamily: "Nunito, system-ui, sans-serif"
-    fontSize: "0.75rem"
-    fontWeight: 800
-    lineHeight: 1
-    letterSpacing: "0.12em"
-rounded:
-  pixel: "4px"
-  panel: "16px"
-  pill: "999px"
-spacing:
-  xs: "0.5rem"
-  sm: "1rem"
-  md: "1.5rem"
-  lg: "2.5rem"
-  xl: "4rem"
-components:
-  button-primary:
-    backgroundColor: "{colors.arcade-gold}"
-    textColor: "{colors.stroke-dark}"
-    typography: "{typography.label}"
-    rounded: "{rounded.pixel}"
-    padding: "1rem 2.5rem"
-  card-panel:
-    backgroundColor: "{colors.panel-blue}"
-    textColor: "{colors.text-bright}"
-    rounded: "{rounded.pixel}"
-    padding: "1.5rem"
-  hud-chip:
-    backgroundColor: "{colors.sky-surface}"
-    textColor: "{colors.arcade-gold}"
-    rounded: "{rounded.pixel}"
-    padding: "0.75rem 1rem"
----
+# DESIGN.md
 
-# Design System: Speedy Bird
+## Status (2026-10-07)
 
-## 1. Overview
+This file is the plan for the next version of the website and manual. The site currently
+shipped (the "night arcade cabinet": dark navy, glowing stat cards, all-caps buttons, an
+eyebrow badge over a giant outlined title) is being replaced because it reads as a generic
+generated landing page wearing game colors. Nothing below is implemented yet; the rollout
+section lists the pull requests that will get there. The old direction stays in git history
+(`git log -p -- DESIGN.md`).
 
-Implementation notes reviewed 2026-10-07. The active landing page is `docs/src/pages/index.astro` with styles in `docs/src/styles/home.css`; the tokens below live once in `docs/src/styles/tokens.css`, and fonts are self-hosted (`docs/src/styles/fonts.css`). The former unused `components/home/` implementation has been removed. Product intent lives in `PRODUCT.md`, while the manual documents actual platform support and build status.
+## Direction: the timing sheet
 
-**Creative North Star: "The Night Arcade Cabinet"**
+Speedy Bird has one idea: every pipe you clear makes the run 1% faster. The site should be
+built from the game itself and read like the timing sheet of a race.
 
-Speedy Bird is a playable night-sky arcade cabinet, not a generic project page with game decoration. The system should feel like a familiar Flappy-style world sharpened around one escalating mechanic: every pipe makes the run faster. The page uses deep sky blues, pipe greens, arcade gold, and speed orange to stage a small but energetic game world.
+- **The game is the hero.** The first screen is the playable level in the game's real
+  daytime colors, drawn with its real sprites, not a dark poster about the game. On a phone
+  the game is above the fold.
+- **Speed is shown as data.** Next to the game, a live timing panel reads the engine state
+  every frame: speed multiplier, pipes cleared, distance between pipes, medal progress.
+  Further down, the speed curve is a real table and chart computed from
+  `src/game/engine.ts` at build time, so it cannot drift from the game.
+- **Engineering is shown, not described.** Real excerpts of the source (the main-thread frame
+  loop, the bridge contract) are read from the repository at build time. Diagrams show what
+  actually runs where.
+- **The manual reads like technical regulations:** numbered articles, ruled tables, plain
+  sentences, a source link on every page.
 
-The design should keep the current retro arcade and pixel-game aesthetic, then make it more structural. Pipes should divide space. Medals should become achievement slots. Documentation should feel like a builder's manual or service panel. HUD elements should explain the game faster than paragraphs can.
+This sits next to the other project sites without copying them: Super Mango is built from its
+game art, Solar System Simulator is an archival chart, the Blazor sandbox is a lab manual, the
+portfolio is a transit map. Speedy Bird is daylight sprites plus race-timing information design.
 
-The system explicitly rejects generic SaaS landing pages, decorative glassmorphism, gradient-text hero shortcuts, dark-mode glows as the main visual idea, and identical card grids. If a section could belong to any modern developer landing page after changing the colors, it is not Speedy Bird enough.
+## Palette
 
-**Key Characteristics:**
+Every color comes from the sprites in `assets/sprites/` (sampled, not invented). Tokens live
+once in `docs/src/styles/tokens.css`, written in OKLCH with these sRGB anchors.
 
-- Deep night-sky surfaces with arcade gold and speed orange accents.
-- Pixel-inspired outlines, tactile buttons, HUD chips, scoreboards, and medal slots.
-- Play-first hierarchy: the run, multiplier, controls, and medals come before explanatory density.
-- Technical credibility framed as an in-world builder's manual.
-- Motion that suggests speed, but stops cleanly for reduced-motion users.
+| Token | Hex | Source | Use |
+|-------|-----|--------|-----|
+| `ink` | `#533847` | Outline of every sprite (bird, pipes, ground, titles) | Text, rules, borders, focus rings |
+| `paper` | `#FBF8E8` | Ground sand, lightened | Page background |
+| `sand` | `#DED895` | Ground strip, game-over panel | Table headers, strips, code background |
+| `sky` | `#00BBC4` | Game background (`BG_COLOR`) | The game band only; body text there sits on `cloud` panels |
+| `cloud` | `#EAFCDB` | Skyline clouds | Surfaces on sky |
+| `grass` | `#73BF2E` | Ground grass | Borders and markers of "Verified" callouts; never text |
+| `pipe` | `#557F22` | Pipe body | Link underlines and rule accents; never body text |
+| `gold` | `#FCB700` | "Get Ready" / "Game Over" titles | The primary action, the current row in the speed table |
+| `flag` | `#FF290C` | Title shadow red | Crash and error markers only; the message text stays `ink` |
 
-## 2. Colors
+Measured contrast (WCAG 2): `ink` on `paper` 9.7:1, on `cloud` 9.6:1, on `sand` 7.1:1, on
+`gold` 5.9:1 (the primary button), on `sky` 4.4:1 (large headings only). `pipe` on `paper` is
+4.4:1 and `flag` 3.5:1, so neither carries body text; `grass` (2.1:1) is decoration. Links are
+`ink` with a `pipe` underline.
 
-The palette is a committed night arcade palette: saturated enough to feel like a game, disciplined enough to support documentation and code reading.
+There is no dark navy and no glow. A dark scheme can follow later, derived from `ink`
+(background) and `paper` (text), behind `prefers-color-scheme`. Every text pair must pass
+WCAG AA; input borders and focus rings must reach 3:1.
 
-### Primary
+## Typography
 
-- **Deep Night Sky** (`sky-deep`): the page background and outermost atmosphere.
-- **Arcade Gold** (`arcade-gold`): primary action, medals, key HUD highlights, and scarce emphasis.
-- **Speed Orange** (`speed-orange`): multiplier, danger, acceleration, and the visual language of increasing difficulty.
+All fonts are self-hosted through `@fontsource`, never requested from a third party.
 
-### Secondary
+- **Barlow Condensed** (600/700) for headings, the timing panel, and table figures. It has
+  the narrow, tabular look of a timing board. Headings are sentence case.
+- **Atkinson Hyperlegible Next** for reading text.
+- **JetBrains Mono** for code, file paths, and units in tables.
+- The game's own digit sprites (`assets/sprites/digits/`) for the live score only.
 
-- **Pipe Green** (`pipe-green`): pipes, obstacle framing, progress dividers, and mechanical section separators.
-- **Pipe Highlight** (`pipe-highlight`): bevels, sprite highlights, and active pipe accents.
+Numbers are always tabular (`font-variant-numeric: tabular-nums`). Space Grotesk, Nunito, and
+Inter are removed.
 
-### Neutral
+## Devices
 
-- **Sky Mid** (`sky-mid`): large surface gradients and intermediate atmospheric depth.
-- **Sky Surface** (`sky-surface`): HUD chips, panels, and quieter containers.
-- **Text Bright** (`text-bright`): primary text on dark surfaces.
-- **Text Dim** (`text-dim`): secondary explanations and metadata.
-- **Stroke Dark** (`stroke-dark`): pixel outlines and button shadows. Use it instead of pure black for large fills.
+- **Timing panel:** a ruled, two-column readout (label, value) with condensed tabular numbers,
+  like a lap timer. Values update from the engine; labels never change.
+- **Sheets:** figures and tables are captioned "Sheet 1 · Speed by score" and numbered across
+  the page.
+- **Ruled tables:** a 2px `ink` rule above the header, hairlines between rows, units in mono.
+  The current row is marked in `gold`, not by color alone (also a "▶" marker in text).
+- **Sprite marks:** the manual's sections use real sprites as small marks (bird, pipe mouth,
+  the four medals), at integer scale with `image-rendering: pixelated`.
+- **Ground strip:** the real ground tile, scrolling only inside the game band, is the
+  divider between the game and the page. It stops for `prefers-reduced-motion`.
+- **Corners and shadows:** square corners, 2px `ink` borders; at most one solid offset shadow
+  (2px, `ink`) on the primary button. No blur, no gradients.
+- **Links:** `ink` text with a `pipe` underline, always visible; the underline thickens on hover.
 
-### Named Rules
+### Remove
 
-**The Gold Is the Button Rule.** Arcade Gold is reserved for action, achievement, and critical HUD state. Do not use it as generic decoration across every card.
+Eyebrow badges, stat cards ("1.00× / +1% / 100", "9 manual pages"), all-caps buttons and
+navigation, glows and radial gradients, decorative clouds and parallax ornaments, scroll-reveal
+animations, icon or emoji feature cards, the "What is Lynx?" sales block on the home page (it
+becomes manual content), and in-world labels such as "Night arcade cabinet", "Builder's manual"
+and "Service manual". Rule: if a section could appear on any developer landing page after a
+color change, rewrite it.
 
-**The Orange Means Speed Rule.** Speed Orange means acceleration, danger, or multiplier. If orange appears, it should teach the player something about intensity.
+## Home page
 
-**The No Pure Fill Rule.** Pure black and pure white are allowed only as tiny sprite-like strokes when preserving pixel-art language. Large surfaces must use tinted night-sky tokens.
+1. **Top bar.** Wordmark "Speedy Bird" in Barlow Condensed with a 16px bird sprite. Links:
+   Play, How it works, Manual, Source. No hamburger at ≥768px.
+2. **Game band.** Sky-colored band containing the playable game (the Canvas build that already
+   shares `src/game/engine.ts`) at its 400x750 aspect, with the live timing panel beside it on
+   wide screens and below it on phones. One sentence under the title: "Flappy Bird where every
+   pipe you clear makes the game 1% faster." Primary button: "Start a run" (gold, sentence
+   case). Controls are stated once, next to the game. The ground strip closes the band.
+   On phones the title, one-line pitch and button form a single compact row above the game
+   (the game must be fully visible at 390x844 without scrolling), and the timing panel moves
+   below the band.
+3. **The speed curve (Sheet 1).** A table generated at build time from `speedMultiplier`,
+   `spawnInterval`, `PIPE_DX` and the medal thresholds, for scores 0, 10, 25, 50, 100, 200 and
+   the score where spawning hits its 20-step floor: speed, pixels per step, steps and seconds
+   between pipes, medal. A small SVG line chart of the same data. Two sentences on why the
+   curve is linear and where it stops getting denser.
+4. **One bundle, three hosts (Sheet 2).** A diagram: `main.lynx.bundle` → Android (Kotlin,
+   SoundPool), iOS (Swift, AVAudioPlayer), Web (`<lynx-view>`, Web Audio). Under it, the
+   `SpeedyBirdModule` contract as a table: method, Android, iOS, Web.
+5. **What runs where (Sheet 3).** Main thread and background thread side by side, with the
+   real `frame()` excerpt from `src/hooks/useGame.ts` (read at build time between
+   `// #region frame-loop` markers) and three annotations: steps, styles, publish.
+6. **Manual contents.** A numbered list (not cards), generated from
+   `docs/src/lib/docs-sidebar.config.ts`, with one line per guide.
+7. **Colophon.** Versions read from `package.json` and the native build files at build time
+   (ReactLynx, Rspeedy, Lynx SDK), credits (Flappy Bird by Dong Nguyen; sprite sources),
+   license, source link.
 
-## 3. Typography
+The consent banner keeps its behavior and adopts the new tokens (paper sheet, ink border,
+sentence-case buttons).
 
-**Display Font:** Nunito with system sans fallback.  
-**Body Font:** Space Grotesk with system sans fallback.  
-**Label/Mono Font:** Use Nunito labels or a deliberately chosen arcade/scoreboard face in a future pass; do not add casual monospace by reflex.
+## Manual
 
-**Character:** The pairing is rounded, approachable, and readable. Pixel outlines, hard shadows, and prominent numbers give the active title, HUD, and medals their arcade treatment.
+- **Layout:** numbered contents on the left ("1 Start · 1.1 Getting started"), the article
+  at a 68-character measure, "On this page" on the right at ≥1200px, previous/next at the end.
+  On phones the contents collapse behind a native `<details>` disclosure.
+- **Page header:** article number, title, one-sentence summary, the source files the page
+  documents (linked), and "Last reviewed" from git. No hero panel, no stat cards.
+- **Callouts:** three typed notes with a text label (never color alone): *Note*, *Hold*
+  (a dependency held back, with the reason), *Verified* (what was run, on what, when).
+- **Code:** paper code blocks with an `ink` border, a file path caption, and a copy button.
+- **Search:** a quiet input at the top of the contents, focused with `/`.
+- **Docs home:** the contents page itself, plus a short "Start here" path: play, run it
+  locally, read the engine, build a host.
 
-### Hierarchy
+## Voice
 
-- **Display** (900, `clamp(3.5rem, 10vw, 8rem)`, 1): hero title and rare marquee moments only.
-- **Headline** (900, `clamp(2rem, 5vw, 4rem)`, 1.05): major sections such as Rules, Medal Cabinet, Builder's Manual.
-- **Title** (800, `1.25rem`, 1.2): component titles, docs entries, HUD module headings.
-- **Body** (400, `1rem`, 1.6): explanatory text, capped at 65-75ch.
-- **Label** (800, `0.75rem`, 0.12em tracking): short HUD labels, nav labels, stat captions, and medal metadata.
+First person and specific: what the game does, why it was built this way, what was measured.
+Sentence case everywhere. No marketing verbs, no "seamless", no "blazing". Numbers come from
+the code or from a measurement, and say which.
 
-### Named Rules
+## Engineering notes
 
-**The Scoreboard Number Rule.** Multipliers, scores, medal thresholds, and pipe counts must be visually stronger than their labels. The game is understood through numbers.
+- `docs/src/lib/game-facts.ts` imports `src/constants.ts` and `src/game/engine.ts` to compute
+  the speed table at build time.
+- `docs/src/lib/source-excerpt.ts` reads a region between `// #region <name>` and
+  `// #endregion` markers; `check-site.mjs` fails if a referenced region is missing.
+- Versions in the colophon come from `package.json`, `android/gradle/libs.versions.toml` and
+  `ios/Podfile.lock`, so they cannot go stale.
+- The timing panel subscribes to the Canvas controller's state (score, speed, pipes, medal);
+  it adds no second game loop.
 
-**The No Costume Mono Rule.** Do not use monospace as a lazy signal for technical credibility. Use it only for real code or command snippets in the builder manual.
+## Mockup
 
-## 4. Elevation
+`design/mockups/home-desktop.png` and `design/mockups/home-mobile.png` are a static mockup of
+the game band and Sheet 1 built with the real sprites, palette, and fonts above. They show
+the direction, not final spacing.
 
-Speedy Bird should use a hybrid of flat pixel layering and rare responsive shadows. Resting surfaces are mostly flat: depth comes from strokes, bevel-like color steps, pipe geometry, and sprite shadows. Shadows appear for active controls, cabinet depth, and playable-device framing, not as generic dark-mode glow.
+![Desktop mockup](design/mockups/home-desktop.png)
 
-### Shadow Vocabulary
+## Rollout
 
-- **Button Press Shadow** (`0 4px 0 #07131f`): tactile arcade buttons and pressed states.
-- **Cabinet Depth** (`0 24px 60px rgba(4, 17, 30, 0.55)`): the embedded play device or major cabinet panel only.
-- **HUD Glow** (`0 0 0 3px rgba(255, 209, 102, 0.18)`): focus-visible rings and selected HUD state, never decorative ambient glow.
+| PR | Scope | Done when |
+|----|-------|-----------|
+| A · Tokens and type | New `tokens.css`, fonts, palette; strip glows, gradients, eyebrows, stat cards, all-caps; buttons and links restyled | Both sites render in the new palette with no layout change; contrast checks pass |
+| B · Home page | Game band with live timing panel, speed curve sheet, hosts sheet, threads sheet with source excerpt, manual contents, colophon | Game above the fold at 390x844; sheets generated at build time; e2e suite passes |
+| C · Manual | Contents/article/on-this-page layout, page headers, typed callouts, ruled tables, code blocks, `/` search | Every guide has one H1, numbered contents, prev/next; `check-site` passes |
+| D · Content and extras | Voice pass on all wiki pages and README, 404 scene (the bird hits a pipe, real sprites), Open Graph image redrawn in the new style | Copy review against the Voice rules; OG image under 100 KB |
 
-### Named Rules
-
-**The No Ambient Glow Rule.** Glows must explain state: focus, active, selected, or danger. Decorative glow on dark surfaces is prohibited.
-
-**The Pixel Layer Rule.** Prefer hard offsets, strokes, and stepped color ramps over blurred glass and floating cards.
-
-## 5. Components
-
-### Buttons
-
-- **Shape:** tactile pixel buttons (`4px`) with hard outlines and press shadows.
-- **Primary:** Arcade Gold background with Stroke Dark text, uppercase label, heavy weight, generous horizontal padding.
-- **Hover / Focus:** move by transform only; focus uses an explicit HUD Glow ring. Do not animate padding, width, or layout properties.
-- **Pressed:** shift down into its hard shadow like an arcade cabinet button.
-
-### HUD Chips
-
-- **Style:** compact panels with Sky Surface background, Arcade Gold or Speed Orange numbers, and short uppercase labels.
-- **State:** active/danger chips use Speed Orange; achievement chips use Arcade Gold; inactive chips use Text Dim.
-- **Usage:** speed multiplier, `+1% / pipe`, current score, controls, and medal thresholds.
-
-### Cards / Containers
-
-- **Corner Style:** pixel panels (`4px`) with visible strokes; the playable phone frame retains rounded corners.
-- **Background:** Panel Blue or Sky Surface. Avoid translucent glass as the default.
-- **Shadow Strategy:** flat at rest, hard offset or cabinet depth only for signature modules.
-- **Border:** pipe-green, arcade-gold, or dark pixel stroke, chosen for meaning rather than decoration.
-- **Internal Padding:** `1.5rem` to `2.5rem`, with varied rhythm instead of identical grids.
-
-### Inputs / Fields
-
-The landing page has no form fields. If fields are added later, they should look like arcade service-panel controls: dark navy fill, clear stroke, large focus ring, and non-color-only validation.
-
-### Navigation
-
-Navigation feels like a HUD or cabinet tab bar: a dark navy panel with a pipe-green border and visible focus states. Keep labels short: Play, Rules, Build, Docs, GitHub. The landing navigation is separate from the manual's sidebar and mobile menu.
-
-### Play Surface
-
-The embedded canvas is a protected game subsystem. Style the frame, controls, labels, and surrounding panel without changing gameplay logic unless explicitly scoped. The canvas requires an accessible label and clear keyboard/mouse/touch instructions.
-
-### Medal Cabinet
-
-Medals should read as achievements, not badges floating in a row. Use locked/unlocked slots, score thresholds, multiplier context, and a challenge CTA such as `Try for Platinum`.
-
-### Builder's Manual
-
-Technical docs should appear as a builder's manual or arcade service panel: grouped routes, short descriptions, source links, and occasional real command snippets. Do not bury technical credibility under generic cards.
-
-## 6. Do's and Don'ts
-
-### Do:
-
-- **Do** keep the night-sky, bird, pipe, medal, and arcade-gold identity intact.
-- **Do** make the speed multiplier visually central through HUD chips, timelines, and threshold markers.
-- **Do** label static rule examples honestly. The starting-speed chip is not live gameplay telemetry.
-- **Do** use pipes, scoreboards, medals, and cabinet panels as structure, not decoration.
-- **Do** cap body copy at 65-75ch and let numbers carry the game mechanic.
-- **Do** add `prefers-reduced-motion` behavior for clouds, particles, CTA pulse, pipe sway, and reveal animations.
-- **Do** use focus-visible rings that are as intentional as hover states.
-- **Do** keep docs and GitHub links visible, but frame them as a builder's manual.
-
-### Don't:
-
-- **Don't** turn the page into a generic SaaS landing page wearing game colors.
-- **Don't** use gradient text for the hero title or major headings.
-- **Don't** use glassmorphism as the default surface treatment.
-- **Don't** rely on dark glows as the main source of visual energy.
-- **Don't** repeat identical feature-card grids when a game-native module would communicate better.
-- **Don't** use pure black or pure white as large fills; reserve them for tiny sprite strokes only.
-- **Don't** animate layout properties such as width, padding, or margin.
-- **Don't** hide primary play or contact actions behind novelty interactions.
-- **Don't** use monospace as developer cosplay; use it for real code only.
+Each PR is checked at 390, 768, 1280 and 1440 px against this file, with Lighthouse
+accessibility at 100 and performance at 95 or above, no third-party requests (analytics only
+after consent), and `prefers-reduced-motion` stopping everything except the game itself.

@@ -11,7 +11,7 @@ Speedy Bird serves two overlapping audiences:
 - **Players** who arrive from GitHub Pages or a shared link and want a fast, instantly understandable browser game with low setup friction.
 - **Developers and technical reviewers** who want to understand how a complete ReactLynx game is built, shipped, and documented: a browser build on GitHub Pages, an Android host, and an iOS host app built from source in Xcode (it is not distributed through an app store).
 
-The page should work first as a playable arcade surface and second as a credible technical artifact. A visitor should be able to play within seconds, then discover the engine, source code, platform story, and documentation without leaving the visual world.
+The page should work first as a playable game and second as a credible technical artifact. A visitor should be able to play within seconds, then discover the engine, source code, platform story, and documentation without leaving the game's world.
 
 ## Product Purpose
 
@@ -28,29 +28,31 @@ Success looks like users starting a run, understanding the `+1% per pipe` mechan
 
 ## Brand Personality
 
-Playful, fast, technical, and arcade-native.
+Playful, fast, precise.
 
-Speedy Bird should feel like a late-night arcade cabinet wrapped around a serious open-source build artifact. It can be charming and kinetic, but it should not become childish, noisy, or gimmicky. The tone is confident and direct: a familiar game with one sharp twist, implemented as a real cross-platform case study.
+Speedy Bird is a bright daytime game with one sharp twist, documented like the timing sheet of a race: real numbers, plain sentences, nothing invented. It can be charming, but it should not become childish, noisy, or gimmicky. The tone is confident and direct, written in the first person by the person who built it.
 
 ## Anti-references
 
 - Generic SaaS landing pages wearing game colors.
 - Glassmorphism as the default surface treatment.
 - Gradient text as a hero shortcut.
-- Dark mode with decorative glows as the only source of energy.
+- Dark navy with decorative glows, eyebrow badges, and stat cards (the previous "night arcade cabinet" site).
 - Identical feature-card grids that flatten the arcade story.
-- Terminal/developer cosplay that hides the playable game.
+- Terminal/developer cosplay, or in-world jargon ("service manual", "cabinet") that hides what the page is.
 - Overly literal Flappy Bird cloning without a distinct Speedy Bird identity.
 - Dense documentation pages that make the game feel secondary.
 
 ## Design Principles
 
-1. **Play first, explain second.** The first action should be to start a run; documentation and architecture are supporting proof, not the initial burden.
-2. **Make speed visible.** The increasing multiplier is the product’s unique idea. Treat it as a first-class visual system: HUD, timeline, thresholds, and medals.
-3. **Use arcade structure, not arcade decoration.** Pipes, medals, scoreboards, cabinets, HUD panels, and manuals should organize content, not merely ornament it.
-4. **Keep technical credibility in-world.** Docs, source, build notes, and architecture should feel like a builder’s manual or service panel from the same arcade cabinet.
-5. **Commit to tactile pixels.** Prefer sharp panels, solid color, sprite-like shadows, and explicit state changes over soft glass, blurred surfaces, and generic glows.
-6. **Respect motion sensitivity.** Motion should sell speed and play, not exhaust the user. Reduced-motion support is mandatory.
+1. **Play first, explain second.** The game is the first screen, on every device; documentation and architecture are supporting proof.
+2. **Make speed visible as data.** The `+1% per pipe` mechanic is shown as a live timing panel and as a speed table computed from the engine, not as slogans.
+3. **Build the site from the game.** Colors, marks, and dividers come from the real sprites; nothing decorative is invented.
+4. **Show the engineering.** Real source excerpts and diagrams of what runs where replace marketing paragraphs; every number says where it comes from.
+5. **Editorial, not promotional.** Sentence case, numbered sheets and articles, ruled tables, underlined links, square corners, no glows or gradients.
+6. **Respect motion sensitivity.** Only the game moves; reduced-motion support is mandatory.
+
+See `DESIGN.md` for the visual system and the rollout plan.
 
 ## Accessibility & Inclusion
 
