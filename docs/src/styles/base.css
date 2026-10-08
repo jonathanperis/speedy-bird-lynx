@@ -1,0 +1,232 @@
+/* Shared base for every page: reset, type, links, focus, controls, tables, code. */
+@import './fonts.css';
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  color: var(--ink);
+  background: var(--paper);
+  font: 400 1.0625rem/1.6 var(--font-body);
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  min-height: 100vh;
+}
+
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+img.sprite {
+  image-rendering: pixelated;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-head);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+}
+
+p,
+li {
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-color: var(--pipe);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  text-decoration-thickness: 3px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* Skip-link targets take focus programmatically; they need no ring. */
+[tabindex='-1']:focus {
+  outline: none;
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+}
+
+:not(pre) > code {
+  padding: 0.05em 0.3em;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  overflow-wrap: anywhere;
+}
+
+kbd {
+  padding: 0.05em 0.35em;
+  border: 1px solid var(--ink);
+  border-bottom-width: 2px;
+  background: var(--sheet);
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Buttons: square, inked, sentence case. The primary action is gold with one offset shadow. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  min-height: 44px;
+  padding: 0.55rem 1.15rem;
+  color: var(--ink);
+  background: var(--sheet);
+  border: var(--border);
+  font: 700 1.25rem/1 var(--font-head);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button:hover {
+  text-decoration: none;
+  background: var(--cloud);
+}
+
+.button-primary {
+  background: var(--gold);
+  box-shadow: var(--shadow);
+}
+
+.button-primary:hover {
+  background: #ffc52e;
+}
+
+.button-primary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+.button[hidden] {
+  display: none;
+}
+
+.text-button {
+  padding: 0;
+  color: inherit;
+  background: none;
+  border: 0;
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--pipe);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.text-button[hidden] {
+  display: none;
+}
+
+/* Ruled tables: 2px ink rule above the header, hairlines between rows, tabular figures. */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+th,
+td {
+  padding: 0.45rem 0.7rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--rule);
+}
+
+thead th {
+  background: var(--sand);
+  border-top: var(--border);
+  border-bottom: 1px solid var(--ink);
+  font: 700 1rem/1.2 var(--font-head);
+  letter-spacing: 0.01em;
+}
+
+.sheet-caption {
+  font: 600 0.95rem/1.2 var(--font-head);
+  letter-spacing: 0.03em;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 1000;
+  padding: 0.6rem 1rem;
+  color: var(--ink);
+  background: var(--gold);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  font: 700 1.1rem/1 var(--font-head);
+  text-decoration: none;
+  transform: translateY(calc(-100% - 1.5rem));
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

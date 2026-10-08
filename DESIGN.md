@@ -1,13 +1,16 @@
 # DESIGN.md
 
-## Status (2026-10-07)
+## Status (2026-10-08)
 
-This file is the plan for the next version of the website and manual. The site currently
-shipped (the "night arcade cabinet": dark navy, glowing stat cards, all-caps buttons, an
-eyebrow badge over a giant outlined title) is being replaced because it reads as a generic
-generated landing page wearing game colors. Nothing below is implemented yet; the rollout
-section lists the pull requests that will get there. The old direction stays in git history
-(`git log -p -- DESIGN.md`).
+This file describes the website and manual. The previous site (the "night arcade cabinet":
+dark navy, glowing stat cards, all-caps buttons, an eyebrow badge over a giant outlined title)
+was replaced because it read as a generic generated landing page wearing game colors; it stays
+in git history (`git log -p -- DESIGN.md`).
+
+Implemented: tokens and type, the home page (game band, live timing panel, Sheets 1–3, manual
+contents, colophon), and the manual layout (numbered contents, page header with documented
+sources, typed callouts, ruled tables, code with copy buttons, `/` search, previous/next).
+Still to do: the content pass, the 404 scene, and the redrawn Open Graph image (rollout PR D).
 
 ## Direction: the timing sheet
 
@@ -127,13 +130,17 @@ color change, rewrite it.
 The consent banner keeps its behavior and adopts the new tokens (paper sheet, ink border,
 sentence-case buttons).
 
+The ground strip under the game band is a static row of the real ground tile; only the game
+itself moves on the page.
+
 ## Manual
 
 - **Layout:** numbered contents on the left ("1 Start · 1.1 Getting started"), the article
   at a 68-character measure, "On this page" on the right at ≥1200px, previous/next at the end.
   On phones the contents collapse behind a native `<details>` disclosure.
-- **Page header:** article number, title, one-sentence summary, the source files the page
-  documents (linked), and "Last reviewed" from git. No hero panel, no stat cards.
+- **Page header:** article number, title, one-sentence summary, and the source files the page
+  documents (linked; a missing path fails the build). No hero panel, no stat cards. A "last
+  reviewed" date is not shown: the Pages build uses a shallow clone, so git dates would be wrong.
 - **Callouts:** three typed notes with a text label (never color alone): *Note*, *Hold*
   (a dependency held back, with the reason), *Verified* (what was run, on what, when).
 - **Code:** paper code blocks with an `ink` border, a file path caption, and a copy button.
@@ -167,6 +174,9 @@ the direction, not final spacing.
 ![Desktop mockup](design/mockups/home-desktop.png)
 
 ## Rollout
+
+PRs A–C shipped together (restyling the old pages first would have been thrown away);
+Lighthouse on the built site: performance 97–98, accessibility, best practices and SEO 100.
 
 | PR | Scope | Done when |
 |----|-------|-----------|

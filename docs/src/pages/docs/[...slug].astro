@@ -1,235 +1,232 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro';
-import '../../styles/docs.css';
-import { PAGE_META, SECTION_CATEGORIES, SECTION_ORDER } from '../../lib/docs-sidebar.config';
-import { renderDoc } from '../../lib/render-doc';
-import { GA_ID } from '../../lib/analytics';
 import type { MarkdownInstance } from 'astro';
-
-const globResult = import.meta.glob<MarkdownInstance<Record<string, unknown>>>('../../../wiki/*.md', { eager: true });
-
-const pagesBySlug: Record<string, MarkdownInstance<Record<string, unknown>>> = {};
-for (const [path, module] of Object.entries(globResult)) {
-  const fileName = path.split('/').pop()!.replace('.md', '');
-  const slug = fileName === 'index' ? 'home' : fileName;
-  pagesBySlug[slug] = module;
-}
-
-// Build-time assertion: validate SECTION_CATEGORIES IDs against discovered slugs
-const availableSlugs = new Set(Object.keys(pagesBySlug));
-for (const cat of SECTION_CATEGORIES) {
-  for (const id of cat.ids) {
-    if (!availableSlugs.has(id)) {
-      const catName = cat.label || "root";
-      const wikiFile = id === "home" ? "index" : id;
-      throw new Error(
-        `SECTION_CATEGORIES references id "${id}" (category: "${catName}") but no matching wiki/${wikiFile}.md was found. Available slugs: ${Array.from(availableSlugs).join(", ")}`
-      );
-    }
-  }
-}
-
-const requestedSlug = Astro.params.slug;
-const isRoot = requestedSlug === undefined;
-const requestedKey = requestedSlug ?? 'home';
-
-const sectionsToRender = isRoot
-  ? SECTION_CATEGORIES.flatMap(cat => cat.ids)
-      .map(slug => ({ slug, page: pagesBySlug[slug] }))
-      .filter(s => s.page)
-  : (() => {
-      const page = pagesBySlug[requestedKey];
-      if (!page) return [];
-      return [{ slug: requestedSlug!, page }];
-    })();
+import SiteFooter from '../../components/SiteFooter.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { ARTICLE_NUMBERS, PAGE_META, PAGE_SOURCES, SECTION_CATEGORIES, SECTION_ORDER } from '../../lib/docs-sidebar.config';
+import { renderDoc } from '../../lib/render-doc';
+import { REPOSITORY_URL, repoFileExists } from '../../lib/repo-files';
+import '../../styles/docs.css';
 
 export function getStaticPaths() {
-  return [
-    { params: { slug: undefined } },
-    ...SECTION_ORDER.filter(id => id !== 'home').map(slug => ({ params: { slug } })),
-  ];
+  return [{ params: { slug: undefined } }, ...SECTION_ORDER.filter((id) => id !== 'home').map((slug) => ({ params: { slug } }))];
 }
 
-const pageTitle = isRoot ? 'Speedy Bird Lynx - Documentation' : `${PAGE_META[requestedKey].title} - Speedy Bird Lynx`;
-const description = isRoot
-  ? 'Speedy Bird builder manual: ReactLynx architecture, game engine, assets, native builds, and CI/CD.'
-  : PAGE_META[requestedKey].description;
-const base = import.meta.env.BASE_URL;
-const docsBase = base.replace(/\/$/, '') + '/docs';
-const backHomeUrl = base.replace(/\/$/, '') + '/';
+const modules = import.meta.glob<MarkdownInstance<Record<string, unknown>>>('../../../wiki/*.md', { eager: true });
+const pages: Record<string, MarkdownInstance<Record<string, unknown>>> = {};
+for (const [path, module] of Object.entries(modules)) {
+  const name = path.split('/').pop()!.replace('.md', '');
+  pages[name === 'index' ? 'home' : name] = module;
+}
+for (const id of SECTION_ORDER) {
+  if (!pages[id]) throw new Error(`docs-sidebar.config lists "${id}" but wiki/${id === 'home' ? 'index' : id}.md is missing`);
+}
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const docsBase = `${base}/docs`;
 const guideUrl = (id: string) => (id === 'home' ? `${docsBase}/` : `${docsBase}/${id}/`);
-const renderedSections = await Promise.all(sectionsToRender.map(async ({ slug, page }) => ({
-  slug,
-  html: await renderDoc(await page.compiledContent(), slug, docsBase, isRoot),
-})));
+const slug = Astro.params.slug ?? 'home';
+
+// Render every guide once: the current page, plus titles and text for search and prev/next.
+const rendered = Object.fromEntries(
+  await Promise.all(SECTION_ORDER.map(async (id) => [id, await renderDoc(await pages[id].compiledContent(), docsBase)] as const)),
+);
+const doc = rendered[slug];
+const number = ARTICLE_NUMBERS[slug];
+const index = SECTION_ORDER.indexOf(slug);
+const previous = index > 0 ? SECTION_ORDER[index - 1] : undefined;
+const next = index < SECTION_ORDER.length - 1 ? SECTION_ORDER[index + 1] : undefined;
+
+// Source files this guide documents. A missing path fails the build.
+const sources = (PAGE_SOURCES[slug] ?? []).map((path) => {
+  if (!repoFileExists(path)) throw new Error(`PAGE_SOURCES["${slug}"] lists missing ${path}`);
+  return { path, href: `${REPOSITORY_URL}/${path.endsWith('/') ? 'tree' : 'blob'}/main/${path}` };
+});
+
+const searchIndex = SECTION_ORDER.map((id) => ({
+  id,
+  title: PAGE_META[id].title,
+  number: ARTICLE_NUMBERS[id] ?? '',
+  url: guideUrl(id),
+  headings: rendered[id].headings,
+  text: rendered[id].text.toLowerCase(),
+}));
+
+const title = slug === 'home' ? 'Speedy Bird manual' : `${number} ${doc.title} · Speedy Bird manual`;
+const description = PAGE_META[slug].description;
 ---
 
-<BaseLayout title={pageTitle} description={description}>
-  <div class="mobile-header">
-    <button type="button" class="menu-toggle" id="menuToggle" aria-label="Open manual navigation" aria-controls="sidebar" aria-expanded="false">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-    <div class="repo-title">Speedy Bird Manual</div>
-  </div>
+<BaseLayout title={title} description={description}>
+  <SiteHeader current="manual" />
 
-  <div class="overlay" id="overlay" aria-hidden="true"></div>
-
-  <aside class="sidebar" id="sidebar" aria-label="Manual navigation">
-    <div class="sidebar-header">
-      <p class="repo-title">Speedy Bird Manual</p>
-      <p class="repo-description">Arcade service notes for the ReactLynx game: speed curve, engine, sprites, native shells, and deploy pipeline.</p>
-      <input type="text" id="searchInput" class="search-box" placeholder="Search documentation..." aria-label="Search documentation" hidden={!isRoot}>
-    </div>
-    <nav class="sidebar-nav-container" aria-label="Manual pages">
-      {SECTION_CATEGORIES.map((cat) => {
-        const catIds = cat.ids;
-        return (
-          <div class="sidebar-category-group" data-category>
-            {cat.label && <div class="sidebar-category">{cat.label}</div>}
-            <ul>
-              {catIds.map((id) => {
-                // The combined manual scrolls to its sections; guide pages link to guide routes.
-                const current = !isRoot && id === requestedKey;
-                return (
+  <div class="manual">
+    <nav class="toc" aria-label="Manual contents">
+      <details class="toc-details" open>
+        <summary>Contents</summary>
+        <div class="search" role="search">
+          <label class="visually-hidden" for="manual-search">Search the manual</label>
+          <input id="manual-search" type="search" placeholder="Search  /" autocomplete="off" aria-controls="search-results" />
+          <ol id="search-results" class="search-results" aria-live="polite" hidden></ol>
+        </div>
+        <ol class="toc-list">
+          <li>
+            <a href={guideUrl('home')} aria-current={slug === 'home' ? 'page' : undefined}>Start here</a>
+          </li>
+          {SECTION_CATEGORIES.filter((category) => category.label).map((category, chapter) => (
+            <li>
+              <span class="toc-part"><span class="num">{chapter + 1}</span> {category.label}</span>
+              <ol>
+                {category.ids.map((id) => (
                   <li>
-                    <a
-                      class:list={['nav-item', { active: current }]}
-                      href={isRoot ? `#${id}` : guideUrl(id)}
-                      data-nav-id={id}
-                      aria-current={current ? 'page' : undefined}
-                    >
-                      {PAGE_META[id].title}
+                    <a href={guideUrl(id)} aria-current={id === slug ? 'page' : undefined}>
+                      <span class="num">{ARTICLE_NUMBERS[id]}</span> {PAGE_META[id].title}
                     </a>
                   </li>
-                );
-              })}
-            </ul>
-          </div>
-        );
-      })}
+                ))}
+              </ol>
+            </li>
+          ))}
+        </ol>
+      </details>
     </nav>
-    <div class="sidebar-footer">
-      <a href={backHomeUrl} class="back-home">← Back to home</a>
-      <a href="https://github.com/jonathanperis/speedy-bird-lynx" target="_blank" rel="noopener noreferrer">View on GitHub</a>
-      {GA_ID && <button type="button" class="link-button" data-analytics-settings hidden>Analytics settings</button>}
-      <div>Built by Jonathan Peris</div>
-    </div>
-  </aside>
 
-  <div class="content-wrapper">
-    <main class="content" id="main-content" tabindex="-1">
-      <header class="docs-marquee">
-        <div>
-          <p class="manual-kicker">Builder's Manual · Night Arcade Cabinet</p>
-          {isRoot
-            ? <h1 class="marquee-title">Speedy Bird Service Manual</h1>
-            : <p class="marquee-title">{PAGE_META[requestedKey].title}</p>}
-          <p class="manual-lede">
-            Source-backed guides to the speed curve, ReactLynx architecture, sprites, native hosts,
-            documentation site, and release pipeline.
+    <main id="main" tabindex="-1" class="article-column">
+      <header class="article-header">
+        <p class="article-number">{number ? `Article ${number}` : 'Manual'}</p>
+        <h1>{slug === 'home' ? 'Speedy Bird manual' : doc.title}</h1>
+        <p class="article-summary">{description}</p>
+        {sources.length > 0 && (
+          <p class="article-sources">
+            <span>Documents</span>
+            {sources.map((source) => <a href={source.href}><code>{source.path}</code></a>)}
           </p>
-        </div>
-        <div class="manual-scoreboard" role="group" aria-label="Documentation quick stats">
-          <div><strong>{SECTION_ORDER.length}</strong><span>Manual pages</span></div>
-          <div><strong>+1%</strong><span>Speed / pipe</span></div>
-          <div><strong>3</strong><span>Platforms</span></div>
-        </div>
+        )}
       </header>
 
-      <nav class="manual-jumpbar" aria-label="Manual quick links">
-        <a href={backHomeUrl}>Play</a>
-        <a href={isRoot ? '#game-engine' : guideUrl('game-engine')}>Engine</a>
-        <a href={isRoot ? '#assets-and-sprites' : guideUrl('assets-and-sprites')}>Sprites</a>
-        <a href={isRoot ? '#ci-cd-pipeline' : guideUrl('ci-cd-pipeline')}>Deploy</a>
-        <a href="https://github.com/jonathanperis/speedy-bird-lynx" target="_blank" rel="noopener noreferrer">GitHub</a>
-      </nav>
+      <article class="doc-section prose" set:html={doc.html} />
 
-      {renderedSections.map(({ slug, html }) => (
-        <section id={slug} class="doc-section" set:html={html} />
-      ))}
+      <nav class="pager" aria-label="Previous and next guide">
+        {previous && (
+          <a class="pager-previous" href={guideUrl(previous)}>
+            <span>Previous</span>
+            {ARTICLE_NUMBERS[previous] ? `${ARTICLE_NUMBERS[previous]} ` : ''}{PAGE_META[previous].title}
+          </a>
+        )}
+        {next && (
+          <a class="pager-next" href={guideUrl(next)}>
+            <span>Next</span>
+            {ARTICLE_NUMBERS[next]} {PAGE_META[next].title}
+          </a>
+        )}
+      </nav>
     </main>
+
+    {doc.headings.length > 1 && (
+      <nav class="on-page" aria-label="On this page">
+        <p class="on-page-title">On this page</p>
+        <ol>
+          {doc.headings.map((heading) => <li><a href={`#${heading.id}`}>{heading.text}</a></li>)}
+        </ol>
+      </nav>
+    )}
   </div>
 
-  <script is:inline define:vars={{ isRoot }}>
-    const menuToggle = document.getElementById('menuToggle');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-    const contentWrapper = document.querySelector('.content-wrapper');
-    const mobile = window.matchMedia('(max-width: 768px)');
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const navItems = document.querySelectorAll('.nav-item');
-    const sections = document.querySelectorAll('section.doc-section');
-    const isOpen = () => sidebar.classList.contains('open');
+  <SiteFooter />
 
-    // On small screens the sidebar is an off-canvas drawer. While closed it is removed from the
-    // tab order and the accessibility tree; while open, the page behind it is inert.
-    const sync = () => {
-      const open = isOpen();
-      sidebar.inert = mobile.matches && !open;
-      contentWrapper.inert = mobile.matches && open;
-      menuToggle.setAttribute('aria-expanded', String(open));
-      menuToggle.setAttribute('aria-label', open ? 'Close manual navigation' : 'Open manual navigation');
+  <script type="application/json" id="search-index" set:html={JSON.stringify(searchIndex).replace(/</g, '\\u003c')} />
+  <script>
+    interface Entry {
+      title: string;
+      number: string;
+      url: string;
+      headings: { id: string; text: string }[];
+      text: string;
+    }
+
+    // Collapse the contents on narrow screens; keep them open on wide ones.
+    const details = document.querySelector<HTMLDetailsElement>('.toc-details');
+    const wide = window.matchMedia('(min-width: 980px)');
+    const syncDetails = () => {
+      if (details) details.open = wide.matches;
     };
-    const setOpen = (open, restoreFocus) => {
-      sidebar.classList.toggle('open', open);
-      overlay.classList.toggle('open', open);
-      sync();
-      if (open) {
-        const target = sidebar.querySelector('[aria-current="page"]') ?? sidebar.querySelector('input:not([hidden]), .nav-item');
-        target?.focus();
-      } else if (restoreFocus) {
-        menuToggle.focus();
+    syncDetails();
+    wide.addEventListener('change', syncDetails);
+
+    // Search: matches page titles, headings, and text from an index built with the site.
+    const input = document.getElementById('manual-search') as HTMLInputElement | null;
+    const results = document.getElementById('search-results');
+    const entries = JSON.parse(document.getElementById('search-index')?.textContent ?? '[]') as Entry[];
+    const show = (query: string) => {
+      if (!results) return;
+      results.replaceChildren();
+      const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+      results.hidden = terms.length === 0;
+      if (!terms.length) return;
+      const matches: { label: string; url: string }[] = [];
+      for (const entry of entries) {
+        const has = (value: string) => terms.every((term) => value.toLowerCase().includes(term));
+        if (!terms.every((term) => entry.text.includes(term) || entry.title.toLowerCase().includes(term))) continue;
+        const heading = entry.headings.find((item) => has(item.text));
+        const prefix = entry.number ? `${entry.number} ` : '';
+        matches.push(
+          heading
+            ? { label: `${prefix}${entry.title} › ${heading.text}`, url: `${entry.url}#${heading.id}` }
+            : { label: `${prefix}${entry.title}`, url: entry.url },
+        );
+      }
+      if (!matches.length) {
+        const empty = document.createElement('li');
+        empty.className = 'search-empty';
+        empty.textContent = 'No matches. Try another word.';
+        results.append(empty);
+        return;
+      }
+      for (const match of matches.slice(0, 8)) {
+        const item = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = match.url;
+        link.textContent = match.label;
+        item.append(link);
+        results.append(item);
       }
     };
-    menuToggle.addEventListener('click', () => setOpen(!isOpen(), false));
-    overlay.addEventListener('click', () => setOpen(false, true));
-    document.addEventListener('keydown', (event) => {
-      if (event.key !== 'Escape' || !isOpen()) return;
-      event.preventDefault();
-      setOpen(false, true);
+    input?.addEventListener('input', () => show(input.value));
+    input?.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        input.value = '';
+        show('');
+      }
     });
-    mobile.addEventListener('change', () => (isOpen() && !mobile.matches ? setOpen(false, false) : sync()));
-    sync();
+    // "/" focuses the search, unless the visitor is already typing somewhere.
+    document.addEventListener('keydown', (event) => {
+      const target = event.target as HTMLElement;
+      if (event.key !== '/' || event.metaKey || event.ctrlKey || event.altKey) return;
+      if (target.closest('input, textarea, select, [contenteditable="true"]')) return;
+      event.preventDefault();
+      if (details) details.open = true;
+      input?.focus();
+    });
 
-    if (isRoot) {
-      // Scrollspy: highlight the section in view.
-      const observer = new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          for (const item of navItems) {
-            const current = item.dataset.navId === entry.target.id;
-            item.classList.toggle('active', current);
-            if (current) {
-              item.setAttribute('aria-current', 'location');
-              item.scrollIntoView({ behavior: reducedMotion.matches ? 'auto' : 'smooth', block: 'nearest' });
-            } else {
-              item.removeAttribute('aria-current');
-            }
-          }
+    // Copy buttons on code blocks.
+    for (const pre of document.querySelectorAll<HTMLPreElement>('.prose pre')) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'copy';
+      button.textContent = 'Copy';
+      button.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(pre.innerText);
+          button.textContent = 'Copied';
+        } catch {
+          button.textContent = 'Copy failed';
         }
-      }, { rootMargin: '-80px 0px -60% 0px', threshold: 0 });
-      sections.forEach((section) => observer.observe(section));
-      navItems.forEach((item) => item.addEventListener('click', () => {
-        if (mobile.matches) setOpen(false, false);
-      }));
-
-      // Search filters the combined manual's sections and their sidebar entries.
-      const searchInput = document.getElementById('searchInput');
-      searchInput?.addEventListener('input', () => {
-        const query = searchInput.value.trim().toLowerCase();
-        for (const section of sections) {
-          const match = !query || section.textContent.toLowerCase().includes(query);
-          section.classList.toggle('hidden-section', !match);
-          const item = document.querySelector(`.nav-item[data-nav-id="${section.id}"]`);
-          if (item) item.parentElement.style.display = match ? '' : 'none';
-        }
-        for (const group of document.querySelectorAll('.sidebar-category-group')) {
-          const visible = [...group.querySelectorAll('.nav-item')].some((item) => item.parentElement.style.display !== 'none');
-          group.style.display = visible ? '' : 'none';
-        }
+        window.setTimeout(() => (button.textContent = 'Copy'), 1600);
       });
+      const frame = document.createElement('div');
+      frame.className = 'code-frame';
+      pre.replaceWith(frame);
+      frame.append(button, pre);
+      pre.tabIndex = 0;
     }
   </script>
 </BaseLayout>

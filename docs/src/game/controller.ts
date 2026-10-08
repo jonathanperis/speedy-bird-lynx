@@ -31,6 +31,14 @@ export interface DemoElements {
   status: HTMLElement;
   /** Base URL of the copied game assets, ending in a slash. */
   assetsUrl: URL;
+  /** Called after every render with the snapshot on screen (drives the timing panel). */
+  onFrame?: (frame: DemoFrame) => void;
+}
+
+export interface DemoFrame {
+  game: GameSnapshot;
+  started: boolean;
+  paused: boolean;
 }
 
 function readStorage(key: string): string | null {
@@ -56,7 +64,7 @@ function randomSeed(): number {
   return Date.now();
 }
 
-export function mountDemo({ root, canvas, startButton, muteButton, status, assetsUrl }: DemoElements) {
+export function mountDemo({ root, canvas, startButton, muteButton, status, assetsUrl, onFrame }: DemoElements) {
   const renderer = createRenderer(canvas);
   const audio = createAudio(assetsUrl);
 
@@ -83,7 +91,11 @@ export function mountDemo({ root, canvas, startButton, muteButton, status, asset
   });
 
   // Until the sprites arrive (or the start timeout passes), show plain sky rather than fallbacks.
-  const render = () => (spritesSettled || started ? renderer.draw(game, paused) : renderer.clear());
+  const render = () => {
+    if (spritesSettled || started) renderer.draw(game, paused);
+    else renderer.clear();
+    onFrame?.({ game, started, paused });
+  };
 
   const announce = (message: string) => {
     // Clear first so repeating the same message is announced again.

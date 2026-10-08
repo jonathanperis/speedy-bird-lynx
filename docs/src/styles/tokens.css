@@ -1,18 +1,31 @@
-/* Design tokens shared by the landing page and the manual (see DESIGN.md). */
+/*
+ * Design tokens for the site and the manual (DESIGN.md › Palette). Every color is sampled
+ * from the game's sprites in assets/sprites/. Measured contrast: ink on paper 9.7:1, on cloud
+ * 9.6:1, on sand 7.1:1, on gold 5.9:1, on sky 4.4:1 (large text only). pipe and flag never
+ * carry body text; grass is decoration only.
+ */
 :root {
-  --sky-deep: #04111e;
-  --sky-mid: #0a2a4a;
-  --sky-surface: #0d1e3a;
-  --sky-dawn: #0d4a7a;
-  --arcade-gold: #ffd166;
-  --speed-orange: #ff6b35;
-  --pipe-green: #2d6a4f;
-  --pipe-highlight: #4a9e6f;
-  --text-bright: #e8f8ff;
-  --text-body: #c8e8ff;
-  --text-dim: #6ba8c8;
-  --panel-blue: #0a1e3c;
-  --stroke-dark: #07131f;
-  --shadow-press: 0 4px 0 var(--stroke-dark);
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ink: #533847; /* outline of every sprite */
+  --ink-soft: #6e5462;
+  --paper: #fbf8e8; /* ground sand, lightened */
+  --sheet: #fffdf3;
+  --sand: #ded895; /* ground strip, game-over panel */
+  --sky: #00bbc4; /* the game's BG_COLOR */
+  --cloud: #eafcdb;
+  --grass: #73bf2e;
+  --pipe: #557f22;
+  --gold: #fcb700; /* "Get Ready" / "Game Over" titles */
+  --flag: #ff290c;
+  --rule: rgb(83 56 71 / 0.22);
+  --rule-strong: var(--ink);
+
+  --font-head: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --font-body: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --measure: 68ch;
+  --gutter: clamp(1rem, 4vw, 2rem);
+  --page: 1180px;
+  --border: 2px solid var(--ink);
+  --shadow: 3px 3px 0 var(--ink);
 }

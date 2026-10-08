@@ -1,0 +1,75 @@
+---
+// Top bar shared by the home page and the manual.
+interface Props {
+  /** Which top-level section is current. */
+  current?: 'home' | 'manual';
+}
+
+const { current = 'home' } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const home = `${base}/`;
+---
+
+<header class="site-header">
+  <a class="wordmark" href={home} aria-label="Speedy Bird, home">
+    <img class="sprite" src={`${base}/assets/sprites/bird-1.png`} width="34" height="24" alt="" />
+    <span>Speedy Bird</span>
+  </a>
+  <nav aria-label="Site">
+    <ul>
+      <li><a href={`${home}#play`}>Play</a></li>
+      <li class="hide-narrow"><a href={`${home}#how-it-works`}>How it works</a></li>
+      <li><a href={`${base}/docs/`} aria-current={current === 'manual' ? 'page' : undefined}>Manual</a></li>
+      <li><a href="https://github.com/jonathanperis/speedy-bird-lynx">Source</a></li>
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem var(--gutter);
+    background: var(--paper);
+    border-bottom: var(--border);
+  }
+
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font: 700 1.6rem/1 var(--font-head);
+    text-decoration: none;
+  }
+
+  .wordmark img {
+    width: 34px;
+    height: 24px;
+  }
+
+  nav ul {
+    display: flex;
+    gap: clamp(0.9rem, 2.5vw, 1.75rem);
+    padding: 0;
+    list-style: none;
+    font: 600 1.15rem/1 var(--font-head);
+  }
+
+  nav a[aria-current='page'] {
+    text-decoration-thickness: 4px;
+  }
+
+  @media (max-width: 560px) {
+    .wordmark {
+      font-size: 1.35rem;
+    }
+
+    .hide-narrow {
+      display: none;
+    }
+  }
+</style>

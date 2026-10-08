@@ -103,33 +103,27 @@ import { GA_ID as gaId } from '../lib/analytics';
     right: max(1rem, env(safe-area-inset-right));
     bottom: max(1rem, env(safe-area-inset-bottom));
     z-index: 200;
-    width: min(24rem, calc(100vw - 2rem));
-    padding: 1rem 1.1rem;
-    color: var(--text-bright);
-    background: var(--panel-blue);
-    border: 2px solid var(--arcade-gold);
-    border-radius: 4px;
-    box-shadow: var(--shadow-press), 0 18px 40px rgba(4, 17, 30, 0.45);
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    text-align: left;
+    width: min(23rem, calc(100vw - 2rem));
+    padding: 1rem 1.1rem 1.1rem;
+    color: var(--ink);
+    background: var(--sheet);
+    border: var(--border);
+    box-shadow: var(--shadow);
+    font-family: var(--font-body);
   }
 
-  .consent[hidden] { display: none; }
+  .consent[hidden] {
+    display: none;
+  }
 
   .consent-title {
-    margin: 0 0 0.35rem;
-    color: var(--arcade-gold);
-    font-family: 'Nunito', system-ui, sans-serif;
-    font-size: 0.78rem;
-    font-weight: 900;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    margin: 0 0 0.3rem;
+    font: 700 1.25rem/1.1 var(--font-head);
   }
 
   .consent-text {
     margin: 0 0 0.9rem;
-    color: var(--text-bright);
-    font-size: 0.92rem;
+    font-size: 0.95rem;
     line-height: 1.5;
   }
 
@@ -140,24 +134,16 @@ import { GA_ID as gaId } from '../lib/analytics';
   }
 
   .consent-actions button {
-    min-height: 40px;
-    padding: 0.55rem 1rem;
-    border: 2px solid var(--stroke-dark);
-    border-radius: 4px;
-    box-shadow: var(--shadow-press);
-    font-family: 'Nunito', system-ui, sans-serif;
-    font-size: 0.82rem;
-    font-weight: 900;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+    color: var(--ink);
+    background: var(--sheet);
+    border: var(--border);
+    font: 700 1.15rem/1 var(--font-head);
     cursor: pointer;
   }
 
-  .consent-actions .consent-accept { color: var(--stroke-dark); background: var(--arcade-gold); }
-  .consent-actions .consent-decline { color: var(--text-bright); background: var(--stroke-dark); border-color: var(--pipe-highlight); }
-
-  .consent-actions button:focus-visible {
-    outline: 3px solid rgba(255, 209, 102, 0.9);
-    outline-offset: 3px;
+  .consent-actions .consent-accept {
+    background: var(--gold);
   }
 </style>
