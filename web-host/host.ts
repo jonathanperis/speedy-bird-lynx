@@ -38,7 +38,10 @@ export interface HostOptions {
 export interface Host {
   /** Same as tapping the game. */
   tap(): void;
-  /** Pause a run in progress and stop sounds. */
+  /**
+   * Pause a run in progress and stop sounds, for example while the page has scrolled the game
+   * away. Showing the tab again does not undo it; only `resume()` does.
+   */
   pause(): void;
   /** Let the ready and game-over screens animate again; a paused run waits for a tap. */
   resume(): void;
@@ -193,17 +196,25 @@ export function mountSpeedyBird(view: LynxViewElement, options: HostOptions): Ho
   };
   view.url = options.bundleUrl ?? new URL('main.web.bundle', baseUrl).href;
 
+  const pauseView = () => {
+    audio.stop();
+    view.sendGlobalEvent('SpeedyBirdPause', []);
+  };
+  const resumeView = () => view.sendGlobalEvent('SpeedyBirdResume', []);
+  let pausedByPage = false;
+
   const host: Host = {
     tap() {
       audio.unlock();
       view.sendGlobalEvent('SpeedyBirdTap', []);
     },
     pause() {
-      audio.stop();
-      view.sendGlobalEvent('SpeedyBirdPause', []);
+      pausedByPage = true;
+      pauseView();
     },
     resume() {
-      view.sendGlobalEvent('SpeedyBirdResume', []);
+      pausedByPage = false;
+      if (!document.hidden) resumeView();
     },
     get muted() {
       return audio.muted;
@@ -224,8 +235,8 @@ export function mountSpeedyBird(view: LynxViewElement, options: HostOptions): Ho
   view.addEventListener('pointerdown', () => audio.unlock());
 
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) host.pause();
-    else host.resume();
+    if (document.hidden) pauseView();
+    else if (!pausedByPage) resumeView();
   });
   window.addEventListener('pagehide', () => audio.stop());
 
