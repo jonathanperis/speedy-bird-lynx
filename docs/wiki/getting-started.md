@@ -1,4 +1,6 @@
-# Getting Started
+# Getting started
+
+This page takes you from a fresh clone to the game running in the dev server, the website, and the native apps.
 
 ## Prerequisites
 
@@ -7,9 +9,9 @@
 - **Java 21**, Android SDK **Platform 37.2**, and current Android command-line tools (minimum supported device API remains 21)
 - **Xcode**, **Ruby >=3.2**, and Bundler (for iOS)
 
-See [Dependencies and Upgrades](dependency-updates.md) for exact versions and compatibility holds.
+See [Dependencies and upgrades](dependency-updates.md) for exact versions and compatibility holds.
 
-## Quick Start
+## Quick start
 
 ```bash
 git clone https://github.com/jonathanperis/speedy-bird-lynx.git
@@ -25,7 +27,7 @@ This starts the Rspeedy dev server with hot module replacement. The game is acce
 
 To view on a mobile device, open the Lynx bundle URL in [Lynx Explorer](https://github.com/lynx-family/lynx) or [Lynx Go](https://apps.apple.com/us/app/lynx-go-dev-explorer/id6743227790) (replace `localhost` with your machine's IP).
 
-## Building for Production
+## Building for production
 
 ```bash
 bun run build
@@ -45,7 +47,7 @@ cd android && ./gradlew assembleDebug
 
 The APK is at `android/app/build/outputs/apk/debug/app-debug.apk`. Gradle stages the current root bundle and sound effects into generated assets; no manual copy is needed. Install via `adb install` or transfer to your device. Run `./gradlew lintDebug` for Android API checks, or `./gradlew assembleRelease` for a release APK.
 
-For release builds with signing, see [CI/CD Pipeline](ci-cd-pipeline.md).
+For release builds with signing, see [CI/CD pipeline](ci-cd-pipeline.md).
 
 ## iOS
 
@@ -57,7 +59,7 @@ bundle exec pod install
 open SpeedyBird.xcworkspace
 ```
 
-Pick a simulator or device and run. The project packages the current `dist/main.lynx.bundle` and the sounds directly; no copy step is needed. Running on a device requires selecting your own signing team in Xcode; CI always builds unsigned. See [Native Host Apps](native-host-apps.md) for the UI tests and project generator.
+Pick a simulator or device and run. The project packages the current `dist/main.lynx.bundle` and the sounds directly; no copy step is needed. Running on a device requires selecting your own signing team in Xcode; CI always builds unsigned. See [Native host apps](native-host-apps.md) for the UI tests and project generator.
 
 ## Web / GitHub Pages
 
@@ -79,7 +81,7 @@ npm run preview
 
 The static output is written to `docs/out/`. Development, preview, and production all serve `/speedy-bird-lynx/` and `/speedy-bird-lynx/docs/` (set `SITE_BASE` to change the base). The shared Pages workflow deploys that production output. Content authoring and asset maintenance are documented in `docs/README.md`.
 
-## Web Surfaces
+## Web surfaces
 
 | Surface | How to use it | Notes |
 |---------|---------------|-------|
@@ -89,7 +91,7 @@ The static output is written to `docs/out/`. Development, preview, and productio
 
 In development the host needs two terminals; both servers configure cross-origin isolation headers. Pass `?bundle=<url>` to load a bundle from elsewhere. For a self-contained build, run `bun run build` and then `bun run build:web-host`: `dist-web-host/` then contains the host, `main.web.bundle`, the audio, and the bridge module, and `bunx rsbuild preview --config rsbuild.web-host.config.ts` serves it with the required headers.
 
-## Project Commands
+## Project commands
 
 | Command | Description |
 |---------|-------------|

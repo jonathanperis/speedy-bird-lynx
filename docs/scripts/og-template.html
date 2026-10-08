@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: 'Barlow Condensed'; font-weight: 700; src: url('../node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-700-normal.woff2'); }
+  @font-face { font-family: 'Barlow Condensed'; font-weight: 600; src: url('../node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-600-normal.woff2'); }
+  @font-face { font-family: 'Atkinson Hyperlegible Next'; font-weight: 400; src: url('../node_modules/@fontsource/atkinson-hyperlegible-next/files/atkinson-hyperlegible-next-latin-400-normal.woff2'); }
+  * { box-sizing: border-box; margin: 0; }
+  body { width: 1200px; height: 630px; display: grid; grid-template-columns: 560px 1fr; background: #fbf8e8; color: #533847; font-family: 'Atkinson Hyperlegible Next', sans-serif; }
+  .scene { position: relative; overflow: hidden; background: #00bbc4; border-right: 4px solid #533847; image-rendering: pixelated; }
+  .bg { position: absolute; left: 0; right: 0; bottom: 120px; height: 228px; background: url('../public/assets/sprites/background.png') repeat-x 0 0 / 276px 228px; }
+  .ground { position: absolute; left: 0; right: 0; bottom: 0; height: 129px; background: url('../public/assets/sprites/ground.png') repeat-x 0 0 / 224px 129px; z-index: 3; border-top: 0; }
+  .pipe { position: absolute; width: 74px; background-repeat: repeat-y; background-size: 74px 71px; z-index: 1; }
+  .mouth { position: absolute; left: 0; width: 74px; height: 71px; }
+  .p1 { left: 300px; }
+  .p1.top { top: 0; height: 190px; background-image: url('../public/assets/sprites/pipes/pipe-top.png'); }
+  .p1.top .mouth { bottom: 0; }
+  .p1.bottom { top: 400px; bottom: 0; background-image: url('../public/assets/sprites/pipes/pipe-bottom.png'); }
+  .p1.bottom .mouth { top: 0; }
+  .bird { position: absolute; left: 150px; top: 270px; width: 68px; height: 48px; transform: rotate(-15deg); z-index: 2; }
+  .score { position: absolute; top: 46px; left: 130px; display: flex; gap: 4px; z-index: 4; }
+  .score img { width: 36px; height: 54px; }
+  .text { padding: 70px 64px 56px 60px; display: flex; flex-direction: column; }
+  h1 { font: 700 128px/0.9 'Barlow Condensed', sans-serif; letter-spacing: -0.01em; }
+  .pitch { margin-top: 28px; padding: 20px 24px; font-size: 34px; line-height: 1.32; background: #eafcdb; border: 4px solid #533847; }
+  .meta { margin-top: auto; display: flex; justify-content: space-between; align-items: baseline; padding-top: 18px; border-top: 4px solid #533847; font: 600 30px/1 'Barlow Condensed', sans-serif; }
+  .meta span:last-child { font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="scene">
+    <div class="bg"></div>
+    <div class="pipe p1 top"><img class="mouth" src="../public/assets/sprites/pipes/pipe-top-mouth.png" alt=""></div>
+    <div class="pipe p1 bottom"><img class="mouth" src="../public/assets/sprites/pipes/pipe-bottom-mouth.png" alt=""></div>
+    <img class="bird" src="../public/assets/sprites/bird-0.png" alt="">
+    <div class="score"><img src="../public/assets/sprites/digits/digit-4.png" alt=""><img src="../public/assets/sprites/digits/digit-2.png" alt=""></div>
+    <div class="ground"></div>
+  </div>
+  <div class="text">
+    <h1>Speedy Bird</h1>
+    <p class="pitch">Flappy Bird where every pipe you clear makes the game 1% faster.</p>
+    <p class="meta"><span>ReactLynx · Android · iOS · Web</span><span>Open source</span></p>
+  </div>
+</body>
+</html>
