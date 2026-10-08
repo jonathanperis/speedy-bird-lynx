@@ -1,8 +1,8 @@
-# Game Engine
+# Game engine
 
-The rules live in `src/game/engine.ts`: a pure, deterministic module with no timers, rendering, storage, audio, or framework APIs. `src/hooks/useGame.ts` runs it on Lynx's main thread, renders each frame there, and sends only discrete changes (state, score, sounds) to React on the background thread. The landing-page Canvas demo imports the same module (see [Web Rendering Surfaces](architecture.md#web-rendering-surfaces)), so both play identically. The engine is covered by unit tests in `tests/engine.test.ts`.
+The rules live in `src/game/engine.ts`: a pure, deterministic module with no timers, rendering, storage, audio, or framework APIs. `src/hooks/useGame.ts` runs it on Lynx's main thread, renders each frame there, and sends only discrete changes (state, score, sounds) to React on the background thread. The landing-page Canvas demo imports the same module (see [Web rendering surfaces](architecture.md#web-rendering-surfaces)), so both play identically. The engine is covered by unit tests in `tests/engine.test.ts`.
 
-## State Machine
+## State machine
 
 ```
 STATE_READY (0) ──tap──> STATE_PLAY (1) ──collision──> STATE_OVER (2)
@@ -29,7 +29,7 @@ The restart delay stops a frantic final tap from skipping the results panel. Onc
 | `fitViewport(width, height)` | Scale and offset that fit the 400x750 playfield on a screen. |
 | `collidesWithPipe`, `medalForScore`, `tiltForVelocity`, `speedMultiplier`, `spawnInterval` | Rule helpers shared with tests and renderers. |
 
-## Frame Loop
+## Frame loop
 
 The loop runs on the Lynx main thread with `lynx.requestAnimationFrame`, so it follows the display's refresh. Each frame:
 
@@ -56,13 +56,13 @@ Values are per fixed step (1/60 s).
 
 The ceiling stops upward motion (velocity is clamped to zero) instead of pinning the bird to the top edge.
 
-## Bird Rotation and Animation
+## Bird rotation and animation
 
 Tilt follows vertical velocity: `clamp((velocity - 2) * 7, -15°, 70°)`. The bird points up while rising, levels off at a velocity of 2, and gradually dives as it falls. In a steep dive (velocity >= 9.25) the wings stop flapping (frame 1). On landing the bird shows frame 2 at the full 70° dive.
 
 The wing cycle is `bird-0, bird-1, bird-2, bird-1`. All four frames stay mounted and only their opacity changes, so a frame change never waits for an image decode.
 
-## Collision Detection
+## Collision detection
 
 The bird's circular hitbox is approximated by its bounding square:
 
@@ -83,7 +83,7 @@ The ground ends a run when `birdY + BIRD_H / 2 >= CANVAS_HEIGHT - GROUND_H`.
 - **Gap size**: 150 px
 - **Rendering**: five reusable pipe slots. Pipe ids are sequential and at most three pipes are alive, so `id % 5` never collides. Off-screen slots are hidden with `display: none`.
 
-## Scoring and Medals
+## Scoring and medals
 
 A point is scored as soon as the bird's trailing edge clears a pipe (`pipe.x + 55 < 68`), exactly once per pipe. The best score is saved through the host bridge, so it persists across launches where the host implements storage.
 
@@ -96,7 +96,7 @@ A point is scored as soon as the bird's trailing edge clears a pipe (`pipe.x + 5
 
 The game-over panel marks a new best score with "NEW".
 
-## Audio and Host Bridge
+## Audio and host bridge
 
 The engine emits sound events; the background thread forwards them to the host's `SpeedyBirdModule` native module (`src/platform/host.ts`):
 
@@ -115,9 +115,9 @@ The engine emits sound events; the background thread forwards them to the host's
 | Landing / ground hit | `sfx_die.wav` |
 | Restart | `sfx_swooshing.wav` |
 
-A pipe hit plays the hit sound, then the landing sound when the bird reaches the ground. Hosts without the module, such as Lynx Explorer, still run the game silently and without saved scores. The standalone web host implements the module with the Web Audio API and `localStorage`; see [Native Host Apps](native-host-apps.md) for the platform hosts.
+A pipe hit plays the hit sound, then the landing sound when the bird reaches the ground. Hosts without the module, such as Lynx Explorer, still run the game silently and without saved scores. The standalone web host implements the module with the Web Audio API and `localStorage`; see [Native host apps](native-host-apps.md) for the platform hosts.
 
-## Host Events
+## Host events
 
 Hosts send these through Lynx's `GlobalEventEmitter`:
 

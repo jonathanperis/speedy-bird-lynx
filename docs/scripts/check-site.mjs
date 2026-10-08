@@ -117,8 +117,13 @@ for (const file of await filesIn(output, '.html')) {
     }
   });
 
-  if (canonical.length !== 1 || canonical[0] !== url.href) errors.push(`${relative}: canonical must be ${url.href}`);
-  if (ogUrls.length !== 1 || ogUrls[0] !== url.href) errors.push(`${relative}: og:url must be ${url.href}`);
+  // The 404 page is served for any missing URL, so it has no canonical address and is noindex.
+  if (relative === '404.html') {
+    if (canonical.length || ogUrls.length) errors.push(`${relative}: must not declare a canonical or og:url`);
+  } else {
+    if (canonical.length !== 1 || canonical[0] !== url.href) errors.push(`${relative}: canonical must be ${url.href}`);
+    if (ogUrls.length !== 1 || ogUrls[0] !== url.href) errors.push(`${relative}: og:url must be ${url.href}`);
+  }
   pages.set(file, { relative, url, ids, links, assetRefs });
 }
 

@@ -1,6 +1,8 @@
 # Architecture
 
-## Project Structure
+This page maps the repository: where each part lives, how the components nest, and what runs on each of Lynx's two threads.
+
+## Project structure
 
 ```
 speedy-bird-lynx/
@@ -39,7 +41,7 @@ speedy-bird-lynx/
 └── tsconfig.json                 # TypeScript configuration
 ```
 
-## Component Hierarchy
+## Component hierarchy
 
 ```
 App (root view: main-thread tap handler, layout listener, accessibility label)
@@ -56,7 +58,7 @@ App (root view: main-thread tap handler, layout listener, accessibility label)
 
 The playfield keeps its 400x750 aspect ratio. On tall phones it fills the width and the extra height above it shows more sky; pipes extend into it. On wide screens it fills the height and dark side panels cover the area outside it, so pipes never pop in at the edge.
 
-## Dual-Threaded Model
+## Dual-threaded model
 
 Lynx runs app code on two threads. This game uses each for what it is good at:
 
@@ -67,7 +69,7 @@ Lynx runs app code on two threads. This game uses each for what it is good at:
 
 The engine module is imported with `with { runtime: 'shared' }` so the same code runs on the main thread. Animated elements have static React props; only the main thread changes their styles, so React never overwrites a frame. Each frame costs no React render and no cross-thread message unless the state, score, or pause flag changes or a sound plays. The loop stops while the game is idle or paused.
 
-## Rendering Approach
+## Rendering approach
 
 Visuals use built-in elements only:
 
@@ -83,9 +85,9 @@ Visuals use built-in elements only:
 - `tests/preferences.test.ts` — saved-score parsing and screen-reader text
 - `tests/app.test.tsx` — the real App with a stubbed frame scheduler and host bridge: taps, sounds, game over with a saved best score, pause and resume
 
-Tests need Node.js (jsdom does not run on Bun).
+> **Note:** The tests need Node.js: jsdom, which the Lynx testing environment builds on, does not run on Bun. If `node` on your `PATH` is Bun's shim, the test config stops with a clear error.
 
-## Web Rendering Surfaces
+## Web rendering surfaces
 
 | Surface | Source | Purpose |
 |---------|--------|---------|

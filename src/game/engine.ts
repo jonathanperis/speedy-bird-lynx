@@ -131,6 +131,7 @@ export function tiltForVelocity(velocity: number): number {
   return Math.max(ROTATION_UP, Math.min(ROTATION_DOWN, angle));
 }
 
+// #region collision
 /** Circular bird hitbox, approximated by its bounding square, against both pipe bodies. */
 export function collidesWithPipe(birdY: number, pipe: PipeData): boolean {
   const overlapsX = BIRD_X - BIRD_RADIUS < pipe.x + PIPE_W && BIRD_X + BIRD_RADIUS > pipe.x;
@@ -139,6 +140,7 @@ export function collidesWithPipe(birdY: number, pipe: PipeData): boolean {
   const gapBottom = gapTop + PIPE_GAP;
   return birdY - BIRD_RADIUS < gapTop || birdY + BIRD_RADIUS > gapBottom;
 }
+// #endregion collision
 
 export function medalForScore(score: number): Medal | null {
   if (score >= MEDAL_PLATINUM) return 'platinum';

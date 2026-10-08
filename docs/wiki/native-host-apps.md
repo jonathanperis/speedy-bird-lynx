@@ -1,12 +1,12 @@
-# Native Host Apps
+# Native host apps
 
-Lynx bundles do not run standalone. They need a thin native shell that embeds the Lynx runtime, loads the bundle, and supplies native modules. This project includes complete Android and iOS hosts. Both register the `SpeedyBirdModule` bridge (sound, saved best score, screen-reader announcements) and forward app lifecycle events to the game (see [Game Engine](game-engine.md#audio-and-host-bridge)).
+Lynx bundles do not run standalone. They need a thin native shell that embeds the Lynx runtime, loads the bundle, and supplies native modules. This project includes complete Android and iOS hosts. Both register the `SpeedyBirdModule` bridge (sound, saved best score, screen-reader announcements) and forward app lifecycle events to the game (see [Game engine](game-engine.md#audio-and-host-bridge)).
 
 ## Android
 
 The Android host is a small Kotlin app in `android/`.
 
-### Key Files
+### Key files
 
 | File | Purpose |
 |------|---------|
@@ -19,7 +19,7 @@ The Android host is a small Kotlin app in `android/`.
 | `app/build.gradle.kts` | Generated assets (bundle + sounds), R8 with resource shrinking, signing from environment variables |
 | `proguard-rules.pro` | Keep rules for Lynx SDK classes and `@LynxMethod` module methods |
 
-### Lifecycle and Display
+### Lifecycle and display
 
 - **Pause/resume:** `onPause` sends `SpeedyBirdPause` and `onResume` sends `SpeedyBirdResume`; Lynx is suspended only in `onStop` (`onEnterBackground()`) and resumed in `onStart`, so the pause is always handled first. A run in progress shows "PAUSED" and resumes on the next tap. `onDestroy` destroys the `LynxView`, which releases the module's `SoundPool`.
 - **Configuration changes:** the activity handles size, density, UI mode, keyboard, and locale changes itself, so folding, multi-window, or a dark-mode switch never restarts a run.
@@ -39,6 +39,8 @@ The Android host is a small Kotlin app in `android/`.
 | `com.google.code.gson:gson` | 2.14.0 | JSON (required by Lynx internals) |
 
 The app does not request `INTERNET` and does not include the Lynx HTTP service or OkHttp: sprites are embedded in the bundle and sounds are packaged assets. Animated GIF/WebP decoders are omitted because the game shows only static PNGs.
+
+> **Verified:** On an Android 12 (API 31) emulator: the app launches, plays a full round to game over, loads a saved best score through `SpeedyBirdModule`, and pauses when sent home or when the notification shade takes focus. On an iPhone 15 Pro simulator (Xcode 27) and in CI (Xcode 16.4), the XCUITest smoke tests pass.
 
 ### Build
 
@@ -64,7 +66,7 @@ The build runs on JDK 21 and compiles the app's own classes to Java 11 bytecode.
 
 CI populates these from GitHub Secrets. For local release builds, export the same variables before running Gradle.
 
-### Android Artifacts
+### Android artifacts
 
 | Build path | Command/workflow | Output | Signing |
 |------------|------------------|--------|---------|
@@ -77,7 +79,7 @@ CI populates these from GitHub Secrets. For local release builds, export the sam
 
 The iOS host is in `ios/`, with a generated Xcode project and a committed `Podfile.lock`.
 
-### Included Files
+### Included files
 
 | File | Purpose |
 |------|---------|
@@ -96,7 +98,7 @@ The iOS host is in `ios/`, with a generated Xcode project and a committed `Podfi
 
 The app bundles `../dist/main.lynx.bundle` and the `../assets/audio` folder directly, so every build packages the current `bun run build` output and the canonical sounds. iPhone runs in portrait; iPad supports every orientation and window size (Split View, Stage Manager) because the game letterboxes itself. The status bar is hidden, the home indicator auto-hides, and taps near the bottom edge reach the game first.
 
-### Build and Run
+### Build and run
 
 ```bash
 bun run build
@@ -110,7 +112,7 @@ xcodebuild test -workspace SpeedyBird.xcworkspace -scheme SpeedyBird \
 
 `xcodebuild test` builds the app and runs the UI smoke tests: start a run, crash, check the restart lock, and survive backgrounding. XCUITest waits for the app to go idle after each tap and a run animates every frame, so it cannot press Home mid-run; mid-run pausing is covered by the App component tests (host pause event and the stall safeguard). To change the project structure (new files or targets), edit `scripts/generate-ios-project.rb`, then run `bundle exec ruby ../scripts/generate-ios-project.rb && bundle exec pod install` from `ios/`.
 
-The Podfile uses both CocoaPods trunk and the official `lynx-family/Specs` repository. Its image-library versions are exact upstream requirements. It raises pod deployment targets to iOS 15 to match Xcode's supported range and uses a native resource-copy phase so user script sandboxing stays enabled. See [Dependencies and Upgrades](dependency-updates.md) for the scoped upstream compiler adjustments.
+The Podfile uses both CocoaPods trunk and the official `lynx-family/Specs` repository. Its image-library versions are exact upstream requirements. It raises pod deployment targets to iOS 15 to match Xcode's supported range and uses a native resource-copy phase so user script sandboxing stays enabled. See [Dependencies and upgrades](dependency-updates.md) for the scoped upstream compiler adjustments.
 
 ### Apple Developer Program
 
