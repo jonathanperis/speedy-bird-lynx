@@ -184,6 +184,7 @@ export function useGame() {
       void runOnBackground(onGameEvent)(next, sounds);
     };
 
+    // #region frame-loop
     const frame = () => {
       handle = 0;
       if (paused) return;
@@ -207,6 +208,7 @@ export function useGame() {
       // Stop the loop once nothing can change until the next tap.
       if (!isIdle(game)) handle = requestFrame(frame);
     };
+    // #endregion frame-loop
 
     const wake = () => {
       if (handle || paused) return;

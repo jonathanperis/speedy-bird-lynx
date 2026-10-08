@@ -1,37 +1,65 @@
 ---
-import Analytics from '../components/Analytics.astro';
-import { GA_ID } from '../lib/analytics';
-import { jsonLd } from '../lib/json-ld';
+import { Code } from 'astro:components';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { BRIDGE_ROWS, HOST_LINKS } from '../lib/bridge';
+import { paperTheme } from '../lib/code-theme.mjs';
+import { PAGE_META, SECTION_CATEGORIES } from '../lib/docs-sidebar.config';
+import { FACTS, fixed, SPAWN_FLOOR_SCORE, SPEED_ROWS } from '../lib/game-facts';
+import { excerpt, REPOSITORY_URL, sourceUrl } from '../lib/repo-files';
 import '../styles/home.css';
 
-const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
-const faviconHref = `${basePath}/favicon.ico`;
-const faviconPngHref = `${basePath}/favicon.png`;
-const favicon32Href = `${basePath}/favicon-32x32.png`;
-const appleTouchIconHref = `${basePath}/apple-touch-icon.png`;
-const assetsHref = `${basePath}/assets/`;
-const docsHref = `${basePath}/docs/`;
-const socialImageUrl = 'https://jonathanperis.github.io/speedy-bird-lynx/og-image.png';
-
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const assets = `${base}/assets/`;
+const docs = `${base}/docs/`;
 const siteUrl = 'https://jonathanperis.github.io/speedy-bird-lynx/';
-const repositoryUrl = 'https://github.com/jonathanperis/speedy-bird-lynx';
-const author = { '@type': 'Person', name: 'Jonathan Peris', url: 'https://github.com/jonathanperis' };
-const license = `${repositoryUrl}/blob/main/LICENSE`;
-// The game and its source code are separate entities: codeRepository belongs to SoftwareSourceCode.
-const structuredData = jsonLd({
+const frameLoop = excerpt('src/hooks/useGame.ts', 'frame-loop');
+
+// Sheet 1 chart: speed against score, from the same rows as the table.
+const chart = { width: 560, height: 260, left: 44, right: 18, top: 16, bottom: 46 };
+const maxScore = SPAWN_FLOOR_SCORE;
+const maxSpeed = Math.ceil(SPEED_ROWS.at(-1)!.speed);
+const x = (score: number) => chart.left + (score / maxScore) * (chart.width - chart.left - chart.right);
+const y = (speed: number) =>
+  chart.height - chart.bottom - ((speed - 1) / (maxSpeed - 1)) * (chart.height - chart.top - chart.bottom);
+const speedPath = SPEED_ROWS.map((row) => `${x(row.score).toFixed(1)},${y(row.speed).toFixed(1)}`).join(' ');
+const yTicks = Array.from({ length: maxSpeed }, (_, index) => index + 1);
+const medalRows = SPEED_ROWS.filter((row) => row.medal);
+// Label the x axis at round scores so the medal scores' close dots never crowd the labels.
+const xTicks = [0, 50, 100, 150, 200, 250].filter((score) => score < maxScore - 15);
+
+// Manual contents, numbered like articles: 1, 1.1, 1.2, ...
+let chapter = 0;
+const contents = SECTION_CATEGORIES.filter((category) => category.label).map((category) => {
+  chapter++;
+  return {
+    number: chapter,
+    label: category.label,
+    pages: category.ids.map((id, index) => ({
+      number: `${chapter}.${index + 1}`,
+      title: PAGE_META[id].title,
+      description: PAGE_META[id].description,
+      href: `${docs}${id}/`,
+    })),
+  };
+});
+
+const author = { '@type': 'Person', name: 'Jonathan Peris', url: 'https://jonathanperis.github.io/' };
+const license = `${REPOSITORY_URL}/blob/main/LICENSE`;
+const structuredData = {
   '@context': 'https://schema.org',
   '@graph': [
     {
       '@type': 'VideoGame',
       '@id': `${siteUrl}#game`,
       name: 'Speedy Bird',
-      description: 'A Flappy Bird-inspired arcade game with an Android ReactLynx host and a playable browser Canvas demo.',
+      description: 'Flappy Bird where every pipe you clear makes the game 1% faster. Built with ReactLynx for Android, iOS, and the Web.',
       url: siteUrl,
-      image: socialImageUrl,
-      genre: ['Arcade', 'Pixel Art', 'Side-Scroller'],
-      gamePlatform: ['Web Browser', 'Android'],
+      image: `${siteUrl}og-image.png`,
+      genre: ['Arcade', 'Side-Scroller'],
+      gamePlatform: ['Web Browser', 'Android', 'iOS'],
       applicationCategory: 'GameApplication',
-      operatingSystem: ['Android', 'Web'],
       author,
       isAccessibleForFree: true,
       license,
@@ -40,7 +68,7 @@ const structuredData = jsonLd({
       '@type': 'SoftwareSourceCode',
       '@id': `${siteUrl}#source`,
       name: 'Speedy Bird Lynx source code',
-      codeRepository: repositoryUrl,
+      codeRepository: REPOSITORY_URL,
       programmingLanguage: 'TypeScript',
       runtimePlatform: 'ReactLynx',
       license,
@@ -48,382 +76,231 @@ const structuredData = jsonLd({
       targetProduct: { '@id': `${siteUrl}#game` },
     },
   ],
-});
+};
 ---
 
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Speedy Bird - Pixel Art Side-Scroller</title>
-  <meta name="description" content="Play Speedy Bird in your browser. Explore the ReactLynx Android and iOS hosts, web preview, and implementation guides.">
-  <meta name="keywords" content="Speedy Bird, pixel art, Lynx, ReactLynx, cross-platform, mobile game, side-scroller, open source">
-  <link rel="icon" href={faviconHref} sizes="any">
-  <link rel="icon" type="image/png" href={faviconPngHref}>
-  <link rel="icon" type="image/png" sizes="32x32" href={favicon32Href}>
-  <link rel="apple-touch-icon" href={appleTouchIconHref}>
-  <link rel="canonical" href={siteUrl}>
-  <link rel="sitemap" type="application/xml" href={`${basePath}/sitemap-index.xml`}>
-
-  <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Speedy Bird - Pixel Art Side-Scroller">
-  <meta property="og:description" content="Every pipe makes it faster. Play the Canvas demo and explore the ReactLynx game, Android host, and builder's manual.">
-  <meta property="og:url" content="https://jonathanperis.github.io/speedy-bird-lynx/">
-  <meta property="og:image" content={socialImageUrl}>
-  <meta property="og:image:secure_url" content={socialImageUrl}>
-  <meta property="og:image:type" content="image/png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Speedy Bird Lynx pixel arcade preview with the bird flying between pipes">
-  <meta property="og:site_name" content="Speedy Bird">
-  <meta property="og:locale" content="en_US">
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Speedy Bird - Pixel Art Side-Scroller">
-  <meta name="twitter:description" content="Every pipe makes it faster. Play the Canvas demo and explore the ReactLynx builder's manual.">
-  <meta name="twitter:image" content={socialImageUrl}>
-  <meta name="twitter:image:alt" content="Speedy Bird Lynx pixel arcade preview with the bird flying between pipes">
-  <meta name="twitter:creator" content="@jperis_silva">
-
-  <!-- Theme -->
-  <meta name="theme-color" content="#04111e">
-
-  <script type="application/ld+json" set:html={structuredData}></script>
-
-</head>
-<body>
-  <a class="skip-link" href="#main">Skip to main content</a>
-  <div class="particles" aria-hidden="true">
-    <div class="particle"></div><div class="particle"></div>
-    <div class="particle"></div><div class="particle"></div>
-    <div class="particle"></div><div class="particle"></div>
-  </div>
-
-  <!-- Sky hero -->
-  <header class="hero">
-    <div class="clouds-container" aria-hidden="true">
-      <div class="cloud cloud-1"></div>
-      <div class="cloud cloud-2"></div>
-      <div class="cloud cloud-3"></div>
-    </div>
-    
-    <div class="bird-wrapper" aria-hidden="true">
-      <div class="bird">
-        <div class="bird-body"></div>
-        <div class="bird-wing bird-wing-bot"></div>
-        <div class="bird-wing bird-wing-top"></div>
-        <div class="bird-eye"></div>
-        <div class="bird-beak"></div>
-      </div>
-    </div>
-
-    <div class="hero-content reveal">
-      <div class="cabinet-kicker">Night Arcade Cabinet · ReactLynx Case Study</div>
-      <h1 class="hero-title">SPEEDY BIRD</h1>
-      <p class="hero-tagline">Flappy Bird, but every pipe makes the run faster.</p>
-
-      <div class="hero-hud" role="group" aria-label="Speedy Bird rules summary">
-        <div class="speed-badge hero-hud-card">
-          <div class="speed-readout"><span class="speed-num">1.00</span><span class="speed-x">×</span></div>
-          <span class="speed-label">Starting Speed</span>
-        </div>
-        <div class="hero-hud-card">
-          <strong>+1%</strong>
-          <span>per pipe</span>
-        </div>
-        <div class="hero-hud-card">
-          <strong>100</strong>
-          <span>platinum run</span>
-        </div>
-      </div>
-
-      <div class="hero-actions">
-        <a href="#play" class="cta-btn">Start Run</a>
-        <a href="#rules" class="secondary-btn">See the speed curve</a>
-      </div>
-      <p class="hero-control-note">Click or tap the game to flap, or press Space or Enter while it has focus.</p>
-    </div>
-  </header>
-
-  <!-- Floating pill nav -->
-  <nav class="pill-nav" id="pill-nav" aria-label="Speedy Bird sections">
-    <a href="#play">Play</a>
-    <a href="#rules">Rules</a>
-    <a href="#build">Build</a>
-    <a href="#docs">Docs</a>
-    <a href="https://github.com/jonathanperis/speedy-bird-lynx" target="_blank" rel="noreferrer noopener">GitHub</a>
-  </nav>
+<BaseLayout
+  title="Speedy Bird: Flappy Bird where every pipe makes it faster"
+  description="Play Speedy Bird in your browser. Every pipe you clear makes the game 1% faster. Built with ReactLynx for Android, iOS, and the Web."
+  structuredData={structuredData}
+>
+  <SiteHeader />
 
   <main id="main" tabindex="-1">
-  <!-- Pipe divider -->
-  <div class="pipe-divider" aria-hidden="true">
-    <div class="pipe pipe-top"></div>
-    <div class="pipe-gap"></div>
-    <div class="pipe pipe-bot"></div>
-  </div>
+    <section class="band" id="play" aria-labelledby="game-title">
+      <div class="band-inner">
+        <div class="intro">
+          <h1 id="game-title">Speedy Bird</h1>
+          <p class="pitch">Flappy Bird where every pipe you clear makes the game {FACTS.percentPerPoint}% faster.</p>
+          <button id="play-btn" type="button" class="button button-primary">Start a run</button>
+        </div>
 
-  <!-- Game Section -->
-  <section id="play" class="play-section reveal" aria-label="Play Speedy Bird">
-    <div class="phone-device">
-      <div class="phone-chrome" aria-hidden="true">
-        <div class="phone-camera"></div>
+        <div class="stage">
+          <div class="game" id="game" data-assets={assets}>
+            <canvas
+              id="canvas"
+              width="400"
+              height="750"
+              tabindex="0"
+              role="application"
+              aria-roledescription="game"
+              aria-label="Speedy Bird"
+              aria-describedby="game-help"
+            >Speedy Bird needs a browser with Canvas support.</canvas>
+            <p id="game-help" class="visually-hidden">
+              Press Space or Enter while the game has focus, or click or tap it, to flap. Fly through the
+              gaps. Each pipe scores a point and makes the game {FACTS.percentPerPoint}% faster.
+            </p>
+            <p id="game-status" class="visually-hidden" role="status" aria-live="polite"></p>
+          </div>
+
+          <div class="side">
+            <p class="controls">
+              Tap or click the game, or press <kbd>Space</kbd> while it has focus.
+              <button id="mute-btn" type="button" class="text-button" aria-pressed="false">Mute sound</button>
+            </p>
+            <section class="timing" id="timing" aria-labelledby="timing-title" data-state="waiting">
+              <h2 id="timing-title">
+                <span data-field="run">No runs yet</span>
+                <span class="timing-state" data-field="state">Waiting</span>
+              </h2>
+              <dl>
+                <div><dt>Pipes cleared</dt><dd class="num" data-field="score">0</dd></div>
+                <div><dt>Speed</dt><dd class="num"><span data-field="speed">1.00</span><small>×</small></dd></div>
+                <div><dt>Scroll</dt><dd class="num"><span data-field="scroll">{fixed(FACTS.baseScroll)}</span><small>px/step</small></dd></div>
+                <div><dt>Next pipe every</dt><dd class="num"><span data-field="spawn">{FACTS.baseSpawnSteps}</span><small>steps</small></dd></div>
+                <div><dt>Next medal</dt><dd data-field="medal">Bronze in {FACTS.medals.bronze}</dd></div>
+                <div><dt>Best</dt><dd class="num" data-field="best">0</dd></div>
+              </dl>
+              <p class="timing-note">
+                Read from the engine every frame (<a href={sourceUrl('src/game/engine.ts')}><code>engine.ts</code></a>).
+              </p>
+            </section>
+          </div>
+        </div>
       </div>
-      <div class="phone-screen" id="game" data-assets={assetsHref}>
-        <canvas
-          id="canvas"
-          width="400"
-          height="750"
-          tabindex="0"
-          role="application"
-          aria-roledescription="game"
-          aria-label="Speedy Bird"
-          aria-describedby="game-help"
-        >Speedy Bird needs a browser with Canvas support.</canvas>
-        <p id="game-help" class="visually-hidden">
-          Press Space or Enter while the game has focus, or click or tap it, to flap.
-          Fly through the gaps between the pipes. Each pipe scores a point and makes the game 1% faster.
+      <div class="ground-strip" style={`--ground: url(${assets}sprites/ground.png)`} aria-hidden="true"></div>
+    </section>
+
+    <div class="page" id="how-it-works">
+      <section class="sheet" aria-labelledby="curve-title">
+        <p class="sheet-caption">Sheet 1 · Speed by score</p>
+        <h2 id="curve-title">The speed curve</h2>
+        <p class="lede">
+          Speed is <code>1 + score ÷ 100</code>: each point adds {FACTS.percentPerPoint}% to how fast the pipes and
+          ground scroll. Pipes also spawn closer together until score {SPAWN_FLOOR_SCORE}, where the gap between
+          them stops shrinking at {FACTS.minSpawnSteps} steps.
         </p>
-        <p id="game-status" class="visually-hidden" role="status" aria-live="polite"></p>
-      </div>
-      <div class="phone-chin">
-        <div class="btn-row">
-          <button id="play-btn" type="button">Start Run</button>
-          <button id="mute-btn" type="button" class="mute-btn" aria-pressed="false">Mute</button>
+        <div class="curve">
+          <div class="table-wrap">
+            <table>
+              <caption class="visually-hidden">Speed, scroll distance, and pipe interval by score</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Score</th>
+                  <th scope="col" class="right">Speed</th>
+                  <th scope="col" class="right">Scroll</th>
+                  <th scope="col" class="right">Pipe every</th>
+                  <th scope="col">Medal</th>
+                </tr>
+              </thead>
+              <tbody>
+                {SPEED_ROWS.map((row) => (
+                  <tr>
+                    <th scope="row" class="num">{row.score}</th>
+                    <td class="num right">{fixed(row.speed)}<small>×</small></td>
+                    <td class="num right">{fixed(row.scroll)}<small>px</small></td>
+                    <td class="num right">{row.pipeEverySteps}<small> steps · {fixed(row.pipeEverySeconds)} s</small></td>
+                    <td class="medal-cell">
+                      {row.medal ? (
+                        <>
+                          <img class="sprite" src={`${assets}sprites/medals/medal-${row.medal}.png`} width="22" height="22" alt="" />
+                          <span>{row.medal[0].toUpperCase() + row.medal.slice(1)}</span>
+                        </>
+                      ) : row.note ? <span class="muted">{row.note}</span> : null}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <figure class="chart">
+            <svg viewBox={`0 0 ${chart.width} ${chart.height}`} role="img" aria-labelledby="chart-title">
+              <title id="chart-title">Speed rises in a straight line from 1× at score 0 to {fixed(SPEED_ROWS.at(-1)!.speed)}× at score {maxScore}.</title>
+              {yTicks.map((tick) => (
+                <g>
+                  <line class="grid" x1={chart.left} x2={chart.width - chart.right} y1={y(tick)} y2={y(tick)} />
+                  <text class="tick" x={chart.left - 6} y={y(tick) + 4} text-anchor="end">{tick}×</text>
+                </g>
+              ))}
+              <line class="axis" x1={chart.left} x2={chart.width - chart.right} y1={chart.height - chart.bottom} y2={chart.height - chart.bottom} />
+              <line class="axis" x1={chart.left} x2={chart.left} y1={chart.top} y2={chart.height - chart.bottom} />
+              {medalRows.map((row) => (
+                <line class="marker" x1={x(row.score)} x2={x(row.score)} y1={y(row.speed)} y2={chart.height - chart.bottom} />
+              ))}
+              {xTicks.map((score) => (
+                <text class="tick" x={x(score)} y={chart.height - chart.bottom + 16} text-anchor="middle">{score}</text>
+              ))}
+              <text class="tick" x={x(maxScore)} y={chart.height - chart.bottom + 16} text-anchor="middle">{maxScore}</text>
+              <polyline class="line" points={speedPath} />
+              {medalRows.map((row) => <circle class="dot" cx={x(row.score)} cy={y(row.speed)} r="4.5" />)}
+              <text class="axis-label" x={chart.left + (chart.width - chart.left - chart.right) / 2} y={chart.height - 6} text-anchor="middle">score</text>
+              <text class="axis-label" x={12} y={chart.top + (chart.height - chart.top - chart.bottom) / 2} text-anchor="middle" transform={`rotate(-90 12 ${chart.top + (chart.height - chart.top - chart.bottom) / 2})`}>speed</text>
+            </svg>
+            <figcaption>Dots mark the medal scores. Computed from <a href={sourceUrl('src/game/engine.ts')}><code>engine.ts</code></a> when this page was built.</figcaption>
+          </figure>
         </div>
-        <div class="game-controls">
-          <kbd>Space</kbd> / <kbd>Click</kbd> / <kbd>Tap</kbd> to flap
+      </section>
+
+      <section class="sheet" aria-labelledby="hosts-title">
+        <p class="sheet-caption">Sheet 2 · One bundle, three hosts</p>
+        <h2 id="hosts-title">The same game on Android, iOS, and the Web</h2>
+        <p class="lede">
+          <code>bun run build</code> produces one Lynx bundle. Each host is a thin native shell that loads it and
+          answers the same five calls through a native module named <code>SpeedyBirdModule</code>: sound, the saved
+          best score, and screen-reader announcements.
+        </p>
+        <ol class="hosts" aria-label="Hosts that load main.lynx.bundle">
+          <li class="bundle"><span class="host-name">main.lynx.bundle</span><span class="host-detail">ReactLynx · one build</span></li>
+          <li><a href={HOST_LINKS.android}><span class="host-name">Android</span></a><span class="host-detail">Kotlin · LynxView</span></li>
+          <li><a href={HOST_LINKS.ios}><span class="host-name">iOS</span></a><span class="host-detail">Swift · LynxView</span></li>
+          <li><a href={HOST_LINKS.web}><span class="host-name">Web</span></a><span class="host-detail">&lt;lynx-view&gt;</span></li>
+        </ol>
+        <div class="table-wrap">
+          <table>
+            <caption class="visually-hidden">How each host implements SpeedyBirdModule</caption>
+            <thead>
+              <tr><th scope="col">Call</th><th scope="col">Android</th><th scope="col">iOS</th><th scope="col">Web</th></tr>
+            </thead>
+            <tbody>
+              {BRIDGE_ROWS.map((row) => (
+                <tr><th scope="row"><code>{row.method}</code></th><td>{row.android}</td><td>{row.ios}</td><td>{row.web}</td></tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        <div class="home-bar" aria-hidden="true"></div>
-      </div>
+        <p class="note">The build checks each host's source for these methods, so this table fails the build if it goes out of date.</p>
+      </section>
+
+      <section class="sheet" aria-labelledby="threads-title">
+        <p class="sheet-caption">Sheet 3 · What runs where</p>
+        <h2 id="threads-title">The frame loop runs on Lynx's main thread</h2>
+        <div class="threads">
+          <div class="thread-notes">
+            <p class="lede">
+              Lynx has two threads: a main thread that owns the screen and a background thread for app logic.
+              Taps, the simulation, and every per-frame style change stay on the main thread, so a flap shows up in
+              the next frame. React on the background thread only redraws the score and overlays when they change.
+            </p>
+            <ol class="annotations">
+              <li><strong>Steps.</strong> Elapsed time becomes fixed 1/{FACTS.stepsPerSecond} s steps, so speed never depends on the display's refresh rate.</li>
+              <li><strong>Render.</strong> <code>render()</code> writes transforms with <code>setStyleProperties</code>; React is not involved.</li>
+              <li><strong>Publish.</strong> <code>publish()</code> crosses to the background thread only when the score, state, or sounds change.</li>
+            </ol>
+          </div>
+          <figure class="excerpt">
+            <figcaption>
+              <a href={frameLoop.url}><code>{frameLoop.path}</code></a>, line {frameLoop.startLine}
+            </figcaption>
+            <Code code={frameLoop.code} lang="ts" theme={paperTheme} />
+          </figure>
+        </div>
+      </section>
+
+      <section class="sheet" aria-labelledby="manual-title">
+        <p class="sheet-caption">Manual</p>
+        <h2 id="manual-title">Read how it is built</h2>
+        <ol class="contents">
+          {contents.map((part) => (
+            <li>
+              <h3><span class="num">{part.number}</span> {part.label}</h3>
+              <ol>
+                {part.pages.map((page) => (
+                  <li>
+                    <a href={page.href}><span class="num">{page.number}</span> {page.title}</a>
+                    <p>{page.description}</p>
+                  </li>
+                ))}
+              </ol>
+            </li>
+          ))}
+        </ol>
+        <p><a class="button" href={docs}>Open the manual</a></p>
+      </section>
     </div>
-  </section>
-
-  <!-- Pipe divider -->
-  <div class="pipe-divider" aria-hidden="true">
-    <div class="pipe pipe-top"></div>
-    <div class="pipe-gap"></div>
-    <div class="pipe pipe-bot"></div>
-  </div>
-
-  <!-- Rules and build sections -->
-  <section id="about" class="about-section">
-    <div class="about-game reveal" id="rules">
-      <p class="section-kicker">Rules of the run</p>
-      <h2>EVERY PIPE TURNS UP THE SPEED</h2>
-      <p class="section-lede">
-        Speedy Bird keeps the familiar flap-and-thread rhythm, then tightens the run after every clear.
-        Pipes move 1% faster per point, so a calm opening becomes a precision test by the medal tiers.
-      </p>
-
-      <div class="difficulty-track reveal" id="speedMeter" role="group" aria-label="Speed multiplier milestones">
-        <div class="track-line"><div class="speed-fill"></div></div>
-        <div class="track-marker marker-start">
-          <span class="marker-value">1.00×</span>
-          <strong>Launch</strong>
-          <small>Normal pace</small>
-        </div>
-        <div class="track-marker marker-bronze">
-          <span class="marker-value">10</span>
-          <strong>Bronze</strong>
-          <small>Wake up</small>
-        </div>
-        <div class="track-marker marker-silver">
-          <span class="marker-value">25</span>
-          <strong>Silver</strong>
-          <small>Fast hands</small>
-        </div>
-        <div class="track-marker marker-gold">
-          <span class="marker-value">50</span>
-          <strong>Gold</strong>
-          <small>1.50× zone</small>
-        </div>
-        <div class="track-marker marker-platinum">
-          <span class="marker-value">100</span>
-          <strong>Platinum</strong>
-          <small>2.00× chaos</small>
-        </div>
-      </div>
-
-      <div class="medal-cabinet reveal" role="group" aria-label="Medal cabinet">
-        <div class="cabinet-header">
-          <span>Medal Cabinet</span>
-          <strong>Try for Platinum</strong>
-        </div>
-        <div class="medal-slots">
-          <div class="medal medal-bronze"><span>Bronze</span><small>10 pipes</small></div>
-          <div class="medal medal-silver"><span>Silver</span><small>25 pipes</small></div>
-          <div class="medal medal-gold"><span>Gold</span><small>50 pipes</small></div>
-          <div class="medal medal-platinum"><span>Platinum</span><small>100 pipes</small></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="about-project reveal" id="build">
-      <p class="section-kicker">Builder's manual</p>
-      <h2>BUILT AS A REAL CROSS-PLATFORM GAME</h2>
-      <p class="section-lede">
-        The Canvas demo above runs the same rules module as the ReactLynx game: identical physics, seeded
-        pipes, scoring, and restart lock, simulated in fixed 1/60 s steps on the same 400×750 playfield.
-        Only the renderer and input differ. Here sound comes from the Web Audio API; the ReactLynx app plays
-        it through a host-provided <code>SpeedyBirdModule</code>.
-      </p>
-
-      <div class="manual-grid">
-        <article class="manual-panel panel-wide">
-          <span class="panel-code">ENGINE / 1/60 S STEPS</span>
-          <h3>Physics that stay readable as speed climbs</h3>
-          <p>Gravity, velocity-based flaps, smooth tilt, AABB collision, and seeded constant-gap pipes run in fixed steps, so the speed never depends on the display's refresh rate.</p>
-        </article>
-        <article class="manual-panel">
-          <span class="panel-code">SPRITES</span>
-          <h3>Tile-Based Pipes</h3>
-          <p>Pipe bodies repeat from pixel tiles with cap sprites, avoiding stretched art at every obstacle height.</p>
-        </article>
-        <article class="manual-panel">
-          <span class="panel-code">WORLD</span>
-          <h3>Parallax Layers</h3>
-          <p>Background, pipes, and ground move at different speeds to make the tiny scene feel alive.</p>
-        </article>
-        <article class="manual-panel">
-          <span class="panel-code">LYNX</span>
-          <h3>ReactLynx Port</h3>
-          <p>The game loop runs on Lynx's main thread in the Android and iOS hosts and the Lynx web preview. This page draws the same engine with Canvas.</p>
-        </article>
-        <article class="manual-panel">
-          <span class="panel-code">SHIP</span>
-          <h3>CI/CD Ready</h3>
-          <p>GitHub Actions test the engine, build Android and iOS (with simulator UI tests), check the docs, then publish Pages and release artifacts. iOS archives are unsigned.</p>
-        </article>
-      </div>
-    </div>
-
-    <div class="about-lynx reveal">
-      <p class="section-kicker">Native UI framework</p>
-      <h2>WHAT IS LYNX?</h2>
-      <p>
-        <a href="https://lynxjs.org/" target="_blank" rel="noreferrer noopener" class="text-link">Lynx</a>
-        is ByteDance's open-source cross-platform native UI framework. ReactLynx brings React patterns
-        to a native rendering engine instead of a WebView, which makes this project a compact game-shaped
-        proof of the framework's rendering, touch input, asset, and release pipeline.
-      </p>
-      <div class="lynx-strip" role="group" aria-label="Lynx platform highlights">
-        <span>React components</span>
-        <span>Native rendering</span>
-        <span>CSS transforms</span>
-        <span>Rspack toolchain</span>
-        <span>Android · iOS · Web</span>
-        <span>Main-thread game loop</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Docs -->
-  <section id="docs" class="docs-section reveal">
-    <p class="section-kicker">Source and docs</p>
-    <h2>BUILDER'S MANUAL</h2>
-    <p class="docs-lede">Open the manual when you want implementation details, native host setup, or release notes.</p>
-    <p class="docs-cta-row">
-      <a href={`${docsHref}`} class="cta-btn docs-primary">View full documentation</a>
-      <a href="https://github.com/jonathanperis/speedy-bird-lynx" class="secondary-btn docs-secondary" target="_blank" rel="noreferrer noopener">View source</a>
-    </p>
-    <div class="docs-grid">
-      <a class="doc-card" href={`${docsHref}`}>
-        <span class="doc-index">01</span>
-        <h3>Start Here</h3>
-        <p>Project overview, Lynx setup, architecture, and getting started.</p>
-      </a>
-      <a class="doc-card" href={`${docsHref}game-engine/`}>
-        <span class="doc-index">02</span>
-        <h3>Game Engine</h3>
-        <p>Physics, collision detection, scoring, and game state machine.</p>
-      </a>
-      <a class="doc-card" href={`${docsHref}architecture/`}>
-        <span class="doc-index">03</span>
-        <h3>Architecture</h3>
-        <p>File structure, game loop, component hierarchy, and module breakdown.</p>
-      </a>
-      <a class="doc-card" href={`${docsHref}assets-and-sprites/`}>
-        <span class="doc-index">04</span>
-        <h3>Assets &amp; Sprites</h3>
-        <p>Sprites, audio files, tile-based rendering, and asset attribution.</p>
-      </a>
-      <a class="doc-card" href={`${docsHref}getting-started/`}>
-        <span class="doc-index">05</span>
-        <h3>Run It Locally</h3>
-        <p>Controls, local setup, and Lynx Explorer testing for mobile devices.</p>
-      </a>
-      <a class="doc-card" href={`${docsHref}dependency-updates/`}>
-        <span class="doc-index">06</span>
-        <h3>Dependencies &amp; Upgrades</h3>
-        <p>Current versions, compatibility holds, native toolchains, and verification.</p>
-      </a>
-    </div>
-  </section>
-
   </main>
 
-  <!-- Footer -->
-  <footer>
-    <p>
-      <a href="https://github.com/jonathanperis/speedy-bird-lynx" target="_blank" rel="noreferrer noopener">GitHub Repository</a>
-      &nbsp;&middot;&nbsp;
-      <a href={`${docsHref}`}>Documentation</a>
-    </p>
-    <p style="margin-top: 0.5rem;">
-      Created by <a href="https://github.com/jonathanperis" target="_blank" rel="noreferrer noopener">jonathanperis</a>.
-      Original Flappy Bird by <a href="https://en.wikipedia.org/wiki/Flappy_Bird" target="_blank" rel="noreferrer noopener">Dong Nguyen</a>.
-      Earlier Canvas recreation by <a href="https://github.com/noanonoa/flappy-bird" target="_blank" rel="noreferrer noopener">noanonoa</a>.
-    </p>
-    <p style="margin-top: 0.25rem;">
-      Sprites from <a href="https://www.spriters-resource.com/fullview/59894/" target="_blank" rel="noreferrer noopener">The Spriters Resource</a>.
-    </p>
-    {GA_ID && (
-      <p class="footer-settings">
-        <button type="button" class="link-button" data-analytics-settings hidden>Analytics settings</button>
-      </p>
-    )}
-  </footer>
+  <SiteFooter />
 
-  <!-- Navigation and section reveals -->
-  <script is:inline>
-    // Pill nav appear
-    const heroEl = document.querySelector('.hero');
-    const navEl = document.getElementById('pill-nav');
-    if (window.IntersectionObserver) {
-      new IntersectionObserver(([e]) => navEl.classList.toggle('visible', !e.isIntersecting)).observe(heroEl);
-    }
-    
-    // Section reveals
-    if (window.IntersectionObserver) {
-      document.querySelectorAll('.reveal').forEach(el => {
-        new IntersectionObserver(([e]) => { if (e.isIntersecting) el.classList.add('visible'); }, { threshold: 0.1 }).observe(el);
-      });
-      // Speed meter reveal separately for its animation
-      const meter = document.getElementById('speedMeter');
-      if (meter) {
-        new IntersectionObserver(([e]) => { if (e.isIntersecting) meter.classList.add('visible'); }, { threshold: 0.5 }).observe(meter);
-      }
-    } else {
-      document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
-    }
-    
-    // Init immediate reveals
-    setTimeout(() => {
-      document.querySelector('.hero-content').classList.add('visible');
-    }, 100);
-  </script>
-
-  <!-- Canvas demo: shares src/game/engine.ts with the ReactLynx app -->
   <script>
     import { mountDemo } from '../game/controller.ts';
+    import { createTimingPanel } from '../game/timing.ts';
 
     const root = document.getElementById('game');
     const canvas = document.getElementById('canvas');
     const startButton = document.getElementById('play-btn');
     const status = document.getElementById('game-status');
+    const panel = document.getElementById('timing');
     if (root && canvas instanceof HTMLCanvasElement && startButton instanceof HTMLButtonElement && status) {
       mountDemo({
         root,
@@ -432,10 +309,8 @@ const structuredData = jsonLd({
         muteButton: document.getElementById('mute-btn') as HTMLButtonElement | null,
         status,
         assetsUrl: new URL(root.dataset.assets ?? 'assets/', document.baseURI),
+        onFrame: panel ? createTimingPanel(panel) : undefined,
       });
     }
   </script>
-
-  <Analytics />
-</body>
-</html>
+</BaseLayout>
