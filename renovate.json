@@ -37,7 +37,7 @@
       "matchManagers": ["gradle"],
       "matchPackageNames": ["/^com\\.facebook\\.fresco:/"],
       "groupName": "fresco",
-      "allowedVersions": "<3",
+      "allowedVersions": "<=2.3.0",
       "automerge": false
     },
     {
