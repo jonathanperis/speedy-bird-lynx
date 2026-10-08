@@ -1,5 +1,5 @@
 import bgSrc from '../../assets/sprites/background.png';
-import { BG_H, BG_W, CANVAS_HEIGHT, GROUND_H } from '../constants.js';
+import { BG_H, BG_W, CANVAS_HEIGHT, GROUND_H, PIXEL_ART } from '../constants.js';
 
 const TILES = [0, 1, 2, 3, 4];
 
@@ -24,7 +24,7 @@ export default function Background() {
           key={tile}
           src={bgSrc}
           // Overlap by one pixel so fractional scaling never shows a seam between tiles.
-          style={{ width: `${BG_W + 1}px`, height: `${BG_H}px`, marginRight: '-1px' }}
+          style={{ ...PIXEL_ART, width: `${BG_W + 1}px`, height: `${BG_H}px`, marginRight: '-1px' }}
         />
       ))}
     </view>
