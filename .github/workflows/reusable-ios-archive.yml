@@ -5,7 +5,6 @@ name: iOS unsigned archive
 
 on:
   workflow_call:
-    inputs:
 
 permissions:
   contents: read
