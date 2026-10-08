@@ -8,6 +8,7 @@ import digit6 from '../../assets/sprites/digits/digit-6.png';
 import digit7 from '../../assets/sprites/digits/digit-7.png';
 import digit8 from '../../assets/sprites/digits/digit-8.png';
 import digit9 from '../../assets/sprites/digits/digit-9.png';
+import { PIXEL_ART } from '../constants.js';
 
 const DIGIT_SPRITES = [digit0, digit1, digit2, digit3, digit4, digit5, digit6, digit7, digit8, digit9];
 
@@ -43,6 +44,7 @@ export default function ScoreDisplay({ score, visible }: ScoreDisplayProps) {
           key={index}
           src={DIGIT_SPRITES[digit]}
           style={{
+            ...PIXEL_ART,
             width: `${DIGIT_W}px`,
             height: `${DIGIT_H}px`,
             marginLeft: index > 0 ? `${DIGIT_GAP}px` : '0px',
