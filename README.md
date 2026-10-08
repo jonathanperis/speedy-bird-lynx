@@ -155,8 +155,8 @@ docs/                          # Astro GitHub Pages site + playable canvas demo
 
 | Workflow | File | Trigger | Description |
 |----------|------|---------|-------------|
-| Build Check | `ci.yml` | Manual, push to `main`, every PR, weekly | Audit, Biome lint/format, type-check, tests, bundles/web host, docs/link checks, Android compilation/lint and APK verification, iOS build + UI tests; on `main` pushes, then calls Build Android |
-| CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript, Actions, Python, and Kotlin security-and-quality analysis; Swift on `main` and weekly |
+| Build Check | `ci.yml` | Manual, push to `main`, every PR, weekly | Audit, Biome lint/format, type-check, tests, bundles/web host, docs/link checks, Android compilation/lint and APK verification, iOS build + UI tests on pull requests; on `main` pushes, then calls Build Android |
+| CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript, Actions, Python, and Kotlin security-and-quality analysis; Swift weekly and on demand |
 | Deploy Web | `deploy.yml` | Push to `main`, manual | Build and deploy the Astro `docs/` site to GitHub Pages via the shared Pages workflow |
 | Build Android | `build-android.yml` | Called by Build Check after a `main` push passes; manual from `main` | Read-only APK build followed by an immutable `build/*` prerelease that never becomes "Latest" |
 | Build iOS | `build-ios.yml` | Manual | Unsigned archive through the shared iOS build |

@@ -66,10 +66,10 @@ jobs:
         with:
           category: /language:java-kotlin
 
-  # Swift extraction needs a full Xcode build; run it on main and weekly to save macOS time.
+  # Swift extraction needs a full Xcode build; run it weekly and on demand to save macOS time.
   analyze-swift:
     name: Analyze (swift)
-    if: github.event_name != 'pull_request'
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: macos-15
     timeout-minutes: 60
     permissions:
