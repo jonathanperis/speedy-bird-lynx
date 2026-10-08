@@ -44,6 +44,7 @@ export function mountGame() {
   let ready = false;
   let failed = false;
   let startWhenReady = false;
+  const startLabel = startButton?.textContent ?? 'Start a run';
   let inView = true;
 
   // A failure shown before the first frame is undone if the game still arrives (for example
@@ -83,7 +84,15 @@ export function mountGame() {
         if (startButton) startButton.hidden = false;
       }
       if (!inView) host?.pause();
-      if (startWhenReady) start();
+      if (startWhenReady) {
+        startWhenReady = false;
+        // Start the queued run only where the player can see it; otherwise offer the button again.
+        if (inView && !document.hidden) start();
+        else if (startButton) {
+          startButton.disabled = false;
+          startButton.textContent = startLabel;
+        }
+      }
     }
     // While a run is in progress the game captures touches, so a quick swipe flaps instead
     // of scrolling. Otherwise touches scroll the page as usual.
