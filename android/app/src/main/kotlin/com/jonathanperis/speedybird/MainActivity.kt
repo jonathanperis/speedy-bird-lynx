@@ -5,11 +5,12 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowInsets
-import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.lynx.react.bridge.JavaOnlyArray
 import com.lynx.tasm.LynxView
 import com.lynx.tasm.LynxViewBuilder
@@ -65,29 +66,24 @@ class MainActivity : Activity() {
                 }
             }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.setDecorFitsSystemWindows(false)
-            window.insetsController?.let { controller ->
-                controller.hide(WindowInsets.Type.systemBars())
-                controller.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            }
-        } else {
-            @Suppress("DEPRECATION")
-            window.decorView.systemUiVisibility = (
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-                    View.SYSTEM_UI_FLAG_FULLSCREEN or
-                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                )
+        WindowCompat.enableEdgeToEdge(window)
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            hide(WindowInsetsCompat.Type.systemBars())
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
     }
 
+    // A window can lose focus while the activity stays resumed (notification shade, dialogs,
+    // multi-window). Pause then too; the game ignores repeated pause events.
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        // Bars revealed by a swipe or a dialog are hidden again when the game regains focus.
-        if (hasFocus) enterImmersiveMode()
+        if (hasFocus) {
+            // Bars revealed by a swipe or a dialog are hidden again.
+            enterImmersiveMode()
+            lynxView.sendGlobalEvent(RESUME_EVENT, JavaOnlyArray())
+        } else {
+            lynxView.sendGlobalEvent(PAUSE_EVENT, JavaOnlyArray())
+        }
     }
 
     // Losing focus pauses the game; only leaving the screen suspends Lynx, after the pause
