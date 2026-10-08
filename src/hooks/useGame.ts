@@ -64,6 +64,7 @@ export function useGame() {
     }
     const announcement = announcementFor(lastHud.current, next);
     if (announcement) bridge?.announce?.(announcement);
+    bridge?.reportHud?.(JSON.stringify(next));
     lastHud.current = next;
     setHud(next);
   };

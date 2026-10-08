@@ -44,6 +44,7 @@
 }
 
 .game {
+  position: relative;
   grid-area: game;
   align-self: end;
   width: min(340px, calc((100svh - 9rem) * 400 / 750));
@@ -54,25 +55,69 @@
   border-bottom: 0;
 }
 
-.game canvas {
+.scenery {
+  position: absolute;
+  inset: 0;
+}
+
+.scenery > div {
+  position: absolute;
+  inset-inline: 0;
+  image-rendering: pixelated;
+}
+
+.scenery-city {
+  top: var(--city-top);
+  height: var(--city-height);
+  background: var(--city) repeat-x 0 0 / var(--city-width) 100%;
+}
+
+.scenery-ground {
+  top: var(--ground-top);
+  bottom: 0;
+  background: var(--sand) var(--ground) repeat-x 0 0 / var(--ground-width) auto;
+}
+
+.game lynx-view {
+  position: relative;
+  display: block;
   width: 100%;
   height: 100%;
   cursor: pointer;
   touch-action: manipulation;
 }
 
-.game canvas:focus-visible {
+.game lynx-view:focus-visible {
   outline: 3px solid var(--gold);
   outline-offset: -5px;
 }
 
-.game[aria-busy='true'] canvas {
+.game[aria-busy='true'] lynx-view {
   cursor: progress;
 }
 
-/* While a run is in progress, the canvas captures touches so a quick swipe still flaps. */
-.game.is-playing canvas {
+/* While a run is in progress, the game captures touches so a quick swipe still flaps. */
+.game.is-playing lynx-view {
   touch-action: none;
+}
+
+/* Loading or failure note, drawn on the sky until the game's first frame. */
+.game-message {
+  position: absolute;
+  inset: auto 0.85rem 40%;
+  padding: 0.6rem 0.8rem;
+  background: var(--cloud);
+  border: var(--border);
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.game-message[hidden] {
+  display: none;
+}
+
+.game.is-failed lynx-view {
+  visibility: hidden;
 }
 
 .side {
@@ -173,7 +218,7 @@
 
 .ground-strip {
   height: 26px;
-  background: var(--ground) repeat-x 0 0 / 224px 129px;
+  background: var(--ground) repeat-x 0 0 / 224px 112px;
   border-block: var(--border);
   image-rendering: pixelated;
 }

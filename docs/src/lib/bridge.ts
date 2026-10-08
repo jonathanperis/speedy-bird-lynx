@@ -5,7 +5,7 @@ import { readRepoFile, sourceUrl } from './repo-files';
 const HOSTS = {
   android: 'android/app/src/main/kotlin/com/jonathanperis/speedybird/SpeedyBirdModule.kt',
   ios: 'ios/SpeedyBird/SpeedyBirdModule.swift',
-  web: 'web-host/index.ts',
+  web: 'web-host/host.ts',
 } as const;
 
 const source = Object.fromEntries(Object.entries(HOSTS).map(([host, path]) => [host, readRepoFile(path)])) as Record<

@@ -1,10 +1,10 @@
 # Speedy Bird website and documentation
 
-Astro 7 static site deployed to [GitHub Pages](https://jonathanperis.github.io/speedy-bird-lynx/). It contains a playable Canvas build of the game, which runs the app's own rules engine, and a manual generated from `wiki/*.md`. The visual system is described in the root `DESIGN.md`.
+Astro 7 static site deployed to [GitHub Pages](https://jonathanperis.github.io/speedy-bird-lynx/). Its home page plays the game itself, the ReactLynx build in Lynx's web runtime, and the manual is generated from `wiki/*.md`. The visual system is described in the root `DESIGN.md`.
 
 ## Run locally
 
-Use **Node.js >=22.12** to execute Astro and **Bun** to install the lockfile. From `docs/`:
+Use **Node.js >=22.12** to execute Astro and **Bun** to install the lockfile. The home page needs the game in `public/play/` (generated, not committed), so first run `bun run build:site` in the repository root, and again after changing the app. Then, from `docs/`:
 
 ```sh
 bun install --frozen-lockfile
@@ -25,8 +25,10 @@ Open the preview URL with `/speedy-bird-lynx/` appended. Build output is `out/`;
 
 | Path | Responsibility |
 |------|----------------|
-| `src/pages/index.astro` | Home page: game band with the live timing panel, Sheets 1–3, manual contents; mounts the Canvas demo |
-| `src/game/*.ts` | Canvas demo: controller (frame loop, input, pause, storage, announcements), renderer, sprite loader, Web Audio, and the timing panel (`timing.ts`). Gameplay is imported from the app's `src/game/engine.ts` |
+| `src/pages/index.astro` | Home page: game band (`<lynx-view>`, the HTML scenery shown while it loads, and the live timing panel), Sheets 1–3, manual contents |
+| `src/scripts/game.ts` | Mounts the game: the shared browser bridge from `../web-host/host.ts`, start and mute buttons, loading and failure states, pause while scrolled away |
+| `src/scripts/timing.ts` | Timing panel: shows the HUD the app reports through `reportHud`; speed values come from the engine |
+| `src/lib/lynx-runtime.ts` | Reads the Lynx runtime's hashed script names from `public/play/manifest.json` at build time |
 | `src/lib/game-facts.ts` | Speed table computed from the engine at build time (Sheet 1) |
 | `src/lib/bridge.ts` | `SpeedyBirdModule` table (Sheet 2); the build fails if a host stops implementing a method |
 | `src/lib/repo-files.ts` | Reads repository files at build time and extracts `// #region` excerpts (Sheet 3) |
@@ -63,9 +65,9 @@ Page titles and descriptions come from `PAGE_META`; the layout derives canonical
 
 ## Assets and credits
 
-Root `assets/` is the canonical game artwork/audio source. When active assets change, synchronize the corresponding files under `public/assets/`; archived sprite sheets under `assets/sprites/unused/` are not served. The site build only copies public assets and does not perform synchronization. Preserve the original-game, upstream Canvas recreation, sprite, and sound attribution in the manual and footer.
+Root `assets/` is the canonical game artwork/audio source. The game itself embeds its sprites in the bundle and `bun run build:site` copies its sounds. The site's own artwork uses copies of the sprites under `public/assets/`: when they change, run `bun run assets:sync`; archived sprite sheets under `assets/sprites/unused/` are not served. The site build only copies public assets and does not perform synchronization. Preserve the original-game, upstream Canvas recreation, sprite, and sound attribution in the manual and footer.
 
-The Canvas demo imports `src/game/engine.ts`, `src/constants.ts`, `src/game/preferences.ts`, and `src/game/announcements.ts` from the app, so gameplay changes reach both surfaces automatically; only rendering lives in `src/game/renderer.ts`, which mirrors the sizes and layering of `src/components/`. `astro.config.mjs` allows the dev server to read the app's `src/` directory. The demo draws the full 400×750 playfield and stores the best score under `speedy-bird.preferences.v1` in the same format as the standalone web host. The timing panel next to the game (`src/game/timing.ts`) reads the snapshot the demo just drew; it has no loop of its own.
+The home page has no game code of its own: it loads `main.web.bundle` in a `<lynx-view>`, so the website always plays exactly what the native apps run. `astro.config.mjs` lets Vite read the app's `src/` (constants and engine functions for the facts, the scenery, and the timing panel) and `web-host/` (the browser bridge). The best score uses the `speedy-bird.preferences.v1` key shared with the standalone web host. See [Web rendering surfaces](wiki/architecture.md#web-rendering-surfaces) for how the runtime is built and loaded.
 
 ### Regenerate the social image and icons
 

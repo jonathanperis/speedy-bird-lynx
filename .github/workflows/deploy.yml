@@ -6,14 +6,54 @@ on:
   workflow_dispatch:
 
 permissions:
-  pages: write
-  id-token: write
   contents: read
 
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
 jobs:
+  # The home page plays the real Lynx build, so the site needs the root package as well as
+  # docs/: `bun run build:site` compiles main.web.bundle and the Lynx web runtime into
+  # docs/public/play/ before Astro builds the site around it.
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-js
+      - name: Build the Lynx game for the site
+        run: bun run build:site
+      - uses: ./.github/actions/setup-js
+        with:
+          working-directory: docs
+      - name: Build site
+        working-directory: docs
+        env:
+          NODE_ENV: production
+          PUBLIC_GA_ID: ${{ secrets.PUBLIC_GA_ID }}
+        run: npm run build
+      - name: Validate generated site
+        working-directory: docs
+        run: npm run check:site
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
+        with:
+          path: docs/out
+
   deploy:
-    uses: jonathanperis/.github/.github/workflows/pages-docs-deploy.yml@adba222717af04bb96c72edeb1de1729f25d521a
-    with:
-      node-version: '24'
-    secrets:
-      PUBLIC_GA_ID: ${{ secrets.PUBLIC_GA_ID }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5

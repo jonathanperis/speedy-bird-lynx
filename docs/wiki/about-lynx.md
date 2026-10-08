@@ -37,7 +37,7 @@ The ReactLynx game uses three built-in elements:
 - `<image>` — bird sprites, pipe tiles, background, ground, medals, digits
 - `<text>` — score numbers on the game-over panel
 
-This application does not use canvas or extended elements for its Lynx renderer. Lynx and its platform extensions offer additional elements such as video, SVG, and canvas integrations; availability depends on the platform and registered components. The Pages demo uses the browser's standard Canvas and Audio APIs.
+This application does not use canvas or extended elements for its Lynx renderer. Lynx and its platform extensions offer additional elements such as video, SVG, and canvas integrations; availability depends on the platform and registered components. On the web, Lynx's web runtime renders the same elements as custom elements inside the `<lynx-view>` shadow root.
 
 ### CSS differences
 
@@ -61,7 +61,7 @@ See [Game engine](game-engine.md) for the frame-by-frame flow.
 
 ### Native Modules
 
-Sound, saved scores, and screen-reader announcements go through one native module, `SpeedyBirdModule`, read from the background thread's `NativeModules` (`src/platform/host.ts`). Each host implements it: the standalone web host registers an ES module through `<lynx-view>`'s `nativeModulesMap` and handles calls with `onNativeModulesCall`. A host without the module still runs the game silently. The Canvas demo runs in the browser document and has its own audio implementation.
+Sound, saved scores, and screen-reader announcements go through one native module, `SpeedyBirdModule`, read from the background thread's `NativeModules` (`src/platform/host.ts`). Each host implements it: the standalone web host registers an ES module through `<lynx-view>`'s `nativeModulesMap` and handles calls with `onNativeModulesCall`. A host without the module still runs the game silently. The website's home page uses the same browser implementation (`web-host/host.ts`) as the standalone host.
 
 ## Resources
 

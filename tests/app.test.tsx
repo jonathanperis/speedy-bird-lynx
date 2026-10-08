@@ -18,6 +18,7 @@ const bridge = {
   played: [] as string[],
   saved: [] as string[],
   announced: [] as string[],
+  huds: [] as string[],
   stored: '',
   play(sound: string) {
     this.played.push(sound);
@@ -31,6 +32,9 @@ const bridge = {
   },
   announce(message: string) {
     this.announced.push(message);
+  },
+  reportHud(json: string) {
+    this.huds.push(json);
   },
 };
 
@@ -59,7 +63,7 @@ function root(container: Element) {
 beforeEach(() => {
   frames = [];
   now = 1_000;
-  Object.assign(bridge, { played: [], saved: [], announced: [], stored: '' });
+  Object.assign(bridge, { played: [], saved: [], announced: [], huds: [], stored: '' });
   rs.spyOn(Date, 'now').mockImplementation(() => now);
   env.mainThread.globalThis.lynx.requestAnimationFrame = (callback: () => void) => frames.push(callback);
   env.mainThread.globalThis.lynx.cancelAnimationFrame = () => {};
@@ -103,6 +107,13 @@ describe('App', () => {
     expect(label(container)).toBe('Game over. Score 0. Best 7. Tap to play again.');
     expect(bridge.played).toContain('fall');
     expect(bridge.saved).toEqual([]);
+    expect(JSON.parse(bridge.huds.at(-1) ?? '{}')).toEqual({
+      gameState: 2,
+      score: 0,
+      bestScore: 7,
+      newBest: false,
+      paused: false,
+    });
     // Once settled the loop stops requesting frames until the next tap.
     expect(frames).toHaveLength(0);
   });

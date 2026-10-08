@@ -102,8 +102,8 @@ color change, rewrite it.
 
 1. **Top bar.** Wordmark "Speedy Bird" in Barlow Condensed with a 16px bird sprite. Links:
    Play, How it works, Manual, Source. No hamburger at ≥768px.
-2. **Game band.** Sky-colored band containing the playable game (the Canvas build that already
-   shares `src/game/engine.ts`) at its 400x750 aspect, with the live timing panel beside it on
+2. **Game band.** Sky-colored band containing the playable game (the ReactLynx build itself, in a
+   `<lynx-view>`) at its 400x750 aspect, with the live timing panel beside it on
    wide screens and below it on phones. One sentence under the title: "Flappy Bird where every
    pipe you clear makes the game 1% faster." Primary button: "Start a run" (gold, sentence
    case). Controls are stated once, next to the game. The ground strip closes the band.
@@ -162,8 +162,10 @@ the code or from a measurement, and say which.
   `// #endregion` markers; `check-site.mjs` fails if a referenced region is missing.
 - Versions in the colophon come from `package.json`, `android/gradle/libs.versions.toml` and
   `ios/Podfile.lock`, so they cannot go stale.
-- The timing panel subscribes to the Canvas controller's state (score, speed, pipes, medal);
-  it adds no second game loop.
+- The timing panel shows the HUD the game reports through `SpeedyBirdModule.reportHud` and
+  derives speed values with the engine's functions; it adds no second game loop.
+- Until the Lynx runtime paints, the game box shows the skyline and ground in HTML, positioned
+  from `src/constants.ts`, so the first frame lands on an identical scene.
 
 ## Mockup
 

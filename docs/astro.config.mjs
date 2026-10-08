@@ -20,8 +20,13 @@ export default defineConfig({
   vite: {
     server: {
       fs: {
-        // The site itself, plus the app's src/ directory: the Canvas demo imports the game rules.
-        allow: [fileURLToPath(new URL('./', import.meta.url)), fileURLToPath(new URL('../src/', import.meta.url))],
+        // The site itself, the app's src/ (game rules for the facts and timing panel), and the
+        // web host's SpeedyBirdModule implementation, which the home page shares.
+        allow: [
+          fileURLToPath(new URL('./', import.meta.url)),
+          fileURLToPath(new URL('../src/', import.meta.url)),
+          fileURLToPath(new URL('../web-host/', import.meta.url)),
+        ],
       },
     },
   },
