@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import { paperTheme } from './src/lib/code-theme.mjs';
 
 // GitHub Pages serves this project under /speedy-bird-lynx/. Every command (dev, build, preview)
 // uses that base, so local URLs match production. Set SITE_BASE (for example SITE_BASE=/) to
@@ -13,6 +14,9 @@ export default defineConfig({
   outDir: 'out',
   site: 'https://jonathanperis.github.io',
   base,
+  markdown: {
+    shikiConfig: { theme: paperTheme },
+  },
   vite: {
     server: {
       fs: {

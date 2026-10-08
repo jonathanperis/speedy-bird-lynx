@@ -1,6 +1,6 @@
 # Speedy Bird website and documentation
 
-Astro 7 static site deployed to [GitHub Pages](https://jonathanperis.github.io/speedy-bird-lynx/). It contains a playable Canvas build of the game, which runs the app's own rules engine, and a manual generated from `wiki/*.md`. Astro uses its default Rust-powered Markdown pipeline; `src/lib/render-doc.ts` adapts compiled HTML links and heading IDs at build time.
+Astro 7 static site deployed to [GitHub Pages](https://jonathanperis.github.io/speedy-bird-lynx/). It contains a playable Canvas build of the game, which runs the app's own rules engine, and a manual generated from `wiki/*.md`. The visual system is described in the root `DESIGN.md`.
 
 ## Run locally
 
@@ -25,35 +25,41 @@ Open the preview URL with `/speedy-bird-lynx/` appended. Build output is `out/`;
 
 | Path | Responsibility |
 |------|----------------|
-| `src/pages/index.astro` | Landing page markup and metadata; mounts the Canvas demo |
-| `src/game/*.ts` | Canvas demo: controller (frame loop, input, pause, storage, announcements), renderer, sprite loader, and Web Audio. Gameplay is imported from the app's `src/game/engine.ts` |
-| `wiki/*.md` | Technical guide content |
-| `src/pages/docs/[...slug].astro` | Combined manual and individual guide routes |
-| `src/lib/docs-sidebar.config.ts` | Navigation groups, route order, page titles, and descriptions |
-| `src/lib/render-doc.ts` | Build-time `.md` link resolution and combined-manual ID namespacing |
-| `src/layouts/BaseLayout.astro` | Documentation HTML shell, per-route canonical/OG URLs, TechArticle metadata |
-| `src/styles/tokens.css` | Design tokens shared by every page (colors, shadows, easing; see `DESIGN.md`) |
-| `src/styles/home.css` | Landing page styles |
-| `src/styles/fonts.css` | Self-hosted Nunito and Space Grotesk (`@fontsource`, latin subset); the site requests no third-party fonts |
-| `src/styles/globals.css`, `docs.css` | Manual base and manual styles |
+| `src/pages/index.astro` | Home page: game band with the live timing panel, Sheets 1–3, manual contents; mounts the Canvas demo |
+| `src/game/*.ts` | Canvas demo: controller (frame loop, input, pause, storage, announcements), renderer, sprite loader, Web Audio, and the timing panel (`timing.ts`). Gameplay is imported from the app's `src/game/engine.ts` |
+| `src/lib/game-facts.ts` | Speed table computed from the engine at build time (Sheet 1) |
+| `src/lib/bridge.ts` | `SpeedyBirdModule` table (Sheet 2); the build fails if a host stops implementing a method |
+| `src/lib/repo-files.ts` | Reads repository files at build time and extracts `// #region` excerpts (Sheet 3) |
+| `src/lib/versions.ts` | Colophon versions read from `package.json`, `libs.versions.toml`, and `Podfile.lock` |
+| `src/lib/code-theme.mjs` | Shiki theme for code on paper; every token color passes AA |
+| `wiki/*.md` | Guide content |
+| `src/pages/docs/[...slug].astro` | Manual routes: `/docs/` (start here) and `/docs/<slug>/`, with contents, search, and previous/next |
+| `src/lib/docs-sidebar.config.ts` | Parts, route order, titles, descriptions, article numbers, and the source files each guide documents |
+| `src/lib/render-doc.ts` | Lifts the guide's H1 into the page header, collects headings, resolves `.md` links, builds typed callouts, wraps tables |
+| `src/layouts/BaseLayout.astro` | HTML shell, per-route canonical/OG URLs, structured data |
+| `src/components/SiteHeader.astro`, `SiteFooter.astro` | Top bar and colophon shared by every page |
+| `src/styles/tokens.css`, `fonts.css`, `base.css` | Palette, self-hosted fonts, and shared rules (see `DESIGN.md`) |
+| `src/styles/home.css`, `docs.css` | Home page and manual styles |
 | `public/assets/` | Browser copies of root game sprites and sounds |
 | `public/og-image.png`, icons | Social preview and browser icons |
-| `scripts/check-site.mjs` | Offline build checks: wiki routes, local links/fragments, unique IDs, canonical/OG URLs, that every local asset (images, stylesheets, scripts, social images, fonts, and the game's sprite/sound lists) exists, that JSON-LD parses, and that no page has inline event handlers or script URLs and no guide has scripts. Paths resolve from `docs/`, so it runs from any directory |
-| `astro.config.mjs` | Site URL, base path (`SITE_BASE`, default `/speedy-bird-lynx`), output directory, sitemap, and the dev server's file access |
+| `scripts/check-site.mjs` | Offline build checks: wiki routes, local links/fragments, unique IDs, canonical/OG URLs, that every local asset exists, that JSON-LD parses, and that no page has inline event handlers or script URLs and no guide has scripts |
+| `astro.config.mjs` | Site URL, base path (`SITE_BASE`, default `/speedy-bird-lynx`), output directory, sitemap, Markdown code theme, and the dev server's file access |
+
+The build reads files outside `docs/` (the engine, host sources, manifests), so run it from `docs/`.
 
 ## Add or edit a guide
 
-1. Edit a file in `wiki/`, or create `wiki/your-guide.md` with a descriptive H1.
-2. Add a new guide's slug to `SECTION_CATEGORIES` and its title/description to `PAGE_META` in `docs-sidebar.config.ts`.
-3. Add it to the table in `wiki/index.md` so both the built manual and GitHub source are discoverable.
-4. Link to sibling sources as `[Guide](your-guide.md)` or `[Section](your-guide.md#heading)`. The build converts these to base-aware public URLs. Use `index.md` for the combined manual.
-5. Build and run `npm run check:site`. The route checker verifies every wiki file has a generated route.
+1. Edit a file in `wiki/`, or create `wiki/your-guide.md` with a sentence-case H1 (the page header shows it).
+2. Add a new guide's slug to `SECTION_CATEGORIES`, its title/description to `PAGE_META`, and the files it documents to `PAGE_SOURCES` in `docs-sidebar.config.ts`. Article numbers follow from the order.
+3. Link to sibling guides as `[Guide](your-guide.md)` or `[Section](your-guide.md#heading)`; the build converts these to base-aware URLs.
+4. For callouts, start a blockquote with `**Note:**`, `**Hold:**` (a dependency held back, with the reason), or `**Verified:**` (what was run, on what).
+5. Build and run `npm run check:site`.
 
-The public `/docs/` route combines all guides. `/docs/<slug>/` renders a single guide. Section IDs such as `#game-engine` remain stable. On the combined page, generated heading IDs are prefixed with their guide slug to avoid collisions; on individual pages, heading fragments remain unprefixed. A heading matching its section slug uses the enclosing section's ID rather than duplicating it. Each page has one H1: a guide's own H1 on its route, and the manual title on the combined page, where `render-doc.ts` moves every guide heading down one level. Styles target the `doc-h<level>` class from the Markdown level, so guides look the same in both places.
+`/docs/` renders `wiki/index.md` as "Start here"; every other guide has its own route. Search runs over an index built with the site and finds titles, headings, and text; `/` focuses it.
 
 The site ships no `robots.txt`: crawlers only read it from the host root (`jonathanperis.github.io/robots.txt`), which this project does not control. Pages link the sitemap with `<link rel="sitemap">` instead.
 
-Sidebar search filters sections on the combined manual; it is intentionally hidden on individual guides. Sidebar entries scroll to sections on the combined manual and link to guide routes on individual guides. Page titles and descriptions come from `PAGE_META`; the layout derives canonical and `og:url` from the current route. The landing page has its own JSON-LD graph: a VideoGame, which must describe actual platform availability, and a SoftwareSourceCode entry that carries the repository URL.
+Page titles and descriptions come from `PAGE_META`; the layout derives canonical and `og:url` from the current route. The landing page has its own JSON-LD graph: a VideoGame, which must describe actual platform availability, and a SoftwareSourceCode entry that carries the repository URL.
 
 ## Assets and credits
 
