@@ -30,9 +30,10 @@ const home = `${base}/`;
     position: relative;
     z-index: 10;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 0.5rem 1rem;
     padding: 0.7rem var(--gutter);
     background: var(--paper);
     border-bottom: var(--border);
@@ -53,6 +54,7 @@ const home = `${base}/`;
 
   nav ul {
     display: flex;
+    flex-wrap: wrap;
     gap: clamp(0.9rem, 2.5vw, 1.75rem);
     padding: 0;
     list-style: none;
