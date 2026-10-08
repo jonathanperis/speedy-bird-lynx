@@ -54,6 +54,8 @@ export const BG_DX = 0.2;
 // Ground — 15% taller to sit higher on screen
 export const GROUND_W = 224;
 export const GROUND_H = 129;
+/** The ground sprite's own height; the band below it is filled with GROUND_COLOR. */
+export const GROUND_TILE_H = 112;
 export const GROUND_DX = 2.7;
 
 // After game over, taps restart only once the bird has landed and this many steps
@@ -69,3 +71,8 @@ export const MEDAL_PLATINUM = 100;
 // Colors
 export const BG_COLOR = '#00bbc4';
 export const LETTERBOX_COLOR = '#04111e';
+/** Bottom row of the ground sprite. */
+export const GROUND_COLOR = '#ded895';
+
+/** Scale sprites with nearest-neighbor sampling so pixel art stays sharp at any size. */
+export const PIXEL_ART = { imageRendering: 'pixelated' } as const;

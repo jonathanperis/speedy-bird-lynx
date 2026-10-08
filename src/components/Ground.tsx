@@ -1,5 +1,5 @@
 import groundSrc from '../../assets/sprites/ground.png';
-import { CANVAS_HEIGHT, GROUND_H, GROUND_W } from '../constants.js';
+import { CANVAS_HEIGHT, GROUND_COLOR, GROUND_H, GROUND_TILE_H, GROUND_W, PIXEL_ART } from '../constants.js';
 
 const TILES = [0, 1, 2, 3, 4];
 
@@ -17,6 +17,9 @@ export default function Ground() {
         zIndex: 3,
         display: 'flex',
         flexDirection: 'row',
+        alignItems: 'flex-start',
+        // The sprite is shorter than the ground band; its sand color continues below it.
+        backgroundColor: GROUND_COLOR,
       }}
     >
       {TILES.map((tile) => (
@@ -24,7 +27,7 @@ export default function Ground() {
           key={tile}
           src={groundSrc}
           // Overlap by one pixel so fractional scaling never shows a seam between tiles.
-          style={{ width: `${GROUND_W + 1}px`, height: `${GROUND_H}px`, marginRight: '-1px' }}
+          style={{ ...PIXEL_ART, width: `${GROUND_W + 1}px`, height: `${GROUND_TILE_H}px`, marginRight: '-1px' }}
         />
       ))}
     </view>

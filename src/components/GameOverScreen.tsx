@@ -3,7 +3,7 @@ import medalBronze from '../../assets/sprites/medals/medal-bronze.png';
 import medalGold from '../../assets/sprites/medals/medal-gold.png';
 import medalPlatinum from '../../assets/sprites/medals/medal-platinum.png';
 import medalSilver from '../../assets/sprites/medals/medal-silver.png';
-import { CANVAS_HEIGHT } from '../constants.js';
+import { CANVAS_HEIGHT, PIXEL_ART } from '../constants.js';
 import { medalForScore } from '../game/engine.js';
 import type { Medal } from '../types.js';
 
@@ -54,12 +54,20 @@ export default function GameOverScreen({ visible, score, bestScore, newBest }: G
       <view style={{ width: `${IMG_W}px`, height: `${IMG_H}px`, position: 'relative' }}>
         <image
           src={gameOverSrc}
-          style={{ position: 'absolute', top: '0px', left: '0px', width: `${IMG_W}px`, height: `${IMG_H}px` }}
+          style={{
+            ...PIXEL_ART,
+            position: 'absolute',
+            top: '0px',
+            left: '0px',
+            width: `${IMG_W}px`,
+            height: `${IMG_H}px`,
+          }}
         />
         {medal ? (
           <image
             src={MEDAL_SPRITES[medal]}
             style={{
+              ...PIXEL_ART,
               position: 'absolute',
               top: '88px',
               left: '24px',

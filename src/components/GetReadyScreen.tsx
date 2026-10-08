@@ -1,5 +1,5 @@
 import getReadySrc from '../../assets/sprites/get-ready.png';
-import { CANVAS_HEIGHT } from '../constants.js';
+import { CANVAS_HEIGHT, PIXEL_ART } from '../constants.js';
 
 const IMG_W = 174;
 const IMG_H = 160;
@@ -23,7 +23,7 @@ export default function GetReadyScreen({ visible }: GetReadyScreenProps) {
         justifyContent: 'center',
       }}
     >
-      <image src={getReadySrc} style={{ width: `${IMG_W}px`, height: `${IMG_H}px` }} />
+      <image src={getReadySrc} style={{ ...PIXEL_ART, width: `${IMG_W}px`, height: `${IMG_H}px` }} />
     </view>
   );
 }

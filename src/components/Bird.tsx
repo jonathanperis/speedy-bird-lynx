@@ -1,7 +1,7 @@
 import bird0 from '../../assets/sprites/bird-0.png';
 import bird1 from '../../assets/sprites/bird-1.png';
 import bird2 from '../../assets/sprites/bird-2.png';
-import { BIRD_H, BIRD_W, BIRD_X, BIRD_Y_START } from '../constants.js';
+import { BIRD_H, BIRD_W, BIRD_X, BIRD_Y_START, PIXEL_ART } from '../constants.js';
 
 // Wing cycle: up, middle, down, middle. All frames stay mounted and the main thread
 // toggles their opacity, so a frame change never waits for an image to decode.
@@ -28,6 +28,7 @@ export default function Bird() {
           id={`bird-frame-${index}`}
           src={src}
           style={{
+            ...PIXEL_ART,
             position: 'absolute',
             width: `${BIRD_W}px`,
             height: `${BIRD_H}px`,

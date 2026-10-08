@@ -2,7 +2,7 @@ import pipeBottomBody from '../../assets/sprites/pipes/pipe-bottom.png';
 import pipeBottomMouth from '../../assets/sprites/pipes/pipe-bottom-mouth.png';
 import pipeTopBody from '../../assets/sprites/pipes/pipe-top.png';
 import pipeTopMouth from '../../assets/sprites/pipes/pipe-top-mouth.png';
-import { PIPE_H, PIPE_W } from '../constants.js';
+import { PIPE_H, PIPE_W, PIXEL_ART } from '../constants.js';
 
 // Source tiles are 26x25; scale them to the pipe width.
 const TILE_H = Math.round(25 * (PIPE_W / 26));
@@ -10,6 +10,7 @@ const TILE_H = Math.round(25 * (PIPE_W / 26));
 const BODY_TILES = Array.from({ length: Math.ceil((PIPE_H + 400) / TILE_H) }, (_, index) => index);
 
 const tileStyle = (top: number, height = TILE_H) => ({
+  ...PIXEL_ART,
   position: 'absolute' as const,
   top: `${top}px`,
   left: '0px',
