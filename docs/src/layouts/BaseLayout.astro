@@ -70,6 +70,7 @@ const data = structuredData ?? {
     <meta name="twitter:creator" content="@jperis_silva" />
 
     <script type="application/ld+json" set:html={jsonLd(data)} />
+    <slot name="head" />
   </head>
   <body>
     <a class="skip-link" href={`#${mainId}`}>Skip to content</a>

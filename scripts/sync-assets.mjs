@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Keep docs/public/assets an exact copy of the canonical game assets in assets/.
+// Keep docs/public/assets an exact copy of the canonical sprites in assets/. The site plays
+// sounds from the Lynx build (`bun run build:site` copies assets/audio to docs/public/play/).
 // Usage: node scripts/sync-assets.mjs [--check]
 import { createHash } from 'node:crypto';
 import { copyFile, mkdir, readdir, readFile, rm } from 'node:fs/promises';
@@ -10,7 +11,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const source = path.join(root, 'assets');
 const target = path.join(root, 'docs/public/assets');
 const check = process.argv.includes('--check');
-const SHIPPED = /\.(png|wav)$/;
+const SHIPPED = /\.png$/;
 
 async function list(dir, base = dir) {
   const entries = await readdir(dir, { withFileTypes: true }).catch(() => []);

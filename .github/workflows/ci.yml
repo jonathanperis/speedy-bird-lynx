@@ -125,6 +125,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      # The home page embeds the real Lynx build (main.web.bundle and the web runtime).
+      - uses: ./.github/actions/setup-js
+      - name: Build the Lynx game for the site
+        run: bun run build:site
       - uses: ./.github/actions/setup-js
         with:
           working-directory: docs

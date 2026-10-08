@@ -10,15 +10,15 @@
 
 ## About
 
-[Lynx](https://lynxjs.org/) is an open-source cross-platform native UI framework created by ByteDance. It uses a native rendering engine rather than a WebView on mobile. Speedy Bird runs its frame loop, taps, and simulation on the Lynx main thread with Main Thread Script, and uses React on the background thread only for discrete UI such as the score and overlays. It demonstrates element-based rendering, frame-rate-independent physics, native modules, assets, and automated builds. The public website draws the same game engine with HTML Canvas.
+[Lynx](https://lynxjs.org/) is an open-source cross-platform native UI framework created by ByteDance. It uses a native rendering engine rather than a WebView on mobile. Speedy Bird runs its frame loop, taps, and simulation on the Lynx main thread with Main Thread Script, and uses React on the background thread only for discrete UI such as the score and overlays. It demonstrates element-based rendering, frame-rate-independent physics, native modules, assets, and automated builds. The public website plays the same ReactLynx build in the browser through Lynx's web runtime.
 
 | Surface | Current status |
 |---------|----------------|
 | Android | Kotlin host with Lynx 4.1.0; debug and release build paths |
 | ReactLynx web | Rspeedy preview and a self-contained standalone host with sound, saved best score, and keyboard input |
-| GitHub Pages | Playable Canvas demo and Astro documentation |
+| GitHub Pages | The ReactLynx build playable on the home page, plus the Astro documentation |
 | iOS | Swift host with a generated Xcode project, CocoaPods lockfile, and XCUITest smoke tests; unsigned builds in CI |
-| Audio and saved score | Android (SoundPool), iOS (AVAudioPlayer), and the standalone web host (Web Audio) through `SpeedyBirdModule`; the Canvas demo has its own audio |
+| Audio and saved score | Android (SoundPool), iOS (AVAudioPlayer), and the browser hosts (Web Audio) through `SpeedyBirdModule` |
 
 ## Tech stack
 
@@ -28,9 +28,9 @@
 | React types | 19.3.0 | JSX typings consumed by ReactLynx |
 | [TypeScript](https://www.typescriptlang.org/) | 6.0.3 app / 7.0.2 docs | Separate toolchains |
 | Rspeedy / ReactLynx plugin | 0.18.0 / 0.20.3 | Coordinated native/web compiler toolchain |
-| Rsbuild | 2.2.12 | Standalone web host |
+| Rsbuild | 2.2.12 | Web host and the website's Lynx runtime |
 | Biome | 2.5.15 | Lint and format checks |
-| Astro | 7.3.6 | Static documentation and Canvas demo |
+| Astro | 7.3.6 | Website and documentation |
 | Android (Kotlin) | Lynx SDK 4.1.0 | Native Android host app |
 | iOS (Swift + CocoaPods) | Lynx SDK 4.1.0 | Native iOS host app |
 | GitHub Actions | SHA-pinned | CI/CD build, sign, deploy, release |
@@ -39,20 +39,20 @@ Versions reviewed **2026-10-07**. See [Dependencies and Upgrades](https://jonath
 
 ## Features
 
-- Tap/click to flap; the standalone web host and the GitHub Pages canvas demo also accept Space/Enter while the game has focus
+- Tap/click to flap; in browsers, Space/Enter also flap while the game has focus
 - Speed increases 1% per pipe cleared; points score the moment the bird clears a pipe
 - Frame-rate-independent physics (fixed 1/60 s steps) on a main-thread frame loop
 - Scales to any screen: extra height becomes sky, wide screens are letterboxed
 - Best score saved by the host; restart is locked briefly after a crash so the results stay visible
 - Pauses when the app is backgrounded mid-run; screen-reader announcements for game state
 - Medal system: Bronze (10+), Silver (25+), Gold (50+), Platinum (100+)
-- ReactLynx rendering using `<view>` and `<image>` with CSS transforms; the public browser demo uses Canvas
+- ReactLynx rendering using `<view>` and `<image>` with CSS transforms, on every platform including the website
 - Tile-based pipe construction to avoid sprite stretching
 - Parallax scrolling background and ground layers
 - Sprite-based digit rendering for in-game score
 - AABB collision detection with circular bird hitbox approximation
 - Five sound effects through the `SpeedyBirdModule` host bridge
-- Astro-powered GitHub Pages site in `docs/`, including a playable canvas demo and generated wiki pages
+- Astro-powered GitHub Pages site in `docs/` that plays the Lynx build, with generated wiki pages
 
 ## Getting started
 
@@ -89,6 +89,7 @@ Outputs `dist/main.lynx.bundle` (native) and `dist/main.web.bundle` (web).
 The public GitHub Pages site lives in `docs/`. It uses Astro 7, so run it with Node.js >=22.12:
 
 ```bash
+bun run build:site   # at the root: main.web.bundle + Lynx web runtime into docs/public/play/
 cd docs
 bun install --frozen-lockfile
 npm run dev
@@ -97,7 +98,7 @@ npm run check:site
 npm run preview
 ```
 
-The docs build writes static output to `docs/out/`; the `deploy.yml` workflow publishes that output to GitHub Pages through the shared reusable Pages workflow.
+The docs build writes static output to `docs/out/`; the `deploy.yml` workflow runs `bun run build:site`, builds and validates the site, and publishes it to GitHub Pages.
 
 See [docs/README.md](docs/README.md) for content authoring, route metadata, asset maintenance, and local/production base paths.
 
@@ -108,7 +109,7 @@ There are three web-related surfaces in the repository:
 | Surface | Location | Purpose |
 |---------|----------|---------|
 | ReactLynx web preview | `bun run dev`, then `http://localhost:3000/__web_preview?casename=main.web.bundle` | Development preview of the compiled `main.web.bundle` |
-| GitHub Pages canvas demo | `docs/src/pages/index.astro` and `docs/src/game/` | Public playable browser demo; it imports `src/game/engine.ts`, so gameplay matches the app on the same 400x750 playfield |
+| GitHub Pages home page | `docs/src/pages/index.astro` and `docs/src/scripts/game.ts` | The public game: `main.web.bundle` in a `<lynx-view>`, with the browser bridge shared with the standalone host |
 | Standalone web host | `bun run dev:web-host` at `http://localhost:4000` | Development-only `<lynx-view>` host; also run `bun run dev` on port 3000 to supply the bundle |
 
 ### Android build
@@ -147,7 +148,7 @@ tests/                         # Rstest unit and component tests
 android/                       # Native Android host app (Kotlin)
 ios/                           # Native iOS host app (Swift, generated Xcode project, UI tests)
 assets/                        # Sprites, audio, medals, digits
-docs/                          # Astro GitHub Pages site + playable canvas demo
+docs/                          # Astro GitHub Pages site; the home page plays the Lynx build
 .github/workflows/             # CI/CD pipelines
 ```
 
@@ -171,7 +172,7 @@ docs/                          # Astro GitHub Pages site + playable canvas demo
 | Tagged Android release APK | `release.yml` on `v*` tags | Attached to the immutable GitHub Release; signed when `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD` are configured |
 | iOS archive | `build-ios.yml` (manual) or `release.yml` | Unsigned; the workflows always disable signing, so providing Apple secrets alone does not enable it |
 
-Quality gates include dependency audits, Biome lint/format checks, TypeScript checks, Rstest unit and component tests, docs asset parity, bundle/web-host/docs builds, generated-site validation, Android compilation/API lint, APK bundle and sound verification, iOS XCUITest smoke tests on a simulator, and CodeQL.
+Quality gates include dependency audits, Biome lint/format checks, TypeScript checks, Rstest unit and component tests, docs sprite parity, bundle/web-host/site builds, generated-site validation, Android compilation/API lint, APK bundle and sound verification, iOS XCUITest smoke tests on a simulator, and CodeQL.
 
 ## Credits
 

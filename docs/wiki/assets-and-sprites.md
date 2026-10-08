@@ -86,6 +86,6 @@ The game-over panel score uses `<text>` elements positioned absolutely over the 
 
 ## Website copies and social assets
 
-The Canvas demo serves copies from `docs/public/assets/`. Keep each sprite and sound byte-identical to its canonical counterpart in root `assets/`: run `bun run assets:sync` after changing assets (CI runs `bun run assets:check`). The docs build copies public files unchanged, and `npm run check:site` fails if a sprite or sound the demo references is missing from the output.
+The website's own artwork (the scenery behind the game while it loads, the ground strip, medals, and the 404 scene) uses copies in `docs/public/assets/`. Keep each sprite byte-identical to its canonical counterpart in root `assets/`: run `bun run assets:sync` after changing sprites (CI runs `bun run assets:check`). The game on the home page needs no copies: its sprites are embedded in `main.web.bundle`, and `bun run build:site` ships the sounds from `assets/audio/`. `npm run check:site` fails if a sprite the site references is missing from the output.
 
 The Open Graph image is rendered from `docs/scripts/og-template.html` by headless Chrome (`npm run og:render`), with the real sprites and the site's fonts. The browser icons come from `docs/scripts/generate_icons.py`, which scales the bird sprite by whole numbers onto the sky color. See `docs/README.md` for the commands.

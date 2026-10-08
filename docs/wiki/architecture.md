@@ -32,8 +32,8 @@ speedy-bird-lynx/
 ├── android/                      # Native Android host app
 ├── ios/                          # Native iOS host app (source files)
 ├── assets/                       # Canonical sprites and audio
-├── docs/                         # Astro GitHub Pages site + playable canvas demo
-├── web-host/                     # Standalone <lynx-view> host with the bridge module
+├── docs/                         # Astro GitHub Pages site; the home page plays the Lynx build
+├── web-host/                     # <lynx-view> runtime and SpeedyBirdModule for browsers
 ├── scripts/                      # Asset sync and APK verification
 ├── lynx.config.ts                # Lynx build configuration
 ├── rstest.config.ts              # Test runner configuration
@@ -92,7 +92,15 @@ Visuals use built-in elements only:
 | Surface | Source | Purpose |
 |---------|--------|---------|
 | ReactLynx web preview | `bun run dev` and `http://localhost:3000/__web_preview?casename=main.web.bundle` | Development preview of the compiled `main.web.bundle` |
-| Standalone web host | `bun run dev:web-host` with `bun run dev`; or `bun run build && bun run build:web-host` | `<lynx-view>` host on port 4000 that implements `SpeedyBirdModule` (Web Audio, `localStorage`, live-region announcements) and forwards Space/Enter and tab visibility. The production build is self-contained: it ships `main.web.bundle` and the audio files |
-| GitHub Pages canvas demo | `docs/src/pages/index.astro` mounting `docs/src/game/` | Public playable browser demo. It imports the app's rules (`src/game/engine.ts`, constants, saved-score format, announcements) and only adds a Canvas renderer, input, Web Audio, and `localStorage`, so gameplay matches the ReactLynx game on the same 400x750 playfield |
+| Standalone web host | `bun run dev:web-host` with `bun run dev`; or `bun run build && bun run build:web-host` | Full-window `<lynx-view>` on port 4000 for development. The production build is self-contained: it ships `main.web.bundle`, the audio files, and the bridge module |
+| GitHub Pages home page | `bun run build:site`, then the Astro build in `docs/` | The public game: the same `main.web.bundle` in a `<lynx-view>` on the home page, next to a live timing panel |
 
-The canvas demo is a second renderer for the same engine, not a port. `docs/src/game/controller.ts` runs `step()` in fixed 1/60 s steps from `requestAnimationFrame` via `consumeElapsed`, stops the loop while idle, hidden, or scrolled out of view (a run in progress pauses until the next tap), and announces state changes with `announcementFor` through a live region. `docs/src/game/renderer.ts` draws the full 400x750 playfield with the sizes and layering of `src/components/`, scaled to the landing page's phone frame. Space and Enter flap only while the canvas has focus. The best score uses the `speedy-bird.preferences.v1` key and format shared with the standalone web host.
+Both browser surfaces share `web-host/host.ts`, the browser implementation of `SpeedyBirdModule`: Web Audio for sounds, `localStorage` for the best score (key `speedy-bird.preferences.v1`), a live region for announcements, Space/Enter while the game has focus, and pause when the tab is hidden. `web-host/runtime.ts` loads the Lynx web runtime (`@lynx-js/web-core` and `@lynx-js/web-elements`).
+
+For the website, `bun run build:site` builds only that runtime, with `main.web.bundle`, the audio, and `native-module.js`, into `docs/public/play/`. Chunks, workers, and WebAssembly resolve relative to the runtime script (`assetPrefix: 'auto'`), and the runtime needs no cross-origin isolation, so plain GitHub Pages hosting works. At build time the home page reads the runtime's file names from `play/manifest.json` (`docs/src/lib/lynx-runtime.ts`) and adds them as deferred scripts. `docs/src/scripts/game.ts` mounts the shared bridge on the page's `<lynx-view>` and adds the page around it: the start and mute buttons, and pausing while the game is scrolled out of view. The timing panel shows what the app reports through the optional `reportHud` bridge call; speed, scroll, and spawn interval are derived from the score with the engine's own functions.
+
+Until the runtime paints its first frame, the game box shows the skyline and ground in plain HTML, positioned from `src/constants.ts`, so the scene appears immediately and the Lynx frame lands on top of it without a visible change.
+
+> **Note:** The site uses no SSR. `@lynx-js/web-core` can render a bundle on the server, but the server-rendered first frame is drawn before layout, so the playfield is unscaled, and after hydration the app's layout event does not fire again.
+
+> **Note:** Lighthouse lists one deprecation on the home page: web-core loads ReactLynx's main-thread worklet chunk with a synchronous `XMLHttpRequest` (`__LoadLepusChunk`). It comes from the Lynx web runtime, not from this app.

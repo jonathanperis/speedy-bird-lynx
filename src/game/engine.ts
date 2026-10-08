@@ -1,5 +1,5 @@
 // Pure, deterministic game rules. This module runs on both Lynx threads (it is imported
-// with `runtime: 'shared'`), in the docs canvas demo, and in unit tests, so it must not
+// with `runtime: 'shared'`), in the website's timing panel, and in unit tests, so it must not
 // touch timers, rendering, storage, audio, or framework APIs.
 
 import {

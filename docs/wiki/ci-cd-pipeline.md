@@ -8,7 +8,7 @@ Every check and release runs on GitHub Actions, from `.github/workflows/`. A cha
 |----------|------|---------|-------------|
 | Build Check | `ci.yml` | Manual, push to `main`, every PR, weekly | Audit dependencies, lint/format, type-check, Rstest tests, check bundles/web host/docs, validate site links/metadata, compile/lint Android, verify the APK bundle and sounds, build iOS and run its XCUITest smoke tests; calls Build Android after `main` pushes pass |
 | CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript, Actions, Python, and Kotlin security analysis; Swift (full Xcode build) weekly and on demand |
-| Deploy Web | `deploy.yml` | Push to `main`, manual | Build and deploy the Astro `docs/` site to GitHub Pages via the shared Pages workflow |
+| Deploy Web | `deploy.yml` | Push to `main`, manual | Build the Lynx game and the Astro `docs/` site, validate it, and deploy it to GitHub Pages |
 | Build Android | `build-android.yml` | Called by Build Check on `main`, manual from `main` | Read-only APK build followed by a separate build-prerelease publisher |
 | Build iOS | `build-ios.yml` | Manual | Unsigned archive |
 | Release | `release.yml` | `v*` tags on `main`, manual from `main` | Full release pipeline with all artifacts |
@@ -24,18 +24,18 @@ Runs on manual dispatch, pushes to `main`, every pull request (including stacked
 3. `bun run lint` — Biome lint and formatting check
 4. `bun run check` — TypeScript type-checking (app, tests, web host, configs)
 5. `bun run test` — Rstest unit and component tests
-6. `bun run assets:check` — docs asset copies match `assets/`
+6. `bun run assets:check` — the site's sprite copies match `assets/`
 7. `bun run build` and `bun run build:web-host` — build Lynx/web bundles and the development host
 8. Upload bundles as artifact (14-day retention)
 9. Compile and lint the Android debug host in a read-only job without signing secrets, then verify the APK contains the current bundle and every sound
 10. Build the iOS host and run its UI smoke tests on a simulator (see Build iOS)
-11. Install the frozen docs lockfile, audit it, build the site, and check every generated page's local links, fragments, unique IDs, and canonical/OG URL
+11. Build the Lynx game for the site (`bun run build:site`), install the frozen docs lockfile, audit it, build the site, and check every generated page's local links, fragments, unique IDs, canonical/OG URL, and spacing around links
 
 Successful builds and static checks do not establish device behavior or accessibility conformance.
 
 ## Deploy Web
 
-Deploys the Astro site in `docs/` to GitHub Pages on pushes to `main` or manual dispatch from `main`. The repository calls `jonathanperis/.github/.github/workflows/pages-docs-deploy.yml` at the full commit SHA recorded in `deploy.yml`. Only the optional public analytics ID is passed as a secret. The shared workflow installs frozen dependencies, uses Node.js 24 for Astro 7, builds the docs site, and publishes the static output.
+Deploys the Astro site in `docs/` to GitHub Pages on pushes to `main` or manual dispatch from `main`. The home page plays the real Lynx build, so the workflow installs both packages: it runs `bun run build:site` at the root (the bundle and the Lynx web runtime into `docs/public/play/`), then builds the site with Node.js 24, runs `npm run check:site`, and publishes `docs/out/` in a separate job that alone holds the Pages and OIDC permissions. Only the optional public analytics ID is read from secrets. It no longer uses the shared docs workflow from `jonathanperis/.github`, which builds `docs/` alone.
 
 ## Build Android
 
