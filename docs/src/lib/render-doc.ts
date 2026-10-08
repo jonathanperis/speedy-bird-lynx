@@ -31,14 +31,17 @@ const textOf = (node: Node) => {
 export async function renderDoc(html: string, docsBase: string): Promise<RenderedDoc> {
   const tree = parse(html);
   let title = '';
+  let titleNode: { node: Node; parent: Node } | undefined;
   const headings: RenderedDoc['headings'] = [];
 
   walkSync(tree, (node, parent) => {
     if (node.type !== ELEMENT_NODE) return;
 
+    // Remember the H1 and remove it after the walk: removing it now would shift the array
+    // walkSync is iterating and skip the next sibling.
     if (node.name === 'h1' && !title && parent) {
       title = textOf(node);
-      parent.children.splice(parent.children.indexOf(node), 1);
+      titleNode = { node, parent };
       return;
     }
     if (node.name === 'h2' && node.attributes.id) headings.push({ id: node.attributes.id, text: textOf(node) });
@@ -76,6 +79,7 @@ export async function renderDoc(html: string, docsBase: string): Promise<Rendere
     }
   });
 
-  if (!title) throw new Error('Wiki page has no H1');
+  if (!title || !titleNode) throw new Error('Wiki page has no H1');
+  titleNode.parent.children.splice(titleNode.parent.children.indexOf(titleNode.node), 1);
   return { title, headings, html: await render(tree), text: textOf(tree) };
 }
