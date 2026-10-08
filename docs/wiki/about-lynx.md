@@ -1,8 +1,8 @@
 # About Lynx
 
-[Lynx](https://lynxjs.org/) is an open-source cross-platform native UI framework created by [ByteDance](https://www.bytedance.com/) (the company behind TikTok). Open-sourced in early 2025, it allows developers to write apps in TypeScript/TSX using React-like APIs and render them as truly native UIs — not WebViews.
+[Lynx](https://lynxjs.org/) is an open-source cross-platform native UI framework created by [ByteDance](https://www.bytedance.com/) (the company behind TikTok). It was open-sourced in early 2025. You write the UI in TypeScript with React-like APIs, and Lynx renders it with native views on Android and iOS instead of a WebView.
 
-## Why Lynx for This Project
+## Why Lynx for this project
 
 This project exists to learn Lynx by building something real. A Flappy Bird clone is a good fit because it exercises:
 
@@ -13,7 +13,7 @@ This project exists to learn Lynx by building something real. A Flappy Bird clon
 - Cross-platform code — Android and iOS hosts plus web preview from one bundle
 - CI/CD — automated build and release pipeline
 
-## How Lynx Differs from Other Frameworks
+## How Lynx differs from other frameworks
 
 | Feature | Lynx | React Native | WebView (Cordova) |
 |---------|------|-------------|-------------------|
@@ -25,11 +25,11 @@ This project exists to learn Lynx by building something real. A Flappy Bird clon
 | Component APIs | ReactLynx, with its own runtime and compatibility APIs | React Native | React DOM |
 | Build tool | Rspack (`@lynx-js/rspeedy`) | Metro | Webpack/Vite |
 
-## Key Lynx Concepts Used in Speedy Bird
+## Key Lynx concepts used in Speedy Bird
 
 React Native 0.82 and newer run only on the New Architecture. Framework behavior evolves; consult the linked official references instead of treating this table as a benchmark or exhaustive feature list.
 
-### Elements Used Here
+### Elements used here
 
 The ReactLynx game uses three built-in elements:
 
@@ -39,7 +39,7 @@ The ReactLynx game uses three built-in elements:
 
 This application does not use canvas or extended elements for its Lynx renderer. Lynx and its platform extensions offer additional elements such as video, SVG, and canvas integrations; availability depends on the platform and registered components. The Pages demo uses the browser's standard Canvas and Audio APIs.
 
-### CSS Differences
+### CSS differences
 
 - Layout and styling are interpreted by Lynx on native targets, not by a browser stylesheet engine
 - The game uses explicit absolute positioning, flex rows, overflow clipping, and transforms
@@ -47,7 +47,7 @@ This application does not use canvas or extended elements for its Lynx renderer.
 
 The project primarily uses pixels and percentages. See the [Lynx length reference](https://lynxjs.org/api/css/data-type/length) for definitions and platform compatibility.
 
-### Dual-Threaded Architecture and Main Thread Script
+### Dual-threaded architecture and Main Thread Script
 
 React reconciliation (diffing, state updates) runs on a background thread. The main thread handles native rendering and touch events. Normally every update crosses between the two, which is fine for UI but too slow for a game updated every frame. [Main Thread Script](https://lynxjs.org/react/main-thread-script.html) lets selected functions run on the main thread instead:
 
@@ -57,7 +57,7 @@ React reconciliation (diffing, state updates) runs on a background thread. The m
 - `import ... with { runtime: 'shared' }` makes the pure engine module callable from main-thread code
 - `runOnBackground` sends discrete changes (score, state, sounds) to React; `runOnMainThread` lets background code start, pause, or resume the loop
 
-See [Game Engine](game-engine.md) for the frame-by-frame flow.
+See [Game engine](game-engine.md) for the frame-by-frame flow.
 
 ### Native Modules
 

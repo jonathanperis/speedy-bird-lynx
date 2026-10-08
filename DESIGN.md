@@ -7,10 +7,10 @@ dark navy, glowing stat cards, all-caps buttons, an eyebrow badge over a giant o
 was replaced because it read as a generic generated landing page wearing game colors; it stays
 in git history (`git log -p -- DESIGN.md`).
 
-Implemented: tokens and type, the home page (game band, live timing panel, Sheets 1–3, manual
-contents, colophon), and the manual layout (numbered contents, page header with documented
-sources, typed callouts, ruled tables, code with copy buttons, `/` search, previous/next).
-Still to do: the content pass, the 404 scene, and the redrawn Open Graph image (rollout PR D).
+Everything below is implemented: tokens and type, the home page (game band, live timing panel,
+Sheets 1–3, manual contents, colophon), the manual layout (numbered contents, page header with
+documented sources, typed callouts, ruled tables, code with copy buttons, `/` search,
+previous/next), the content pass, the 404 scene, and the Open Graph image and icons.
 
 ## Direction: the timing sheet
 
@@ -183,7 +183,7 @@ Lighthouse on the built site: performance 97–98, accessibility, best practices
 | A · Tokens and type | New `tokens.css`, fonts, palette; strip glows, gradients, eyebrows, stat cards, all-caps; buttons and links restyled | Both sites render in the new palette with no layout change; contrast checks pass |
 | B · Home page | Game band with live timing panel, speed curve sheet, hosts sheet, threads sheet with source excerpt, manual contents, colophon | Game above the fold at 390x844; sheets generated at build time; e2e suite passes |
 | C · Manual | Contents/article/on-this-page layout, page headers, typed callouts, ruled tables, code blocks, `/` search | Every guide has one H1, numbered contents, prev/next; `check-site` passes |
-| D · Content and extras | Voice pass on all wiki pages and README, 404 scene (the bird hits a pipe, real sprites), Open Graph image redrawn in the new style | Copy review against the Voice rules; OG image under 100 KB |
+| D · Content and extras | Voice pass on all wiki pages and README, 404 scene (the bird hits a pipe, real sprites, the real collision rule), Open Graph image rendered from an HTML template with the site's fonts, icons redrawn from the sprite | Copy review against the Voice rules; OG image under 100 KB (48 KB) |
 
 Each PR is checked at 390, 768, 1280 and 1440 px against this file, with Lighthouse
 accessibility at 100 and performance at 95 or above, no third-party requests (analytics only

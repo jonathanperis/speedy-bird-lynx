@@ -1,0 +1,151 @@
+---
+import { Code } from 'astro:components';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { paperTheme } from '../lib/code-theme.mjs';
+import { excerpt } from '../lib/repo-files';
+import '../styles/home.css';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const sprites = `${base}/assets/sprites/`;
+const rule = excerpt('src/game/engine.ts', 'collision');
+---
+
+<BaseLayout title="Page not found · Speedy Bird" description="There is no page at this address." noindex>
+  <SiteHeader />
+
+  <main id="main" tabindex="-1">
+    <section class="band crash" aria-labelledby="crash-title">
+      <div class="crash-inner">
+        <div class="crash-scene" aria-hidden="true" style={`--bg: url(${sprites}background.png); --ground: url(${sprites}ground.png)`}>
+          <div class="crash-pipe crash-pipe-top" style={`--tile: url(${sprites}pipes/pipe-top.png)`}>
+            <img class="sprite crash-mouth" src={`${sprites}pipes/pipe-top-mouth.png`} alt="" />
+          </div>
+          <div class="crash-pipe crash-pipe-bottom" style={`--tile: url(${sprites}pipes/pipe-bottom.png)`}>
+            <img class="sprite crash-mouth" src={`${sprites}pipes/pipe-bottom-mouth.png`} alt="" />
+          </div>
+          <img class="sprite crash-bird" src={`${sprites}bird-2.png`} width="34" height="24" alt="" />
+        </div>
+        <div class="crash-text">
+          <p class="sheet-caption">Error 404</p>
+          <h1 id="crash-title">This page hit a pipe</h1>
+          <p class="pitch">There is nothing at this address. The page may have moved when the manual was reorganized.</p>
+          <p class="crash-links">
+            <a class="button button-primary" href={`${base}/#play`}>Play a run</a>
+            <a class="button" href={`${base}/docs/`}>Open the manual</a>
+          </p>
+        </div>
+      </div>
+      <div class="ground-strip" style={`--ground: url(${sprites}ground.png)`} aria-hidden="true"></div>
+    </section>
+
+    <div class="page">
+      <section class="sheet" aria-labelledby="rule-title">
+        <p class="sheet-caption">The rule that ended this run</p>
+        <h2 id="rule-title">How the game decides you crashed</h2>
+        <figure class="excerpt">
+          <figcaption><a href={rule.url}><code>{rule.path}</code></a>, line {rule.startLine}</figcaption>
+          <Code code={rule.code} lang="ts" theme={paperTheme} />
+        </figure>
+      </section>
+    </div>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  .crash-inner {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: end;
+    max-width: var(--page);
+    margin: 0 auto;
+    padding: clamp(1.5rem, 4vw, 3rem) var(--gutter) 0;
+  }
+
+  .crash-scene {
+    position: relative;
+    width: 280px;
+    height: 360px;
+    overflow: hidden;
+    background: var(--bg) repeat-x 0 bottom / 207px 171px, var(--sky);
+    border: var(--border);
+    border-bottom: 0;
+    image-rendering: pixelated;
+  }
+
+  .crash-pipe {
+    position: absolute;
+    left: 150px;
+    width: 52px;
+    background: var(--tile) repeat-y 0 0 / 52px 50px;
+    image-rendering: pixelated;
+  }
+
+  .crash-pipe-top {
+    top: 0;
+    height: 120px;
+  }
+
+  .crash-pipe-bottom {
+    top: 250px;
+    bottom: 0;
+  }
+
+  .crash-mouth {
+    position: absolute;
+    left: 0;
+    width: 52px;
+    height: 50px;
+  }
+
+  .crash-pipe-top .crash-mouth {
+    bottom: 0;
+  }
+
+  .crash-pipe-bottom .crash-mouth {
+    top: 0;
+  }
+
+  /* Nose-down against the lower pipe's mouth, the frame the game shows after a crash. */
+  .crash-bird {
+    position: absolute;
+    left: 112px;
+    top: 238px;
+    width: 34px;
+    height: 24px;
+    transform: rotate(70deg);
+  }
+
+  .crash-text h1 {
+    margin: 0.3rem 0 0;
+    font-size: clamp(2.6rem, 6vw, 4.25rem);
+    line-height: 0.95;
+  }
+
+  .crash-text .sheet-caption {
+    color: var(--ink);
+  }
+
+  .crash-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding-bottom: 2rem;
+  }
+
+  @media (max-width: 640px) {
+    .crash-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .crash-scene {
+      order: 2;
+      justify-self: center;
+      height: 300px;
+    }
+  }
+</style>

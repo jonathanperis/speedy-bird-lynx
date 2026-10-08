@@ -65,27 +65,23 @@ Page titles and descriptions come from `PAGE_META`; the layout derives canonical
 
 Root `assets/` is the canonical game artwork/audio source. When active assets change, synchronize the corresponding files under `public/assets/`; archived sprite sheets under `assets/sprites/unused/` are not served. The site build only copies public assets and does not perform synchronization. Preserve the original-game, upstream Canvas recreation, sprite, and sound attribution in the manual and footer.
 
-The Canvas demo imports `src/game/engine.ts`, `src/constants.ts`, `src/game/preferences.ts`, and `src/game/announcements.ts` from the app, so gameplay changes reach both surfaces automatically; only rendering lives in `src/game/renderer.ts`, which mirrors the sizes and layering of `src/components/`. `astro.config.mjs` allows the dev server to read the app's `src/` directory. The demo draws the full 400×750 playfield and stores the best score under `speedy-bird.preferences.v1` in the same format as the standalone web host. The `1.00× Starting Speed` display is a static rule explanation, not live telemetry.
+The Canvas demo imports `src/game/engine.ts`, `src/constants.ts`, `src/game/preferences.ts`, and `src/game/announcements.ts` from the app, so gameplay changes reach both surfaces automatically; only rendering lives in `src/game/renderer.ts`, which mirrors the sizes and layering of `src/components/`. `astro.config.mjs` allows the dev server to read the app's `src/` directory. The demo draws the full 400×750 playfield and stores the best score under `speedy-bird.preferences.v1` in the same format as the standalone web host. The timing panel next to the game (`src/game/timing.ts`) reads the snapshot the demo just drew; it has no loop of its own.
 
-### Regenerate social images and icons
+### Regenerate the social image and icons
 
-Requires **Python >=3.10**, the pinned Pillow dependency, and two installed TTF fonts. Create an isolated environment inside the repository, then run from the root:
-
-```sh
-python3 -m venv .specs/docs-assets-venv
-.specs/docs-assets-venv/bin/python -m pip install -r docs/scripts/requirements.txt
-.specs/docs-assets-venv/bin/python docs/scripts/generate_social_assets.py
-```
-
-Defaults use Linux DejaVu font paths. On macOS, pass installed font paths explicitly:
+The Open Graph image is an HTML page rendered by headless Chrome, so it uses the site's own fonts and the real sprites. With Google Chrome installed, from `docs/`:
 
 ```sh
-.specs/docs-assets-venv/bin/python docs/scripts/generate_social_assets.py \
-  --font-bold "/System/Library/Fonts/Supplemental/Arial Bold.ttf" \
-  --font-mono-bold "/System/Library/Fonts/Supplemental/Courier New Bold.ttf"
+npm run og:render        # scripts/og-template.html -> public/og-image.png (1200x630)
 ```
 
-Outputs are `public/og-image.png` (1200×630), `favicon.png` (256×256), `favicon-32x32.png`, and `apple-touch-icon.png` (180×180). `favicon.ico` remains the icon source. Review generated images after changing fonts or text and keep both layout metadata and the landing page's image dimensions aligned.
+The browser icons are the bird sprite scaled by whole numbers onto the sky color inside an ink border. From the repository root, with the Pillow version in `docs/scripts/requirements.txt`:
+
+```sh
+uvx --with pillow==12.3.0 python -I docs/scripts/generate_icons.py
+```
+
+It writes `favicon.png` (256x256), `favicon-32x32.png`, `apple-touch-icon.png` (180x180, opaque), and `favicon.ico` (16, 32, 48). Review the images after changing the template or the sprite.
 
 ## Optional analytics
 

@@ -20,7 +20,7 @@
 | iOS | Swift host with a generated Xcode project, CocoaPods lockfile, and XCUITest smoke tests; unsigned builds in CI |
 | Audio and saved score | Android (SoundPool), iOS (AVAudioPlayer), and the standalone web host (Web Audio) through `SpeedyBirdModule`; the Canvas demo has its own audio |
 
-## Tech Stack
+## Tech stack
 
 | Technology | Version | Purpose |
 |-----------|---------|---------|
@@ -54,7 +54,7 @@ Versions reviewed **2026-10-07**. See [Dependencies and Upgrades](https://jonath
 - Five sound effects through the `SpeedyBirdModule` host bridge
 - Astro-powered GitHub Pages site in `docs/`, including a playable canvas demo and generated wiki pages
 
-## Getting Started
+## Getting started
 
 ### Prerequisites
 
@@ -63,7 +63,7 @@ Versions reviewed **2026-10-07**. See [Dependencies and Upgrades](https://jonath
 - **Java 21** and **Android SDK Platform 37.2** (for Android; minimum device API remains 21)
 - **Xcode**, **Ruby >=3.2**, and the CocoaPods/Bundler dependencies in `ios/Gemfile` (for iOS)
 
-### Quick Start
+### Quick start
 
 ```bash
 git clone https://github.com/jonathanperis/speedy-bird-lynx.git
@@ -84,7 +84,7 @@ bun run build
 
 Outputs `dist/main.lynx.bundle` (native) and `dist/main.web.bundle` (web).
 
-### Documentation Site
+### Documentation site
 
 The public GitHub Pages site lives in `docs/`. It uses Astro 7, so run it with Node.js >=22.12:
 
@@ -101,7 +101,7 @@ The docs build writes static output to `docs/out/`; the `deploy.yml` workflow pu
 
 See [docs/README.md](docs/README.md) for content authoring, route metadata, asset maintenance, and local/production base paths.
 
-### Web Surfaces
+### Web surfaces
 
 There are three web-related surfaces in the repository:
 
@@ -121,7 +121,7 @@ cd android
 
 Gradle stages the current `dist/main.lynx.bundle` and the sound effects into generated APK assets. Images are embedded in the bundle; manually copied assets are not used. For iOS: `cd ios && bundle install && bundle exec pod install`, then open `SpeedyBird.xcworkspace` or run `xcodebuild test` (see [Native Host Apps](docs/wiki/native-host-apps.md)). APKs are under `android/app/build/outputs/apk/`. Release signing remains optional and requires the documented keystore environment variables.
 
-## Project Structure
+## Project structure
 
 ```
 src/
@@ -162,7 +162,7 @@ docs/                          # Astro GitHub Pages site + playable canvas demo
 | Build iOS | `build-ios.yml` | Manual | Unsigned archive through the shared iOS build |
 | Release | `release.yml` | `v*` tags on `main`, manual from `main` | Sole versioned-release publisher: verify, build Android/iOS through the shared builds, upload all assets, then publish |
 
-### Release Artifact Matrix
+### Release artifact matrix
 
 | Artifact | How it is produced | Signing/status |
 |----------|--------------------|----------------|

@@ -11,7 +11,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "check:site": "node scripts/check-site.mjs",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "og:render": "node scripts/render-og.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
@@ -22,6 +23,7 @@
     "ultrahtml": "^1.7.0"
   },
   "devDependencies": {
+    "playwright-core": "1.64.0",
     "typescript": "^7.0.2"
   },
   "overrides": {

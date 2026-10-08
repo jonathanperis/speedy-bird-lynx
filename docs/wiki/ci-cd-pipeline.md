@@ -1,8 +1,8 @@
-# CI/CD Pipeline
+# CI/CD pipeline
 
-All automation runs on GitHub Actions. Workflows are in `.github/workflows/`.
+Every check and release runs on GitHub Actions, from `.github/workflows/`. A change reaches `main` only through a pull request whose checks pass, and only a verified commit on `main` publishes anything.
 
-## Workflow Overview
+## Workflow overview
 
 | Workflow | File | Trigger | Description |
 |----------|------|---------|-------------|
@@ -15,7 +15,7 @@ All automation runs on GitHub Actions. Workflows are in `.github/workflows/`.
 
 Shared steps live in composite actions: `.github/actions/setup-js` installs Node.js 24, the Bun version pinned by each package's `packageManager` field, restores Bun's package cache, and runs a frozen install; `.github/actions/setup-android` installs JDK 21, the Android SDK platform, and Gradle caching. The release APK and unsigned iOS archive are reusable workflows (`reusable-android-apk.yml`, `reusable-ios-archive.yml`) shared by the build and release pipelines. Every job declares `timeout-minutes`, and only publishing jobs receive `contents: write`.
 
-## Build Check
+## Build check
 
 Runs on manual dispatch, pushes to `main`, every pull request (including stacked ones), and weekly. Pull-request runs cancel superseded runs; `main` runs queue so every verified commit can publish. Validates the codebase compiles and builds:
 
@@ -51,7 +51,7 @@ The main production workflow. Build Check calls it only after its `build`, `andr
 
 The signing step learns only whether `KEYSTORE_BASE64` is configured (secrets cannot be read in step conditions), decodes the keystore when present, and deletes it after the Gradle build.
 
-### Android Signing Secrets
+### Android signing secrets
 
 | Secret | Purpose |
 |--------|---------|
@@ -60,7 +60,7 @@ The signing step learns only whether `KEYSTORE_BASE64` is configured (secrets ca
 | `KEY_ALIAS` | Key alias name |
 | `KEY_PASSWORD` | Key password |
 
-### Android Artifact Matrix
+### Android artifact matrix
 
 | Artifact | Trigger/path | Signing/status |
 |----------|--------------|----------------|
