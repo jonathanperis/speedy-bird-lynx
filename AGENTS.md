@@ -157,8 +157,8 @@ speedy-bird-lynx/
 
 | Workflow | File | Trigger | Actions |
 |----------|------|---------|---------|
-| Build Check | `ci.yml` | Manual, push to `main`, every PR, weekly | Audits, Biome, type-check, tests, bundles/web-host/docs builds, site validation, Android compilation/lint and APK verification, iOS build + XCUITest; calls Build Android after `main` pushes pass |
-| CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript, Actions, Python, and Kotlin analysis; Swift on `main` and weekly |
+| Build Check | `ci.yml` | Manual, push to `main`, every PR, weekly | Audits, Biome, type-check, tests, bundles/web-host/docs builds, site validation, Android compilation/lint and APK verification, iOS build + XCUITest (PRs, weekly, manual); calls Build Android after `main` pushes pass |
+| CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript, Actions, Python, and Kotlin analysis; Swift weekly and on demand |
 | Deploy Web | `deploy.yml` | Push to `main`, manual | Reusable GitHub Pages docs deploy for `docs/` |
 | Build Android | `build-android.yml` | Called by Build Check on `main`, manual from `main` | Read-only APK build; separate job publishes an immutable `build/*` prerelease |
 | Build iOS | `build-ios.yml` | Manual | Unsigned archive |
