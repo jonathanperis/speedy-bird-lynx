@@ -79,7 +79,10 @@ jobs:
       - name: Verify packaged bundle
         run: python3 scripts/verify_android_bundle.py android/app/build/outputs/apk/debug/app-debug.apk
 
+  # macOS runners are scarce. Pull requests (which every main commit passes first), the
+  # weekly run and manual runs build iOS; a push to main does not repeat it.
   ios:
+    if: github.event_name != 'push'
     runs-on: macos-15
     timeout-minutes: 45
     steps:

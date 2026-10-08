@@ -7,7 +7,7 @@ All automation runs on GitHub Actions. Workflows are in `.github/workflows/`.
 | Workflow | File | Trigger | Description |
 |----------|------|---------|-------------|
 | Build Check | `ci.yml` | Manual, push to `main`, every PR, weekly | Audit dependencies, lint/format, type-check, Rstest tests, check bundles/web host/docs, validate site links/metadata, compile/lint Android, verify the APK bundle and sounds, build iOS and run its XCUITest smoke tests; calls Build Android after `main` pushes pass |
-| CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript, Actions, Python, and Kotlin security analysis; Swift (full Xcode build) on `main` and weekly |
+| CodeQL | `codeql.yml` | Push/PR to `main`, weekly, manual | JavaScript/TypeScript, Actions, Python, and Kotlin security analysis; Swift (full Xcode build) weekly and on demand |
 | Deploy Web | `deploy.yml` | Push to `main`, manual | Build and deploy the Astro `docs/` site to GitHub Pages via the shared Pages workflow |
 | Build Android | `build-android.yml` | Called by Build Check on `main`, manual from `main` | Read-only APK build followed by a separate build-prerelease publisher |
 | Build iOS | `build-ios.yml` | Manual | Unsigned archive |
@@ -79,7 +79,7 @@ The signing step learns only whether `KEYSTORE_BASE64` is configured (secrets ca
 
 ## Build iOS
 
-Build Check's `ios` job (macOS) builds the bundle, installs the locked pods with `pod install --deployment`, builds the app, and runs the XCUITest smoke tests on the newest available iPhone simulator; the result bundle is uploaded when it fails. `build-ios.yml` (manual) and the release pipeline produce an unsigned archive through `reusable-ios-archive.yml`. Paid membership is not needed for either.
+Build Check's `ios` job (macOS) runs on pull requests, the weekly run, and manual runs; pushes to `main` skip it because every commit there already passed it in its pull request, and macOS runners are scarce. It builds the bundle, installs the locked pods with `pod install --deployment`, builds the app, and runs the XCUITest smoke tests on the newest available iPhone simulator; the result bundle is uploaded when it fails. `build-ios.yml` (manual) and the release pipeline produce an unsigned archive through `reusable-ios-archive.yml`. Paid membership is not needed for either.
 
 The workflows always disable code signing; Apple secrets are not read. Signed device distribution would require additional workflow implementation as well as Apple signing assets.
 
