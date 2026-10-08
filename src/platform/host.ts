@@ -12,6 +12,11 @@ export interface HostBridge {
   savePreferences(value: string): void;
   /** Speak a short status message through the platform screen reader. Optional. */
   announce?(message: string): void;
+  /**
+   * Receive the HUD (`gameState`, `score`, `bestScore`, `newBest`, `paused`) as JSON each
+   * time it changes, for hosts that show game data outside the game view. Optional.
+   */
+  reportHud?(json: string): void;
 }
 
 declare const NativeModules: { SpeedyBirdModule?: HostBridge } | undefined;

@@ -3,16 +3,33 @@ import { Code } from 'astro:components';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { BG_H, BG_W, CANVAS_HEIGHT, CANVAS_WIDTH, GROUND_H, GROUND_W } from '../../../src/constants.ts';
 import { BRIDGE_ROWS, HOST_LINKS } from '../lib/bridge';
 import { paperTheme } from '../lib/code-theme.mjs';
 import { PAGE_META, SECTION_CATEGORIES } from '../lib/docs-sidebar.config';
 import { FACTS, fixed, SPAWN_FLOOR_SCORE, SPEED_ROWS } from '../lib/game-facts';
+import { LYNX_RUNTIME } from '../lib/lynx-runtime';
 import { excerpt, REPOSITORY_URL, sourceUrl } from '../lib/repo-files';
 import '../styles/home.css';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const assets = `${base}/assets/`;
 const docs = `${base}/docs/`;
+// The real ReactLynx build: main.web.bundle and the Lynx web runtime (`bun run build:site`).
+const play = `${base}/play/`;
+// The game's still scenery, drawn in HTML so the scene is on screen before the Lynx runtime
+// paints the same frame over it. Positions come from the game's constants, as percentages of
+// the 400x750 playfield.
+const percent = (value: number, total: number) => `${((value / total) * 100).toFixed(3)}%`;
+const scenery = [
+  `--city: url(${assets}sprites/background.png)`,
+  `--ground: url(${assets}sprites/ground.png)`,
+  `--city-top: ${percent(CANVAS_HEIGHT - GROUND_H - BG_H, CANVAS_HEIGHT)}`,
+  `--city-height: ${percent(BG_H, CANVAS_HEIGHT)}`,
+  `--city-width: ${percent(BG_W, CANVAS_WIDTH)}`,
+  `--ground-top: ${percent(CANVAS_HEIGHT - GROUND_H, CANVAS_HEIGHT)}`,
+  `--ground-width: ${percent(GROUND_W, CANVAS_WIDTH)}`,
+].join('; ');
 const siteUrl = 'https://jonathanperis.github.io/speedy-bird-lynx/';
 const frameLoop = excerpt('src/hooks/useGame.ts', 'frame-loop');
 
@@ -84,6 +101,12 @@ const structuredData = {
   description="Play Speedy Bird in your browser. Every pipe you clear makes the game 1% faster. Built with ReactLynx for Android, iOS, and the Web."
   structuredData={structuredData}
 >
+  <Fragment slot="head">
+    <link rel="preload" as="image" href={`${assets}sprites/background.png`} fetchpriority="high" />
+    {LYNX_RUNTIME.css.map((file) => <link rel="stylesheet" href={`${play}${file}`} />)}
+    {LYNX_RUNTIME.js.map((file) => <script is:inline defer src={`${play}${file}`} />)}
+  </Fragment>
+
   <SiteHeader />
 
   <main id="main" tabindex="-1">
@@ -96,17 +119,23 @@ const structuredData = {
         </div>
 
         <div class="stage">
-          <div class="game" id="game" data-assets={assets}>
-            <canvas
-              id="canvas"
-              width="400"
-              height="750"
+          <div class="game" id="game" data-play={play} aria-busy="true">
+            <div class="scenery" style={scenery} aria-hidden="true">
+              <div class="scenery-city"></div>
+              <div class="scenery-ground"></div>
+            </div>
+            <lynx-view
+              id="lynx"
               tabindex="0"
               role="application"
               aria-roledescription="game"
               aria-label="Speedy Bird"
               aria-describedby="game-help"
-            >Speedy Bird needs a browser with Canvas support.</canvas>
+            ></lynx-view>
+            <p class="game-message" id="game-message">
+              Loading <code>main.web.bundle</code>…
+              <noscript><br />The game needs JavaScript.</noscript>
+            </p>
             <p id="game-help" class="visually-hidden">
               Press Space or Enter while the game has focus, or click or tap it, to flap. Fly through the
               gaps. Each pipe scores a point and makes the game {FACTS.percentPerPoint}% faster.
@@ -119,10 +148,10 @@ const structuredData = {
               Tap or click the game, or press <kbd>Space</kbd> while it has focus.
               <button id="mute-btn" type="button" class="text-button" aria-pressed="false">Mute sound</button>
             </p>
-            <section class="timing" id="timing" aria-labelledby="timing-title" data-state="waiting">
+            <section class="timing" id="timing" aria-labelledby="timing-title" data-state="loading">
               <h2 id="timing-title">
                 <span data-field="run">No runs yet</span>
-                <span class="timing-state" data-field="state">Waiting</span>
+                <span class="timing-state" data-field="state">Loading</span>
               </h2>
               <dl>
                 <div><dt>Pipes cleared</dt><dd class="num" data-field="score">0</dd></div>
@@ -133,7 +162,8 @@ const structuredData = {
                 <div><dt>Best</dt><dd class="num" data-field="best">0</dd></div>
               </dl>
               <p class="timing-note">
-                Read from the engine every frame (<a href={sourceUrl('src/game/engine.ts')}><code>engine.ts</code></a>).
+                The game is the ReactLynx app itself, <code>main.web.bundle</code> in a <code>&lt;lynx-view&gt;</code>.
+                It reports these values through <a href={sourceUrl('src/hooks/useGame.ts')}><code>SpeedyBirdModule</code></a>.
               </p>
             </section>
           </div>
@@ -293,24 +323,8 @@ const structuredData = {
   <SiteFooter />
 
   <script>
-    import { mountDemo } from '../game/controller.ts';
-    import { createTimingPanel } from '../game/timing.ts';
+    import { mountGame } from '../scripts/game.ts';
 
-    const root = document.getElementById('game');
-    const canvas = document.getElementById('canvas');
-    const startButton = document.getElementById('play-btn');
-    const status = document.getElementById('game-status');
-    const panel = document.getElementById('timing');
-    if (root && canvas instanceof HTMLCanvasElement && startButton instanceof HTMLButtonElement && status) {
-      mountDemo({
-        root,
-        canvas,
-        startButton,
-        muteButton: document.getElementById('mute-btn') as HTMLButtonElement | null,
-        status,
-        assetsUrl: new URL(root.dataset.assets ?? 'assets/', document.baseURI),
-        onFrame: panel ? createTimingPanel(panel) : undefined,
-      });
-    }
+    mountGame();
   </script>
 </BaseLayout>

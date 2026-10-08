@@ -15,7 +15,7 @@ export const PAGE_META: Record<string, { title: string; description: string }> =
   'assets-and-sprites': { title: 'Assets and sprites', description: 'Sprites embedded in the bundle, tile-based pipes, the sound files, keeping the website copies in sync, and credits.' },
   'ci-cd-pipeline': { title: 'CI/CD pipeline', description: 'Build checks, iOS UI tests, Android build releases, unsigned iOS archives, and immutable versioned releases.' },
   'game-engine': { title: 'Game engine', description: 'The pure rules engine, main-thread frame loop, physics, collisions, scoring, restart lock, and host bridge.' },
-  'getting-started': { title: 'Getting started', description: 'Install dependencies and run the ReactLynx app, Canvas demo, documentation site, and native hosts.' },
+  'getting-started': { title: 'Getting started', description: 'Install dependencies and run the ReactLynx app, web hosts, documentation site, and native hosts.' },
   'native-host-apps': { title: 'Native host apps', description: 'Build and test the Kotlin Android and Swift iOS hosts: native bridge, lifecycle, UI tests, and signing.' },
   'dependency-updates': { title: 'Dependencies and upgrades', description: 'Verified dependency versions, native toolchain requirements, compatibility holds, and the upgrade verification process.' },
 };

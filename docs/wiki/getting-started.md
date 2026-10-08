@@ -63,9 +63,12 @@ Pick a simulator or device and run. The project packages the current `dist/main.
 
 ## Web / GitHub Pages
 
-The public web surface is the Astro site in `docs/`. It renders the landing page, embeds the playable canvas demo, and generates wiki pages from `docs/wiki/*.md`. Astro 7 requires Node.js >=22.12, so use the npm scripts for the docs dev server/build even though dependencies are installed from `bun.lock`.
+The public web surface is the Astro site in `docs/`. It renders the landing page, plays the real ReactLynx build on it, and generates wiki pages from `docs/wiki/*.md`. Astro 7 requires Node.js >=22.12, so use the npm scripts for the docs dev server/build even though dependencies are installed from `bun.lock`.
+
+The home page loads `main.web.bundle` and the Lynx web runtime from `docs/public/play/`, so build them at the repository root first (and again after changing the app):
 
 ```bash
+bun run build:site
 cd docs
 bun install --frozen-lockfile
 npm run dev
@@ -79,17 +82,17 @@ npm run check:site
 npm run preview
 ```
 
-The static output is written to `docs/out/`. Development, preview, and production all serve `/speedy-bird-lynx/` and `/speedy-bird-lynx/docs/` (set `SITE_BASE` to change the base). The shared Pages workflow deploys that production output. Content authoring and asset maintenance are documented in `docs/README.md`.
+The static output is written to `docs/out/`. Development, preview, and production all serve `/speedy-bird-lynx/` and `/speedy-bird-lynx/docs/` (set `SITE_BASE` to change the base). The Deploy Web workflow runs `bun run build:site` and then deploys that production output. Content authoring and asset maintenance are documented in `docs/README.md`.
 
 ## Web surfaces
 
 | Surface | How to use it | Notes |
 |---------|---------------|-------|
 | ReactLynx web preview | `bun run dev`, then open `http://localhost:3000/__web_preview?casename=main.web.bundle` | Uses the compiled `main.web.bundle` from Rspeedy for development |
-| GitHub Pages canvas demo | `cd docs && npm run dev`, then open `http://localhost:4321/speedy-bird-lynx/` | Browser-only playable demo (`docs/src/game/`) that runs the app's own engine on the full 400x750 playfield; click, tap, or Space/Enter while the game has focus |
+| GitHub Pages home page | `bun run build:site`, then `cd docs && npm run dev` and open `http://localhost:4321/speedy-bird-lynx/` | The ReactLynx build in a `<lynx-view>` with the shared bridge from `web-host/host.ts`; click, tap, or Space/Enter while the game has focus |
 | Standalone web host | `bun run dev:web-host` at `http://localhost:4000` | Also run `bun run dev` at port 3000; the host loads `http://localhost:3000/main.web.bundle`. Implements sound, the saved best score, Space/Enter, and pause on tab switch |
 
-In development the host needs two terminals; both servers configure cross-origin isolation headers. Pass `?bundle=<url>` to load a bundle from elsewhere. For a self-contained build, run `bun run build` and then `bun run build:web-host`: `dist-web-host/` then contains the host, `main.web.bundle`, the audio, and the bridge module, and `bunx rsbuild preview --config rsbuild.web-host.config.ts` serves it with the required headers.
+In development the host needs two terminals. Pass `?bundle=<url>` to load a bundle from elsewhere. For a self-contained build, run `bun run build` and then `bun run build:web-host`: `dist-web-host/` then contains the host, `main.web.bundle`, the audio, and the bridge module, and `bunx rsbuild preview --config rsbuild.web-host.config.ts` serves it. The dev and preview servers send cross-origin isolation headers, but the Lynx web runtime does not need them: any static server works, including GitHub Pages under a project path.
 
 ## Project commands
 
@@ -100,9 +103,10 @@ In development the host needs two terminals; both servers configure cross-origin
 | `bun run check` | Type-check the app, tests, web host, and configs |
 | `bun run test` | Rstest unit and component tests (needs Node.js on `PATH`) |
 | `bun run lint` / `bun run format` | Biome check / apply fixes |
-| `bun run assets:sync` / `assets:check` | Copy `assets/` to `docs/public/assets/` / verify the copies |
+| `bun run assets:sync` / `assets:check` | Copy the sprites in `assets/` to `docs/public/assets/` / verify the copies |
 | `bun run dev:web-host` | Serve the Lynx web host on port 4000 (with `bun run dev`) |
 | `bun run build:web-host` | Build the self-contained standalone host (after `bun run build`) |
+| `bun run build:site` | Build `main.web.bundle` and the Lynx web runtime into `docs/public/play/` for the website |
 | `cd docs && npm run dev` | Start Astro docs/dev site with Node >=22.12 |
 | `cd docs && npm run build` | Build Astro GitHub Pages output to `docs/out/` with Node >=22.12 |
 | `cd docs && npm run preview` | Preview the production docs build with Node >=22.12 |
