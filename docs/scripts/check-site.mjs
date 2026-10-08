@@ -117,6 +117,21 @@ for (const file of await filesIn(output, '.html')) {
     }
   });
 
+  // A link must never touch a word: Astro drops a line break next to an element, which turns
+  // "by\n<a>Name</a>" into "byName".
+  walkSync(tree, (node, parent, index) => {
+    if (node.type !== ELEMENT_NODE || node.name !== 'a' || !parent?.children) return;
+    const before = parent.children[index - 1];
+    const after = parent.children[index + 1];
+    const label = textOf(node).trim();
+    if (before?.type === TEXT_NODE && /[\p{L}\p{N}]$/u.test(before.value)) {
+      errors.push(`${relative}: no space before link "${label}"`);
+    }
+    if (after?.type === TEXT_NODE && /^[\p{L}\p{N}]/u.test(after.value)) {
+      errors.push(`${relative}: no space after link "${label}"`);
+    }
+  });
+
   // The 404 page is served for any missing URL, so it has no canonical address and is noindex.
   if (relative === '404.html') {
     if (canonical.length || ogUrls.length) errors.push(`${relative}: must not declare a canonical or og:url`);
