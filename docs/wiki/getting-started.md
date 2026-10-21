@@ -82,14 +82,14 @@ npm run check:site
 npm run preview
 ```
 
-The static output is written to `docs/out/`. Development, preview, and production all serve `/speedy-bird-lynx/` and `/speedy-bird-lynx/docs/` (set `SITE_BASE` to change the base). The Deploy Web workflow runs `bun run build:site` and then deploys that production output. Content authoring and asset maintenance are documented in `docs/README.md`.
+The static output is written to `docs/out/`. Development, preview, and production serve the host root and `/docs/` (set `SITE_BASE` to change the base). The Deploy Web workflow runs `bun run build:site` and then deploys that production output. Content authoring and asset maintenance are documented in `docs/README.md`.
 
 ## Web surfaces
 
 | Surface | How to use it | Notes |
 |---------|---------------|-------|
 | ReactLynx web preview | `bun run dev`, then open `http://localhost:3000/__web_preview?casename=main.web.bundle` | Uses the compiled `main.web.bundle` from Rspeedy for development |
-| GitHub Pages home page | `bun run build:site`, then `cd docs && npm run dev` and open `http://localhost:4321/speedy-bird-lynx/` | The ReactLynx build in a `<lynx-view>` with the shared bridge from `web-host/host.ts`; click, tap, or Space/Enter while the game has focus |
+| Site home page | `bun run build:site`, then `cd docs && npm run dev` and open `http://localhost:4321/` | The ReactLynx build in a `<lynx-view>` with the shared bridge from `web-host/host.ts`; click, tap, or Space/Enter while the game has focus |
 | Standalone web host | `bun run dev:web-host` at `http://localhost:4000` | Also run `bun run dev` at port 3000; the host loads `http://localhost:3000/main.web.bundle`. Implements sound, the saved best score, Space/Enter, and pause on tab switch |
 
 In development the host needs two terminals. Pass `?bundle=<url>` to load a bundle from elsewhere. For a self-contained build, run `bun run build` and then `bun run build:web-host`: `dist-web-host/` then contains the host, `main.web.bundle`, the audio, and the bridge module, and `bunx rsbuild preview --config rsbuild.web-host.config.ts` serves it. The dev and preview servers send cross-origin isolation headers, but the Lynx web runtime does not need them: any static server works, including GitHub Pages under a project path.

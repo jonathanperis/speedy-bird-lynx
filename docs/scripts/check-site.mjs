@@ -9,7 +9,7 @@ import { ELEMENT_NODE, parse, TEXT_NODE, walkSync } from 'ultrahtml';
 const packageRoot = fileURLToPath(new URL('..', import.meta.url));
 const output = path.resolve(process.argv[2] ?? path.join(packageRoot, 'out'));
 const wikiDir = path.join(packageRoot, 'wiki');
-const site = new URL('https://jonathanperis.github.io/speedy-bird-lynx/');
+const site = new URL('https://speedy-bird-lynx.jonathanperis.tech/');
 
 async function filesIn(directory, extension) {
   const entries = await readdir(directory, { withFileTypes: true });

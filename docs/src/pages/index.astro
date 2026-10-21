@@ -30,7 +30,7 @@ const scenery = [
   `--ground-top: ${percent(CANVAS_HEIGHT - GROUND_H, CANVAS_HEIGHT)}`,
   `--ground-width: ${percent(GROUND_W, CANVAS_WIDTH)}`,
 ].join('; ');
-const siteUrl = 'https://jonathanperis.github.io/speedy-bird-lynx/';
+const siteUrl = 'https://speedy-bird-lynx.jonathanperis.tech/';
 const frameLoop = excerpt('src/hooks/useGame.ts', 'frame-loop');
 
 // Sheet 1 chart: speed against score, from the same rows as the table.
@@ -62,7 +62,7 @@ const contents = SECTION_CATEGORIES.filter((category) => category.label).map((ca
   };
 });
 
-const author = { '@type': 'Person', name: 'Jonathan Peris', url: 'https://jonathanperis.github.io/' };
+const author = { '@type': 'Person', name: 'Jonathan Peris', url: 'https://www.jonathanperis.tech/' };
 const license = `${REPOSITORY_URL}/blob/main/LICENSE`;
 const structuredData = {
   '@context': 'https://schema.org',

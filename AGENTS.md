@@ -4,9 +4,9 @@ Harness-neutral operating guide for automated coding agents working in this repo
 
 Cross-platform Flappy Bird clone built with ReactLynx + TypeScript. One codebase runs on Android, iOS, and the Web. Both native hosts register the `SpeedyBirdModule` bridge (sound, saved best score, announcements).
 
-**Play online:** https://jonathanperis.github.io/speedy-bird-lynx/
+**Play online:** https://speedy-bird-lynx.jonathanperis.tech/
 
-**Docs:** https://jonathanperis.github.io/speedy-bird-lynx/docs/
+**Docs:** https://speedy-bird-lynx.jonathanperis.tech/docs/
 
 ---
 

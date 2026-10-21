@@ -82,7 +82,7 @@ jobs:
 
           Lynx SDK 4.1.0 · minimum Android API 21.
 
-          > **[Play the web version](https://jonathanperis.github.io/speedy-bird-lynx/)** if you don't have an Android device."
+          > **[Play the web version](https://speedy-bird-lynx.jonathanperis.tech/)** if you don't have an Android device."
 
           gh release create "$TAG" "apk/$APK_FILE" \
             --repo "$GH_REPO" \
