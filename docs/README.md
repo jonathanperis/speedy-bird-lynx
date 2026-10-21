@@ -1,6 +1,6 @@
 # Speedy Bird website and documentation
 
-Astro 7 static site deployed to [GitHub Pages](https://jonathanperis.github.io/speedy-bird-lynx/). Its home page plays the game itself, the ReactLynx build in Lynx's web runtime, and the manual is generated from `wiki/*.md`. The visual system is described in the root `DESIGN.md`.
+Astro 7 static site deployed to [GitHub Pages](https://speedy-bird-lynx.jonathanperis.tech/). Its home page plays the game itself, the ReactLynx build in Lynx's web runtime, and the manual is generated from `wiki/*.md`. The visual system is described in the root `DESIGN.md`.
 
 ## Run locally
 
@@ -11,7 +11,7 @@ bun install --frozen-lockfile
 npm run dev
 ```
 
-Every command uses the GitHub Pages base path, so development serves `http://localhost:4321/speedy-bird-lynx/` and `/speedy-bird-lynx/docs/`, exactly like production. Set `SITE_BASE` (for example `SITE_BASE=/ npm run dev`) to use another base. To build, check, and preview:
+Development, preview, and production serve the host root, so the home page is `http://localhost:4321/` and the manual is `/docs/`. Set `SITE_BASE` to build under another path. To build, check, and preview:
 
 ```sh
 npm run build
@@ -19,7 +19,7 @@ npm run check:site
 npm run preview
 ```
 
-Open the preview URL with `/speedy-bird-lynx/` appended. Build output is `out/`; generated files are not source files to edit.
+Open the preview URL Astro prints. Build output is `out/`; generated files are not source files to edit.
 
 ## Source map
 
@@ -45,7 +45,7 @@ Open the preview URL with `/speedy-bird-lynx/` appended. Build output is `out/`;
 | `public/assets/` | Browser copies of root game sprites and sounds |
 | `public/og-image.png`, icons | Social preview and browser icons |
 | `scripts/check-site.mjs` | Offline build checks: wiki routes, local links/fragments, unique IDs, canonical/OG URLs, that every local asset exists, that JSON-LD parses, and that no page has inline event handlers or script URLs and no guide has scripts |
-| `astro.config.mjs` | Site URL, base path (`SITE_BASE`, default `/speedy-bird-lynx`), output directory, sitemap, Markdown code theme, and the dev server's file access |
+| `astro.config.mjs` | Site URL, base path (`SITE_BASE`, default host root), output directory, sitemap, Markdown code theme, and the dev server's file access |
 
 The build reads files outside `docs/` (the engine, host sources, manifests), so run it from `docs/`.
 
@@ -59,7 +59,7 @@ The build reads files outside `docs/` (the engine, host sources, manifests), so 
 
 `/docs/` renders `wiki/index.md` as "Start here"; every other guide has its own route. Search runs over an index built with the site and finds titles, headings, and text; `/` focuses it.
 
-The site ships no `robots.txt`: crawlers only read it from the host root (`jonathanperis.github.io/robots.txt`), which this project does not control. Pages link the sitemap with `<link rel="sitemap">` instead.
+`public/robots.txt` points crawlers at this host's sitemap. Pages also link the sitemap with `<link rel="sitemap">`.
 
 Page titles and descriptions come from `PAGE_META`; the layout derives canonical and `og:url` from the current route. The landing page has its own JSON-LD graph: a VideoGame, which must describe actual platform availability, and a SoftwareSourceCode entry that carries the repository URL.
 

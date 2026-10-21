@@ -4,7 +4,7 @@
 
 [![Build Check](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/ci.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/ci.yml) [![Release](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/release.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/release.yml) [![CodeQL](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/codeql.yml/badge.svg)](https://github.com/jonathanperis/speedy-bird-lynx/actions/workflows/codeql.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**[Live demo →](https://jonathanperis.github.io/speedy-bird-lynx/)** | **[Documentation →](https://jonathanperis.github.io/speedy-bird-lynx/docs/)**
+**[Live demo →](https://speedy-bird-lynx.jonathanperis.tech/)** | **[Documentation →](https://speedy-bird-lynx.jonathanperis.tech/docs/)**
 
 ---
 
@@ -35,7 +35,7 @@
 | iOS (Swift + CocoaPods) | Lynx SDK 4.1.0 | Native iOS host app |
 | GitHub Actions | SHA-pinned | CI/CD build, sign, deploy, release |
 
-Versions reviewed **2026-10-07**. See [Dependencies and Upgrades](https://jonathanperis.github.io/speedy-bird-lynx/docs/dependency-updates/) for native toolchains, supported-version holds, and upgrade evidence. Root TypeScript stays on 6.0.3 because Rspeedy does not yet support TypeScript 7; Fresco (Android) and the iOS image libraries follow the exact versions Lynx's image services are built against.
+Versions reviewed **2026-10-07**. See [Dependencies and Upgrades](https://speedy-bird-lynx.jonathanperis.tech/docs/dependency-updates/) for native toolchains, supported-version holds, and upgrade evidence. Root TypeScript stays on 6.0.3 because Rspeedy does not yet support TypeScript 7; Fresco (Android) and the iOS image libraries follow the exact versions Lynx's image services are built against.
 
 ## Features
 
